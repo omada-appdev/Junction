@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.omada.junction.viewmodels.LoginViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <ImageView
+            android:id="@+id/junction_logo_image"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/guideline"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:src="@drawable/ic_junction_logo"
+            app:tint="@color/colorPrimaryDark"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ALPHA"
+            app:layout_constraintBottom_toBottomOf="@id/junction_logo_image"
+            app:layout_constraintRight_toRightOf="@id/junction_logo_image"
+            android:textStyle="bold"
+            android:textColor="#AAAAAA"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id = "@+id/sign_up_button"
+            android:layout_height="wrap_content"
+            android:layout_width="160dp"
+            app:layout_constraintBottom_toBottomOf="@id/guideline2"
+            app:layout_constraintTop_toTopOf="@id/guideline2"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text = "sign up"
+            android:onClick="@{() -> viewModel.startSignUp()}"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/sign_in_button"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text="Already have an account?"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id = "@+id/sign_in_button"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            app:layout_constraintBottom_toTopOf="@id/guideline3"
+            app:layout_constraintRight_toRightOf="@id/sign_up_button"
+            app:layout_constraintLeft_toLeftOf="@id/sign_up_button"
+            android:text = "log in"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:onClick="@{() -> viewModel.startSignIn()}"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/guideline"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/guideline2"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.7"/>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/guideline3"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.95"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

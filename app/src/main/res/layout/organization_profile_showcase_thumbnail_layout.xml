@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="com.omada.junction.viewmodels.FeedContentViewModel" />
+        <variable
+            name="showcaseModel"
+            type="com.omada.junction.data.models.ShowcaseModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="160dp"
+        android:layout_height="120dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="2dp"
+        app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance"
+        android:onClick="@{()->viewModel.organizationViewHandler.goToOrganizationShowcase(showcaseModel)}"
+        android:visibility="@{showcaseModel.showcaseID == null ? View.GONE : View.VISIBLE}">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:foreground="@drawable/gradient_bottom_fade_black"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance"
+            android:background="@color/colorAccent"
+            remoteImageUrl="@{showcaseModel.showcasePhoto}"
+            android:scaleType="centerCrop" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="@{showcaseModel.showcaseTitle}"
+            android:textStyle="bold"
+            android:textColor="@color/White"
+            android:layout_margin="8dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

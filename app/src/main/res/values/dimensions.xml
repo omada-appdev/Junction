@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_framelayout_padding">30dp</dimen>
+    <dimen name = "card_content_width">400dp</dimen>
+    <dimen name = "card_height">650dp</dimen>
+    <dimen name = "card_desc_width">350dp</dimen>
+    <dimen name = "card_top_margin">20dp</dimen>
+    <dimen name = "card_bottom_margin">20dp</dimen>
+    <dimen name = "bottom_toolbar_height">100dp</dimen>
+    <dimen name = "card_imageview_margin">10dp</dimen>
+    <dimen name = "card_frameview_margin">5dp</dimen>
+    <dimen name ="card_textview_height">552.5dp</dimen>
+    <dimen name = "autofill_linearlayout_padding">10dp</dimen>
+    <dimen name = "autofill_textview_padding">10dp</dimen>
+    <dimen name = "autofill_textsize_heading">30dp</dimen>
+    <dimen name = "autofill_button_padding">10dp</dimen>
+</resources>

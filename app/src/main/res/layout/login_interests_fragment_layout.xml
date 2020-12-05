@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+
+    <data>
+        <import type="com.omada.junction.data.models.InterestModel"/>
+        <variable
+            name="viewModel"
+            type="com.omada.junction.viewmodels.LoginViewModel" />
+        <variable
+            name="listSection"
+            type="mva3.adapter.ListSection&lt;InterestModel>" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.Toolbar
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+                app:title="Your Interests"
+                app:layout_scrollFlags="noScroll"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/SignUp_2_Linear_layout"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            app:layout_behavior=".ui.uicomponents.behaviors.CoordinatedChildBehaviour">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:numColumns="2"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="center" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/interest_error_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:textColor="@color/design_default_color_error"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
+                android:visibility="invisible"
+                android:text=""/>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/next"
+                android:layout_weight="0"
+                android:layout_gravity="bottom|end"
+                android:text="Next"
+                android:onClick="@{()->viewModel.interestsSelectionDone(listSection.getSelectedItems())}"
+                android:layout_marginBottom="24dp"
+                android:layout_marginEnd="24dp" />
+
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

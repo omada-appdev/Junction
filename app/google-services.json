@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1010582124053",
+    "firebase_url": "https://junction-b7b44.firebaseio.com",
+    "project_id": "junction-b7b44",
+    "storage_bucket": "junction-b7b44.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010582124053:android:501224fdc3d5b05eb4801c",
+        "android_client_info": {
+          "package_name": "com.omada.junction"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1010582124053-pjmmp3d32alf4c17kci5g19qfjvug1pi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.omada.junction",
+            "certificate_hash": "fadd3630a1566261ff2ceaeef2f4e2d31dfca07e"
+          }
+        },
+        {
+          "client_id": "1010582124053-l9uk70mmld8bnblrgk5gmghf7oq4oc0o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkDyZBSu5nw2FgZpu7NpxQ9TX_-rXP6uQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1010582124053-l9uk70mmld8bnblrgk5gmghf7oq4oc0o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

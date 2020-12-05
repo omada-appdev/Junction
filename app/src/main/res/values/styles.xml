@@ -1,0 +1,50 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="Theme.AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#512DA8</item>
+        <item name="colorPrimaryDark">#311B92</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowDisablePreview">true</item>
+
+        <item name="materialCardViewStyle">@style/Widget.AppTheme.GlobalCardStyle</item>
+
+    </style>
+
+    <style name="Theme.AppTheme.SplashScreenTheme" parent="Theme.AppTheme">
+        <item name="android:windowBackground">@drawable/some_image</item>
+    </style>
+
+    <style name="Widget.AppTheme.GlobalCardStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="backgroundTint">@color/colorPrimaryDark</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.AppTheme.GlobalCardAppearance</item>
+        <item name="cardElevation">3dp</item>
+    </style>
+
+    <style name="ShapeAppearance.AppTheme.GlobalCardAppearance" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="Widget.AppTheme.CircleShapeAppearance" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Widget.AppTheme.ThumbnailShapeAppearance" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerRadius">4dp</item>
+    </style>
+
+    <style name="Theme.AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

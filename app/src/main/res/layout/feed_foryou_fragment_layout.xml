@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.github.rubensousa.gravitysnaphelper.GravitySnapRecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:snapGravity="center"
+        android:paddingBottom="16dp"
+        app:snapEnabled="true"
+        app:snapLastItem="true"
+        app:snapMaxFlingSizeFraction="0.6"
+        app:snapScrollMsPerInch="50"
+        android:background="@color/backdrop"/>
+
+</LinearLayout>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Text">
+    </style>
+
+    <style name="Text.card_event">
+        <item name="android:padding">10dp</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:layout_gravity">center|bottom</item>
+    </style>
+
+
+    <style name="Text.moreScreen_headings" parent="Text">
+        //fonts are same as default
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginLeft">20dp</item>
+    </style>
+
+
+    <style name="Text.personal_details_heading" parent="Text">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:paddingStart">10dp</item>
+    </style>
+
+
+    <style name="Text.personal_detail_params" parent="Text">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginStart">10dp</item>
+    </style>
+
+
+    <style name="Text.textView_card">
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:layout_marginEnd">20dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:layout_height">@dimen/card_textview_height</item>
+    </style>
+
+
+    <style name="login_hint">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:ems">10</item>
+        <item name="android:cursorVisible">true</item>
+        <item name="android:layout_margin">15dp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="Card_linear_layout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="moreScreen_Buttons" parent="Widget.AppCompat.Button">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:gravity">start|center</item>
+        <item name="android:background">@color/White</item>
+    </style>
+
+
+    <style name="bottom_toolbar_button" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:background">@color/White</item>
+        <item name="android:textColor">@color/JunctionLightGray</item>
+    </style>
+
+
+    <style name="card_buttons" parent="Widget.AppCompat.Button">
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">50dp</item>
+    </style>
+
+
+    <style name="autofill_linear_layout">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/autofill_linearlayout_padding</item>
+    </style>
+
+    <style name="Personal_details_linear_layout">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+
+    <style name="SearchBar">
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:paddingLeft">20dp</item>
+    </style>
+
+
+    <style name="login_signup_cards" parent="CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_marginBottom">80dp</item>
+        <item name="android:layout_marginLeft">18dp</item>
+        <item name="android:layout_marginRight">18dp</item>
+        <item name="android:layout_marginTop">80dp</item>
+        <item name="cardCornerRadius">15dp</item>
+        <item name="elevation">15dp</item>
+    </style>
+
+</resources>

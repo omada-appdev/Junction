@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+    <data>
+        <variable
+            name="viewModel"
+            type="com.omada.junction.viewmodels.FeedContentViewModel" />
+        <variable
+            name="eventModel"
+            type="com.omada.junction.data.models.EventModel" />
+    </data>
+    <com.google.android.material.imageview.ShapeableImageView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/attended_event_thumbnail_image"
+        android:layout_height="56dp"
+        android:layout_width="56dp"
+        android:onClick="@{()->viewModel.eventViewHandler.goToAttendedEventDetails(eventModel)}"/>
+</layout>

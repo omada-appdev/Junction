@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="com.omada.junction.viewmodels.FeedContentViewModel" />
+        <variable
+            name="organizationModel"
+            type="com.omada.junction.data.models.OrganizationModel" />
+    </data>
+    <com.google.android.material.imageview.ShapeableImageView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/organization_thumbnail_image"
+        android:layout_height="80dp"
+        android:layout_width="80dp"
+        android:onClick="@{()->viewModel.organizationViewHandler.goToOrganization(organizationModel)}"
+        android:src="@color/colorAccent"
+        remoteImageUrl="@{organizationModel.organizationProfilePhoto}"
+        android:layout_margin="4dp"
+        app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
+        android:visibility="@{organizationModel.organizationID == null ? View.GONE : View.VISIBLE}"/>
+</layout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="institute"
+        android:id="@+id/institute_button"
+        android:icon="@drawable/ic_city_buildings_silhouette"/>
+
+    <item android:title="junction"
+        android:id="@+id/home_button"
+        android:icon="@drawable/ic_home"/>
+
+    <item android:title="profile"
+        android:id="@+id/more_button"
+        android:icon="@drawable/ic_person"/>
+
+</menu>
