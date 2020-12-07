@@ -130,8 +130,6 @@ public class OrganizationContentFragment extends Fragment {
 
     private void onHighlightsLoaded(List<BaseModel> baseModels){
 
-        Log.e("VM", "onHighlightsLoaded : " + refreshHighlights);
-
         if(baseModels != null && baseModels.size() > 0 && refreshHighlights) {
 
             if(highlightHeaderSection.isSectionHidden()){

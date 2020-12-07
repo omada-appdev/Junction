@@ -55,4 +55,21 @@ public class DataRepository {
     public ShowcaseDataHandler getShowcaseDataHandler() {
         return showcaseDataHandler;
     }
+
+    public void resetHomeFeedContent() {
+        resetForYouFeedContent();
+        resetLearnFeedContent();
+        resetCompeteFeedContent();
+    }
+
+    private void resetForYouFeedContent() {
+        eventDataHandler.resetLastForYouEvent();
+        articleDataHandler.resetLastForYouArticle();
+    }
+
+    private void resetLearnFeedContent() {
+    }
+
+    private void resetCompeteFeedContent() {
+    }
 }

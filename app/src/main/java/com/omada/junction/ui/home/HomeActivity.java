@@ -25,13 +25,15 @@ import com.omada.junction.viewmodels.HomeFeedViewModel;
 public class HomeActivity extends AppCompatActivity {
 
 
+    private HomeFeedViewModel homeFeedViewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_activity_layout);
 
-        HomeFeedViewModel homeFeedViewModel = new ViewModelProvider(this).get(HomeFeedViewModel.class);
+        homeFeedViewModel = new ViewModelProvider(this).get(HomeFeedViewModel.class);
 
         if(savedInstanceState == null) {
 
@@ -40,12 +42,6 @@ public class HomeActivity extends AppCompatActivity {
                     .replace(R.id.home_content_placeholder, new FeedFragment())
                     .commit();
 
-        }
-
-        if(savedInstanceState == null ||
-                homeFeedViewModel.getLoadedForYou().getValue() == null || homeFeedViewModel.getLoadedForYou().getValue().size() == 0){
-
-            homeFeedViewModel.getHomeFeed();
         }
 
         setupBottomNavigation();
@@ -78,7 +74,6 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
 
             } else {
-                Log.e("HomeActivity", "invalid bottom button press id" + itemId + " " + R.id.more_details_button);
                 return false;
             }
 
@@ -174,4 +169,8 @@ public class HomeActivity extends AppCompatActivity {
         bottomMenu.getMenu().findItem(R.id.home_button).setChecked(true);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

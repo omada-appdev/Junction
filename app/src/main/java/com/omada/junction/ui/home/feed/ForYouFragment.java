@@ -25,13 +25,13 @@ import java.util.List;
 
 import mva3.adapter.ListSection;
 import mva3.adapter.MultiViewAdapter;
+import mva3.adapter.util.InfiniteLoadingHelper;
 
 
 public class ForYouFragment extends Fragment {
 
     private HomeFeedViewModel homeFeedViewModel;
-    private final MultiViewAdapter adapter = new MultiViewAdapter();
-    private final ListSection<BaseModel> contentListSection = new ListSection<>();
+    private ListSection<BaseModel> contentListSection;
 
     private boolean refreshContents = true;
 
@@ -47,10 +47,11 @@ public class ForYouFragment extends Fragment {
         ViewModelProvider viewModelProvider = new ViewModelProvider(requireParentFragment().requireActivity());
 
         homeFeedViewModel = viewModelProvider.get(HomeFeedViewModel.class);
-        FeedContentViewModel feedContentViewModel = viewModelProvider.get(FeedContentViewModel.class);
 
-        adapter.registerItemBinders(new EventCardLargeBinder(feedContentViewModel), new ArticleCardBinder(feedContentViewModel));
-        adapter.addSection(contentListSection);
+        if(savedInstanceState == null ||
+                homeFeedViewModel.getLoadedForYou().getValue() == null || homeFeedViewModel.getLoadedForYou().getValue().size() == 0){
+            homeFeedViewModel.getForYouFeedContent();
+        }
     }
 
     @Nullable
@@ -62,12 +63,61 @@ public class ForYouFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        MultiViewAdapter adapter = new MultiViewAdapter();
+        contentListSection = new ListSection<>();
+
+        adapter.addSection(contentListSection);
+
+        FeedContentViewModel feedContentViewModel = new ViewModelProvider(requireParentFragment().requireActivity()).get(FeedContentViewModel.class);
+
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager( new LinearLayoutManager(getContext()) );
+        recyclerView.setAdapter(adapter);
+
+        adapter.registerItemBinders(new EventCardLargeBinder(feedContentViewModel), new ArticleCardBinder(feedContentViewModel));
+
+        InfiniteLoadingHelper infiniteLoadingHelper = new InfiniteLoadingHelper(recyclerView, R.layout.loading_footer_layout) {
+
+            private boolean added = false;
+
+            @Override
+            public void onLoadNextPage(int page) {
+                refreshContents = true;
+                homeFeedViewModel.getForYouFeedContent();
+            }
+
+            @Override
+            public void markCurrentPageLoaded() {
+                if(added) {
+                    super.markCurrentPageLoaded();
+                }
+                else{
+                    adapter.setInfiniteLoadingHelper(this);
+                    added = true;
+                }
+            }
+
+            @Override
+            public void markAllPagesLoaded() {
+                if(added) {
+                    super.markAllPagesLoaded();
+                }
+                else{
+                    adapter.setInfiniteLoadingHelper(this);
+                    added = true;
+                }
+            }
+        };
 
         homeFeedViewModel.getLoadedForYou()
-                .observe(getViewLifecycleOwner(), this::onContentLoaded);
-        recyclerView.setAdapter(adapter);
+                .observe(getViewLifecycleOwner(), contents->{
+                    if(contents.size() == contentListSection.size()){
+                        infiniteLoadingHelper.markAllPagesLoaded();
+                    }
+                    onContentLoaded(contents);
+                    infiniteLoadingHelper.markCurrentPageLoaded();
+                });
+
 
     }
 
@@ -82,7 +132,7 @@ public class ForYouFragment extends Fragment {
 
             Toast.makeText(requireContext(), refreshContents+"  "+contentListSection.size(), Toast.LENGTH_SHORT).show();
 
-            contentListSection.addAll(contents);
+            contentListSection.addAll(contents.subList(contentListSection.size(), contents.size()));
             refreshContents = false;
         }
     }

@@ -152,7 +152,6 @@ public class InstituteActivity extends AppCompatActivity {
                 return true;
 
             } else {
-                Log.e("HomeActivity", "invalid bottom button press id" + itemId + " " + R.id.more_details_button);
                 return false;
             }
 

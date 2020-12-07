@@ -150,8 +150,6 @@ public abstract class Form <S, Q, R> {
     */
     public Form( @NonNull Map<String, Map<String, Map<String, String>>> formData) throws ParseException {
 
-        Log.e("FORM", formData.toString());
-
         Map<String, Map<String, String>> sectionsData;
         Map<String, Map<String, String>> questionsData;
         Map<String, Map<String, String>> optionsData;

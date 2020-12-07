@@ -293,9 +293,6 @@ public class LoginViewModel extends ViewModel {
         else {
             selectedInterests.clear();
             selectedInterests.addAll(interestListSection);
-            for (InterestModel interest : selectedInterests) {
-                Log.d("TAG", interest.interestString);
-            }
             fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_DETAILS_FRAGMENT));
         }
     }

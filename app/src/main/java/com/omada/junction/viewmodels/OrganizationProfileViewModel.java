@@ -51,10 +51,6 @@ public class OrganizationProfileViewModel extends ViewModel {
 
         organizationID = organizationID == null ? (organizationModel == null ? null : organizationModel.getOrganizationID()) : organizationID;
 
-        if(organizationID == null){
-            Log.e("WTF", "ID is null");
-        }
-
         return DataRepository
                 .getInstance()
                 .getOrganizationDataHandler()
@@ -99,7 +95,6 @@ public class OrganizationProfileViewModel extends ViewModel {
     }
 
     public void doFollowAction(){
-        Log.e("Favorite", "followed organization");
     }
 
 }

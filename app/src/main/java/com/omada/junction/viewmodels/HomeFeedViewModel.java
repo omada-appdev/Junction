@@ -1,7 +1,5 @@
 package com.omada.junction.viewmodels;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -9,7 +7,6 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.handler.AuthDataHandler;
 import com.omada.junction.data.models.ArticleModel;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
@@ -20,21 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFeedViewModel extends ViewModel {
-
-    private enum ContentTypeIdentifier {
-        CONTENT_TYPE_EVENT,
-        CONTENT_TYPE_ARTICLE,
-        CONTENT_TYPE_ANNOUNCEMENT,
-        CONTENT_TYPE_ADVERTISEMENT
-    }
-
-
-    /*
-    ########################
-    #   REMOVE THIS FIELD  #
-    ########################
-     */
-    public final MutableLiveData<String> test = new MutableLiveData<>();
 
     /*
     ################################
@@ -53,22 +35,18 @@ public class HomeFeedViewModel extends ViewModel {
     # OUTPUT FIELDS TO VIEW #
     #########################
      */
-
-    private final MediatorLiveData<List<BaseModel>> loadedForYou = new MediatorLiveData<>();
-    private final MediatorLiveData<List<BaseModel>> loadedLearn = new MediatorLiveData<>();
-    private final MediatorLiveData<List<BaseModel>> loadedCompete = new MediatorLiveData<>();
-
-    // TODO remove if not needed
-    private final LiveData<LiveEvent<Boolean>> forYouRefreshNotifier = new MutableLiveData<>();
-    private final LiveData<LiveEvent<Boolean>> learnRefreshNotifier = new MutableLiveData<>();
-    private final LiveData<LiveEvent<Boolean>> competeRefreshNotifier = new MutableLiveData<>();
+    private MediatorLiveData<List<BaseModel>> loadedForYou = new MediatorLiveData<>();
+    private MediatorLiveData<List<BaseModel>> loadedLearn = new MediatorLiveData<>();
+    private MediatorLiveData<List<BaseModel>> loadedCompete = new MediatorLiveData<>();
 
     /*
     ###########################
     # FIELDS FOR INTERNAL USE #
     ###########################
      */
-    private final ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou);
+    private boolean forYouLoadingInProgress = false;
+    private final List<BaseModel> loadedForYouCache = new ArrayList<>();
+    private ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou);
 
 
     public HomeFeedViewModel(){
@@ -115,8 +93,7 @@ public class HomeFeedViewModel extends ViewModel {
         return loadedCompete;
     }
 
-    //get all required content and store internally or in live data
-    public void getHomeFeed(){
+    public void getForYouFeedContent(){
 
         DataRepository
                 .getInstance()
@@ -129,6 +106,55 @@ public class HomeFeedViewModel extends ViewModel {
                 .getAllArticles();
     }
 
+    public void resetForYouFeedContent(){
+
+        loadedForYou = new MediatorLiveData<>();
+        forYouAggregator = new ForYouAggregator(loadedForYou);
+
+    }
+
+    public void resetLearnFeedContent(){
+
+        loadedLearn = new MediatorLiveData<>();
+        //forYouAggregator = new ForYouAggregator(loadedForYou);
+
+    }
+
+    public void resetCompeteFeedContent(){
+
+        loadedCompete = new MediatorLiveData<>();
+        //forYouAggregator = new ForYouAggregator(loadedForYou);
+
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
+        DataRepository.getInstance()
+                .resetHomeFeedContent();
+
+        initializeDataLoaders();
+
+        resetForYouFeedContent();
+        resetLearnFeedContent();
+        resetCompeteFeedContent();
+
+        distributeLoadedData();
+    }
+
+    private enum ContentTypeIdentifier {
+        CONTENT_TYPE_EVENT,
+        CONTENT_TYPE_ARTICLE,
+        CONTENT_TYPE_ANNOUNCEMENT,
+        CONTENT_TYPE_ADVERTISEMENT
+    }
+
+    /*
+    ############################
+    # STATIC CLASSES AND ENUMS #
+    ############################
+     */
 
     // Apply things like sorting, etc. in aggregator
     private static class ForYouAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>>{
@@ -140,29 +166,15 @@ public class HomeFeedViewModel extends ViewModel {
         @Override
         public void holdData(ContentTypeIdentifier typeOfData, List<? extends BaseModel> data) {
 
-            if(data == null || data.size() == 0){
+            if(data == null){
                 return;
             }
-            
-            switch (typeOfData) {
-                case CONTENT_TYPE_EVENT:
-                    if (!(data.get(0) instanceof EventModel)) return;
-                    break;
-                case CONTENT_TYPE_ARTICLE:
-                    if (!(data.get(0) instanceof ArticleModel)) return;
-                    break;
-                case CONTENT_TYPE_ANNOUNCEMENT:
-                    break;
-                case CONTENT_TYPE_ADVERTISEMENT:
-                    break;
-            }
-
             super.holdData(typeOfData, data);
         }
 
         @Override
         protected List<BaseModel> mergeWithExistingData(ContentTypeIdentifier typeOfData, List<? extends BaseModel> oldData, List<? extends BaseModel> newData) {
-            return null;
+            return (List<BaseModel>) newData;
         }
 
         @Override
@@ -177,6 +189,14 @@ public class HomeFeedViewModel extends ViewModel {
             List<BaseModel> aggregatedList = new ArrayList<>();
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_EVENT));
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE));
+
+            dataOnHold.put(ContentTypeIdentifier.CONTENT_TYPE_EVENT, null);
+            dataOnHold.put(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE, null);
+
+            //to retain existing data in destination live data
+            if(destinationLiveData.getValue() != null){
+                aggregatedList.addAll(0, destinationLiveData.getValue());
+            }
             destinationLiveData.setValue(aggregatedList);
         }
 

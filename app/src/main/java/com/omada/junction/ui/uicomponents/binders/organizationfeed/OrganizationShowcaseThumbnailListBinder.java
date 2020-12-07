@@ -19,7 +19,7 @@ import mva3.adapter.MultiViewAdapter;
 
 public class OrganizationShowcaseThumbnailListBinder extends ItemBinder<ListSection<ShowcaseModel>, OrganizationShowcaseThumbnailListBinder.ShowcaseThumbnailListViewHolder> {
 
-    private final MultiViewAdapter adapter = new MultiViewAdapter();
+    MultiViewAdapter adapter = new MultiViewAdapter();
     private boolean addedSection = false;
 
 

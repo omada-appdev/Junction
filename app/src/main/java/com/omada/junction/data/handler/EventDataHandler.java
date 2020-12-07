@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.BaseModel;
@@ -41,7 +42,7 @@ public class EventDataHandler {
     # OUTPUT FIELDS TO VIEWMODEL #
     ##############################
      */
-    private final MediatorLiveData<List<EventModel>> loadedAllEventsNotifier = new MediatorLiveData<>();
+    private MediatorLiveData<List<EventModel>> loadedAllEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedAForYouEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedLearnEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedCompeteEventsNotifier = new MediatorLiveData<>();
@@ -54,7 +55,7 @@ public class EventDataHandler {
     # FIELDS FOR INTERNAL USE #
     ###########################
     */
-    private final EventsAggregator allEventsAggregator = new EventsAggregator(loadedAllEventsNotifier);
+    private EventsAggregator allEventsAggregator = new EventsAggregator(loadedAllEventsNotifier);
 
     public EventDataHandler(){
     }
@@ -112,9 +113,15 @@ public class EventDataHandler {
         //TODO add query to check what the latest timestamp in local events is and get all after that
 
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
-        dbInstance
+        Query query = dbInstance
                 .collection("events")
-                .get()
+                .limit(1);
+
+        if(PaginationHelper.lastAllEvent != null){
+            query = query.startAfter(PaginationHelper.lastAllEvent);
+        }
+
+        query.get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     ArrayList<EventModel> loadedEvents = new ArrayList<>();
                     for(QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
@@ -122,7 +129,7 @@ public class EventDataHandler {
                         item.setEventId(snapshot.getId());
                         loadedEvents.add(new EventModel(item));
                     }
-                    PaginationHelper.lastAllEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                    if(queryDocumentSnapshots.size() > 0) PaginationHelper.lastAllEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                     destinationLiveData.setValue(loadedEvents);
                 })
                 .addOnFailureListener(e -> Log.d("TAG", Objects.requireNonNull(e.getMessage())));
@@ -217,6 +224,12 @@ public class EventDataHandler {
         public static DocumentSnapshot lastInstituteEvent = null;
     }
 
+    public void resetLastForYouEvent(){
+        PaginationHelper.lastAllEvent = null;
+        loadedAllEventsNotifier = new MediatorLiveData<>();
+        allEventsAggregator = new EventsAggregator(loadedAllEventsNotifier);
+    }
+
     private static class EventsAggregator extends LiveDataAggregator<EventType, List<EventModel>, List<EventModel>>{
 
         public EventsAggregator(MediatorLiveData<List<EventModel>> destination) {
@@ -246,7 +259,7 @@ public class EventDataHandler {
                 }
 
                  */
-                return remoteEvents != null && remoteEvents.size() > 0;
+                return remoteEvents != null;
             } catch (Exception e) {
                 e.printStackTrace();
                 return false;
@@ -260,6 +273,7 @@ public class EventDataHandler {
             //TODO result.addAll(dataOnHold.get("localEvents"));
             List<EventModel> result = new ArrayList<>(dataOnHold.get(EventType.EVENT_TYPE_REMOTE));
 
+            dataOnHold.put(EventType.EVENT_TYPE_REMOTE, null);
             destinationLiveData.setValue(result);
         }
     }

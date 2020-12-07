@@ -72,7 +72,6 @@ public class OrganizationProfileFragment extends Fragment {
         else{
 
             if(organizationProfileViewModel.getOrganizationID() == null){
-                Log.e("WTF", "The view model was destroyed");
                 if(organizationProfileViewModel.getOrganizationModel() != null){
                     organizationProfileViewModel.setOrganizationID(
                             organizationProfileViewModel.getOrganizationModel().getOrganizationID()

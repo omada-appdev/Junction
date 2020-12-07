@@ -48,7 +48,7 @@ public class AuthDataHandler {
     }
 
     //to be used as a cache to check for changes
-    private UserModelInternal signedInUser = new UserModelInternal();
+    private final UserModelInternal signedInUser = new UserModelInternal();
     private String prevUserUID = "";
 
     //output fields to viewmodel or mid level layers

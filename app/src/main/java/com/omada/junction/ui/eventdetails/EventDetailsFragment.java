@@ -58,7 +58,6 @@ public class EventDetailsFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        Log.e("Parse", "reached here");
         outState.putSerializable("eventModel", eventModel);
     }
 }
