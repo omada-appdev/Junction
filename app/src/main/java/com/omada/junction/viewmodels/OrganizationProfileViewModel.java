@@ -10,6 +10,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.data.models.OrganizationModel;
@@ -94,7 +95,22 @@ public class OrganizationProfileViewModel extends ViewModel {
         return loadedOrganizationShowcases;
     }
 
-    public void doFollowAction(){
+    public boolean getFollowingStatus(){
+
+        UserDataHandler.UserModel currentUserModel = DataRepository.getInstance()
+                .getUserDataHandler()
+                .getCurrentUserModel();
+
+        Object val = currentUserModel.getUserFollowing().get(organizationID);
+
+        return val != null;
+
+    }
+
+    public void updateFollowingStatus(boolean following){
+        DataRepository.getInstance()
+                .getUserDataHandler()
+                .updateFollow(organizationID, following);
     }
 
 }

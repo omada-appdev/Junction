@@ -5,18 +5,18 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 public class SplashViewModel extends ViewModel {
 
-    private final LiveData<LiveEvent<AuthDataHandler.AuthStatus>> authResultAction;
-    private final LiveData<LiveEvent<AuthDataHandler.UserModel>> signedInUserAction;
+    private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> authResultAction;
+    private final LiveData<LiveEvent<UserDataHandler.UserModel>> signedInUserAction;
 
     public SplashViewModel() {
         authResultAction = Transformations.map(
                 DataRepository.getInstance()
-                    .getAuthDataHandler()
+                    .getUserDataHandler()
                     .getAuthResponseNotifier(),
 
                 authResponse->{
@@ -24,7 +24,7 @@ public class SplashViewModel extends ViewModel {
                         return null;
                     }
 
-                    AuthDataHandler.AuthStatus receivedAuthResponse = authResponse.getDataOnceAndReset();
+                    UserDataHandler.AuthStatus receivedAuthResponse = authResponse.getDataOnceAndReset();
                     if(receivedAuthResponse == null) {
                         return null;
                     }
@@ -40,7 +40,7 @@ public class SplashViewModel extends ViewModel {
 
         signedInUserAction = Transformations.map(
                 DataRepository.getInstance()
-                        .getAuthDataHandler()
+                        .getUserDataHandler()
                         .getSignedInUserNotifier(),
 
                 userModelLiveEvent->{
@@ -48,7 +48,7 @@ public class SplashViewModel extends ViewModel {
                         return null;
                     }
 
-                    AuthDataHandler.UserModel signedInUser = userModelLiveEvent.getDataOnceAndReset();
+                    UserDataHandler.UserModel signedInUser = userModelLiveEvent.getDataOnceAndReset();
                     if(signedInUser == null) return null;
                     else return new LiveEvent<>(signedInUser);
                 });
@@ -56,15 +56,15 @@ public class SplashViewModel extends ViewModel {
 
     public void getCurrentUser(){
         DataRepository.getInstance()
-                .getAuthDataHandler()
-                .getCurrentUserFromDatabase();
+                .getUserDataHandler()
+                .getCurrentUserDetails();
     }
 
-    public LiveData<LiveEvent<AuthDataHandler.AuthStatus>> getAuthResultAction() {
+    public LiveData<LiveEvent<UserDataHandler.AuthStatus>> getAuthResultAction() {
         return authResultAction;
     }
 
-    public LiveData<LiveEvent<AuthDataHandler.UserModel>> getSignedInUserAction() {
+    public LiveData<LiveEvent<UserDataHandler.UserModel>> getSignedInUserAction() {
         return signedInUserAction;
     }
 }

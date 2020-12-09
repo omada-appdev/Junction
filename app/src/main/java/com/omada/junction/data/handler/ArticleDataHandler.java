@@ -114,7 +114,7 @@ public class ArticleDataHandler {
     public void getInstituteHighlightArticles(){
 
         String instituteID = DataRepository.getInstance()
-                .getAuthDataHandler()
+                .getUserDataHandler()
                 .getCurrentUserModel()
                 .getUserInstitute();
 

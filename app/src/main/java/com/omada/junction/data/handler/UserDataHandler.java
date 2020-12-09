@@ -10,6 +10,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.InterestModel;
@@ -21,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AuthDataHandler {
+public class UserDataHandler {
 
     public enum AuthStatus{
 
@@ -51,14 +56,14 @@ public class AuthDataHandler {
     private final UserModelInternal signedInUser = new UserModelInternal();
     private String prevUserUID = "";
 
-    //output fields to viewmodel or mid level layers
+    //output fields to view model or mid level layers
     MutableLiveData<LiveEvent<AuthStatus>> authResponseNotifier = new MutableLiveData<>();
     MutableLiveData<LiveEvent<UserModel>> signedInUserNotifier = new MutableLiveData<>();
 
     //state fields go here
 
 
-    public AuthDataHandler(){
+    public UserDataHandler(){
 
         /*
         this is only to check for sign outs and token expiration (if needed)
@@ -138,7 +143,7 @@ public class AuthDataHandler {
     }
 
     /*
-    call this in auth state listener to get extra user details from firestore with the UID
+    This method is for getting details of newly authenticated user
      */
     private void getAuthenticatedUserDetails(){
 
@@ -205,7 +210,7 @@ public class AuthDataHandler {
     this method triggers a get user through firebase auth that changes the value in signed in user
     notifier live data through the auth state listener callback
      */
-    public void getCurrentUserFromDatabase(){
+    public void getCurrentUserDetails(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null && user.getUid() != null){
 
@@ -216,7 +221,7 @@ public class AuthDataHandler {
             signedInUser.setUserEmail(user.getEmail());
 
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_SUCCESS));
-            getCurrentUserDetailsFromDatabase();
+            getUserDetailsFromRemote();
         }
         else {
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_FAILURE));
@@ -227,7 +232,7 @@ public class AuthDataHandler {
     This method is called after login and getting details is done. ie, when firebase already has a current user.
     It sets details into the signed in user notifier live data
      */
-    private void getCurrentUserDetailsFromDatabase(){
+    private void getUserDetailsFromRemote(){
 
         if(!signedInUser.getUID().equals("") && !(signedInUser == null)){
             //TODO get data from local and then remote if that fails
@@ -264,8 +269,32 @@ public class AuthDataHandler {
                             signedInUser.setUserInterests(null);
                         }
 
-                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_LOGIN_SUCCESS));
-                        signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
+                        FirebaseDatabase.getInstance()
+                                .getReference()
+                                .child("follows")
+                                .child(signedInUser.getUID())
+                                .addValueEventListener(new ValueEventListener(){
+
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        HashMap<String, Object> dataMap = new HashMap<>();
+                                        for (DataSnapshot childSnapshot: snapshot.getChildren()) {
+                                            dataMap.put(childSnapshot.getKey(), childSnapshot.getValue());
+                                        }
+                                        signedInUser.userFollowing = dataMap;
+
+                                        Log.e("Following", dataMap.toString());
+
+                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_LOGIN_SUCCESS));
+                                        signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
 
                     })
                     .addOnFailureListener(e -> authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE)));
@@ -301,6 +330,27 @@ public class AuthDataHandler {
                     signedInUser.userInstitute = updatedUserModel.userInstitute;
                 })
                 .addOnFailureListener(e -> Log.e("Update", e.getMessage()));
+
+    }
+
+    public void updateFollow(String organizationID, boolean following) {
+
+        if(following) {
+            FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("follows")
+                    .child(getCurrentUserModel().getUID())
+                    .child(organizationID)
+                    .setValue(true);
+        }
+        else {
+            FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("follows")
+                    .child(getCurrentUserModel().getUID())
+                    .child(organizationID)
+                    .removeValue();
+        }
 
     }
 
@@ -346,6 +396,7 @@ public class AuthDataHandler {
         Timestamp userDateOfBirth;
         String userGender;
         String userInstitute;
+        Map<String, Object> userFollowing;
 
         private UserModel(){}
 
@@ -368,6 +419,10 @@ public class AuthDataHandler {
 
         public List<InterestModel> getUserInterests() {
             return userInterests;
+        }
+
+        public Map<String, Object> getUserFollowing() {
+            return userFollowing;
         }
 
         public List<String> getUserInterestsString(){

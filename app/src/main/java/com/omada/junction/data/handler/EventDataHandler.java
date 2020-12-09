@@ -143,7 +143,7 @@ public class EventDataHandler {
     public void getInstituteHighlightEvents(){
 
         String instituteID = DataRepository.getInstance()
-                .getAuthDataHandler()
+                .getUserDataHandler()
                 .getCurrentUserModel()
                 .getUserInstitute();
 

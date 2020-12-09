@@ -2,7 +2,7 @@ package com.omada.junction.data;
 
 import com.omada.junction.data.handler.AppDataHandler;
 import com.omada.junction.data.handler.ArticleDataHandler;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.data.handler.EventDataHandler;
 import com.omada.junction.data.handler.OrganizationDataHandler;
 import com.omada.junction.data.handler.PostDataHandler;
@@ -13,7 +13,7 @@ public class DataRepository {
     private static DataRepository dataRepository;
 
     private final AppDataHandler appDataHandler = new AppDataHandler();
-    private final AuthDataHandler authDataHandler = new AuthDataHandler();
+    private final UserDataHandler userDataHandler = new UserDataHandler();
     private final OrganizationDataHandler organizationDataHandler = new OrganizationDataHandler();
     private final ArticleDataHandler articleDataHandler = new ArticleDataHandler();
     private final ShowcaseDataHandler showcaseDataHandler = new ShowcaseDataHandler();
@@ -38,8 +38,8 @@ public class DataRepository {
         return appDataHandler;
     }
 
-    public AuthDataHandler getAuthDataHandler() {
-        return authDataHandler;
+    public UserDataHandler getUserDataHandler() {
+        return userDataHandler;
     }
 
     public EventDataHandler getEventDataHandler() {

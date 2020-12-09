@@ -1,14 +1,11 @@
 package com.omada.junction.ui.uicomponents;
 
-import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.ToggleButton;
 
 import androidx.databinding.BindingAdapter;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.omada.junction.R;
@@ -37,18 +34,26 @@ public class CustomBindings {
     @BindingAdapter({"onFollowClicked"})
     public static void onFollowAction(ToggleButton toggleButton, OrganizationProfileViewModel viewModel){
 
-        toggleButton.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
+
+        boolean following = viewModel.getFollowingStatus();
+
+        toggleButton.setChecked(following);
+
+        toggleButton.setBackgroundResource(
+                toggleButton.isChecked()
+                ? R.drawable.ic_favorite_red_24dp : R.drawable.ic_favorite_black_24dp
+        );
 
         toggleButton.setOnClickListener(v -> {
 
             ToggleButton view = (ToggleButton) v;
 
             if(view.isChecked()) {
-                viewModel.doFollowAction();
+                viewModel.updateFollowingStatus(true);
                 view.setBackgroundResource(R.drawable.ic_favorite_red_24dp);
             }
             else {
-                viewModel.doFollowAction();
+                viewModel.updateFollowingStatus(false);
                 view.setBackgroundResource(R.drawable.ic_favorite_black_24dp);
             }
         });

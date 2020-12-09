@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.Timestamp;
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 import com.omada.junction.utils.transform.TransformUtilities;
@@ -18,7 +18,7 @@ public class UserProfileViewModel extends ViewModel {
 
 
     private final MutableLiveData<LiveEvent<Boolean>> editProfileTrigger = new MutableLiveData<>();
-    private final LiveData<LiveEvent<AuthDataHandler.AuthStatus>> signOutTrigger;
+    private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> signOutTrigger;
     private final MutableLiveData<LiveEvent<DataValidator.DataValidationInformation>> dataValidationAction = new MutableLiveData<>();
 
     public MutableLiveData<String> userDisplayName = new MutableLiveData<>();
@@ -31,14 +31,14 @@ public class UserProfileViewModel extends ViewModel {
 
         signOutTrigger = Transformations.map(
                 DataRepository.getInstance()
-                .getAuthDataHandler()
+                .getUserDataHandler()
                 .getAuthResponseNotifier(),
 
                 authStatusLiveEvent -> authStatusLiveEvent
         );
 
-        AuthDataHandler.UserModel currentUserModel = DataRepository.getInstance()
-                .getAuthDataHandler()
+        UserDataHandler.UserModel currentUserModel = DataRepository.getInstance()
+                .getUserDataHandler()
                 .getCurrentUserModel();
 
         userDisplayName.setValue(currentUserModel.getUserDisplayName());
@@ -51,7 +51,7 @@ public class UserProfileViewModel extends ViewModel {
 
     public void updateUserDetails(){
 
-        AuthDataHandler.MutableUserModel mutableUserModel = new AuthDataHandler.MutableUserModel();
+        UserDataHandler.MutableUserModel mutableUserModel = new UserDataHandler.MutableUserModel();
 
         DataValidator validator = new DataValidator();
         AtomicBoolean anyDetailsEntryInvalid = new AtomicBoolean(false);
@@ -90,7 +90,7 @@ public class UserProfileViewModel extends ViewModel {
 
         if(!anyDetailsEntryInvalid.get()) {
             DataRepository.getInstance()
-                    .getAuthDataHandler()
+                    .getUserDataHandler()
                     .updateCurrentUserDetails(mutableUserModel);
 
             dataValidationAction.setValue(new LiveEvent<>(
@@ -119,16 +119,16 @@ public class UserProfileViewModel extends ViewModel {
     }
 
     public void signOutUser(){
-        DataRepository.getInstance().getAuthDataHandler().signOutCurrentUser();
+        DataRepository.getInstance().getUserDataHandler().signOutCurrentUser();
     }
 
     public LiveData<LiveEvent<Boolean>> getEditProfileTrigger() {
         return editProfileTrigger;
     }
 
-    public AuthDataHandler.UserModel getCurrentUserModel() {
+    public UserDataHandler.UserModel getCurrentUserModel() {
         return DataRepository.getInstance()
-                .getAuthDataHandler()
+                .getUserDataHandler()
                 .getCurrentUserModel();
     }
 
@@ -136,7 +136,7 @@ public class UserProfileViewModel extends ViewModel {
         return dataValidationAction;
     }
 
-    public LiveData<LiveEvent<AuthDataHandler.AuthStatus>> getSignOutTrigger() {
+    public LiveData<LiveEvent<UserDataHandler.AuthStatus>> getSignOutTrigger() {
         return signOutTrigger;
     }
 
