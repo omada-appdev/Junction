@@ -148,8 +148,9 @@ public class EventDataHandler {
                 .getUserInstitute();
 
         FirebaseFirestore.getInstance()
-                .collection("events")
-                .whereEqualTo("eventOrganizerCache.institute", instituteID)
+                .collection("posts")
+                .whereEqualTo("type", "event")
+                .whereEqualTo("creatorCache.institute", instituteID)
                 .whereEqualTo("instituteHighlight", true)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -169,11 +170,15 @@ public class EventDataHandler {
         final MutableLiveData<List<EventModel>> loadedOrganizationHighlightEventsNotifier = new MutableLiveData<>();
 
         FirebaseFirestore.getInstance()
-                .collection("events")
-                .whereEqualTo("eventOrganizer", organizerID)
+                .collection("posts")
+                .whereEqualTo("type", "event")
+                .whereEqualTo("creator", organizerID)
                 .whereEqualTo("organizationHighlight", true)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    Log.e("InstHigh", "Fetched " + queryDocumentSnapshots.size() + " highlights");
+
                     List<EventModel> eventModelList = new ArrayList<>(queryDocumentSnapshots.size());
                     for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
                         eventModelList.add(new EventModel(documentSnapshot.toObject(EventModelRemoteDB.class)));
