@@ -2,37 +2,37 @@ package com.omada.junction.data.models;
 
 public class ArticleModel extends ArticleModelRemoteDB{
 
-    private String articlePublisherProfilePictureRemote;
-    private String articlePublisherName;
+    private String creatorProfilePicture;
+    private String creatorName;
 
     public ArticleModel(ArticleModelRemoteDB modelRemoteDB) {
 
-        setArticleId(modelRemoteDB.getArticleId());
-        setArticleTitle(modelRemoteDB.getArticleTitle());
-        setArticleText(modelRemoteDB.getArticleText());
+        setId(modelRemoteDB.getId());
+        setTitle(modelRemoteDB.getTitle());
+        setText(modelRemoteDB.getText());
 
-        setArticlePublisher(modelRemoteDB.getArticlePublisher());
-        setArticlePublisherName(modelRemoteDB.getArticlePublisherCache().get("name"));
+        setCreator(modelRemoteDB.getCreator());
+        setCreatorName(modelRemoteDB.getCreatorCache().get("name"));
 
-        setArticlePublisherProfilePictureRemote(modelRemoteDB.getArticlePublisherCache().get("profilePicture"));
-        setArticleAuthor(modelRemoteDB.getArticleAuthor());
+        setCreatorProfilePicture(modelRemoteDB.getCreatorCache().get("profilePicture"));
+        setAuthor(modelRemoteDB.getAuthor());
 
-        setArticlePoster(modelRemoteDB.getArticlePoster());
+        setImage(modelRemoteDB.getImage());
     }
 
-    public void setArticlePublisherProfilePictureRemote(String articlePublisherProfilePictureRemote) {
-        this.articlePublisherProfilePictureRemote = articlePublisherProfilePictureRemote;
+    public void setCreatorProfilePicture(String creatorProfilePicture) {
+        this.creatorProfilePicture = creatorProfilePicture;
     }
 
-    public String getArticlePublisherProfilePictureRemote() {
-        return articlePublisherProfilePictureRemote;
+    public String getCreatorProfilePicture() {
+        return creatorProfilePicture;
     }
 
-    public String getArticlePublisherName() {
-        return articlePublisherName;
+    public String getCreatorName() {
+        return creatorName;
     }
 
-    public void setArticlePublisherName(String articlePublisherName) {
-        this.articlePublisherName = articlePublisherName;
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 }

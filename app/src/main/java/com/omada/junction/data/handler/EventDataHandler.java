@@ -114,7 +114,8 @@ public class EventDataHandler {
 
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
         Query query = dbInstance
-                .collection("events")
+                .collection("posts")
+                .whereEqualTo("type", "event")
                 .limit(1);
 
         if(PaginationHelper.lastAllEvent != null){
@@ -126,7 +127,7 @@ public class EventDataHandler {
                     ArrayList<EventModel> loadedEvents = new ArrayList<>();
                     for(QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
                         EventModelRemoteDB item = snapshot.toObject(EventModelRemoteDB.class);
-                        item.setEventId(snapshot.getId());
+                        item.setId(snapshot.getId());
                         loadedEvents.add(new EventModel(item));
                     }
                     if(queryDocumentSnapshots.size() > 0) PaginationHelper.lastAllEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
@@ -155,7 +156,7 @@ public class EventDataHandler {
                     List<EventModel> eventModelList = new ArrayList<>(queryDocumentSnapshots.size());
                     for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
                         EventModelRemoteDB modelRemote = documentSnapshot.toObject(EventModelRemoteDB.class);
-                        modelRemote.setEventId(documentSnapshot.getId());
+                        modelRemote.setId(documentSnapshot.getId());
 
                         eventModelList.add(new EventModel(modelRemote));
                     }
@@ -197,7 +198,7 @@ public class EventDataHandler {
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
         dbInstance
                 .collection("events")
-                .document(eventModel.getEventId())
+                .document(eventModel.getId())
                 .collection("registrations")
                 .document(UID)
                 .set(responses)

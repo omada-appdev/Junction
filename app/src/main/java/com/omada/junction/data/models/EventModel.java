@@ -2,7 +2,6 @@ package com.omada.junction.data.models;
 
 import com.google.firebase.Timestamp;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -11,235 +10,197 @@ import javax.annotation.Nonnull;
 
 public class EventModel extends BaseModel {
 
-    private String eventId;
-    private String eventName;
-    private String eventDescription;
+    private String id;
+    private String title;
+    private String description;
 
-    private String eventOrganizer;
-    private String eventOrganizerName;
-    private String eventOrganizerType;
-    private String eventOrganizerPhone;
-    private String eventOrganizerMail;
+    private String creator;
+    private String creatorName;
+    private String creatorPhone;
+    private String creatorMail;
 
-    private String eventOrganizerProfilePictureRemote;
-    private String eventOrganizerPhotoLocal;
+    private String creatorProfilePicture;
 
-    private Map<String, Map<String, Map <String, String>>> eventForm;
+    private Map<String, Map<String, Map <String, String>>> form;
 
-    private String eventPosterRemote;
-    private String eventPosterLocal;
+    private String image;
 
-    private String eventStatus;
-    private Date eventTimeStart;
-    private Date eventTimeEnd;
+    private String status;
+    private Date startTime;
+    private Date endTime;
 
-    private String eventVenue;
-    private String eventVenueName;
-    private String eventVenueDetails;
+    private String venue;
+    private String venueName;
+    private String venueAddress;
 
     private ArrayList<String> tags;
-    private Integer usersRegistered;
 
 
     public EventModel(@Nonnull EventModelRemoteDB modelRemoteDB){
 
-        setEventId(modelRemoteDB.getEventId());
-        setEventName(modelRemoteDB.getEventName());
-        setEventDescription(modelRemoteDB.getEventDescription());
+        setId(modelRemoteDB.getId());
+        setTitle(modelRemoteDB.getTitle());
+        setDescription(modelRemoteDB.getDescription());
 
-        setEventPosterRemote(modelRemoteDB.getEventPoster());
+        setImage(modelRemoteDB.getImage());
 
-        setEventOrganizer(modelRemoteDB.getEventOrganizer());
-        setEventOrganizerName(modelRemoteDB.getEventOrganizerCache().get("name"));
-        setEventOrganizerPhone(modelRemoteDB.getEventOrganizerCache().get("phone"));
-        setEventOrganizerProfilePictureRemote(modelRemoteDB.getEventOrganizerCache().get("profilePicture"));
-        setEventOrganizerMail(modelRemoteDB.getEventOrganizerCache().get("mail"));
+        setCreator(modelRemoteDB.getCreator());
+        setCreatorName(modelRemoteDB.getCreatorCache().get("name"));
+        setCreatorPhone(modelRemoteDB.getCreatorCache().get("phone"));
+        setCreatorProfilePicture(modelRemoteDB.getCreatorCache().get("profilePicture"));
+        setCreatorMail(modelRemoteDB.getCreatorCache().get("mail"));
 
-        setEventForm(modelRemoteDB.getEventForm());
+        setForm(modelRemoteDB.getForm());
 
-        setEventStatus(modelRemoteDB.getEventStatus());
-        setEventTimeStart(modelRemoteDB.getEventTimeStart());
-        setEventTimeEnd(modelRemoteDB.getEventTimeEnd());
+        setStatus(modelRemoteDB.getStatus());
+        setStartTime(modelRemoteDB.getStartTime());
+        setEndTime(modelRemoteDB.getEndTime());
 
-        setEventVenue(modelRemoteDB.getEventVenue());
-        setEventVenueName(modelRemoteDB.getEventVenueCache().get("name"));
-        setEventVenueDetails(modelRemoteDB.getEventVenueCache().get("details"));
+        setVenue(modelRemoteDB.getVenue());
+        setVenueName(modelRemoteDB.getVenueCache().get("name"));
+        setVenueAddress(modelRemoteDB.getVenueCache().get("address"));
 
         setTags(modelRemoteDB.getTags());
-        setUsersRegistered(modelRemoteDB.getUsersRegistered());
     }
-
 
     public EventModel(EventModelLocalDB modelLocalDB){
     }
 
-    public String getEventName() {
-        return eventName;
+    public String getTitle() {
+        return title;
     }
 
-    public String getEventOrganizer() {
-        return eventOrganizer;
+    public String getCreator() {
+        return creator;
     }
 
-    public String getEventDescription() {
-        return eventDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public Map <String, Map<String, Map<String, String>>> getEventForm() {
-        return eventForm;
+    public Map <String, Map<String, Map<String, String>>> getForm() {
+        return form;
     }
 
-    private void setEventName(String eventName) {
-        this.eventName = eventName;
+    private void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getEventStatus() {
-        return eventStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public Timestamp getEventTimeStart() {
-        return new Timestamp(eventTimeStart);
+    public Timestamp getStartTime() {
+        return new Timestamp(startTime);
     }
 
-    public Timestamp getEventTimeEnd() {
-        return new Timestamp(eventTimeEnd);
+    public Timestamp getEndTime() {
+        return new Timestamp(endTime);
     }
 
-    public String getEventVenue() {
-        return eventVenue;
+    public String getVenue() {
+        return venue;
     }
 
     public ArrayList<String> getTags() {
         return tags;
     }
 
-    public Integer getUsersRegistered() {
-        return usersRegistered;
+    public String getId() {
+        return id;
     }
 
-    public String getEventId() {
-        return eventId;
+    public String getVenueName() {
+        return venueName;
     }
 
-    public String getEventVenueName() {
-        return eventVenueName;
+    public String getVenueAddress() {
+        return venueAddress;
     }
 
-    public String getEventVenueDetails() {
-        return eventVenueDetails;
+    public String getCreatorName() {
+        return creatorName;
     }
 
-    public String getEventOrganizerName() {
-        return eventOrganizerName;
+    public String getCreatorProfilePicture() {
+        return creatorProfilePicture;
     }
 
-    public String getEventOrganizerType() {
-        return eventOrganizerType;
+    public String getImage() {
+        return image;
     }
 
-    public String getEventOrganizerProfilePictureRemote() {
-        return eventOrganizerProfilePictureRemote;
-    }
-
-    public String getEventPosterRemote() {
-        return eventPosterRemote;
-    }
-
-    public String getEventPosterLocal() {
-        return eventPosterLocal;
-    }
-
-    public String getEventOrganizerPhotoLocal() {
-        return eventOrganizerPhotoLocal;
-    }
-
-    public String getEventOrganizerPhone() {
-        return eventOrganizerPhone;
+    public String getCreatorPhone() {
+        return creatorPhone;
     }
 
 
 
-    private void setEventOrganizer(String eventOrganizer) {
-        this.eventOrganizer = eventOrganizer;
+    private void setCreator(String creator) {
+        this.creator = creator;
     }
 
-    private void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
+    private void setDescription(String description) {
+        this.description = description;
     }
 
-    private void setEventForm(Map<String, Map<String, Map<String, String>>> eventForm) {
-        this.eventForm = eventForm;
+    private void setForm(Map<String, Map<String, Map<String, String>>> form) {
+        this.form = form;
     }
 
-    private void setEventStatus(String eventStatus) {
-        this.eventStatus = eventStatus;
+    private void setStatus(String status) {
+        this.status = status;
     }
 
-    private void setEventTimeStart(Timestamp eventTimeStart) {
-        this.eventTimeStart = eventTimeStart.toDate();
+    private void setStartTime(Timestamp startTime) {
+        this.startTime = startTime.toDate();
     }
 
-    private void setEventTimeEnd(Timestamp eventTimeEnd) {
-        this.eventTimeEnd = eventTimeEnd.toDate();
+    private void setEndTime(Timestamp endTime) {
+        this.endTime = endTime.toDate();
     }
 
-    private void setEventVenue(String eventVenue) {
-        this.eventVenue = eventVenue;
+    private void setVenue(String venue) {
+        this.venue = venue;
     }
 
     private void setTags(ArrayList<String> tags) {
         this.tags = tags;
     }
 
-    private void setUsersRegistered(Integer usersRegistered) {
-        this.usersRegistered = usersRegistered;
+    private void setId(String id) {
+        this.id = id;
     }
 
-    private void setEventId(String eventId) {
-        this.eventId = eventId;
+    private void setVenueName(String venueName) {
+        this.venueName = venueName;
     }
 
-    private void setEventVenueName(String eventVenueName) {
-        this.eventVenueName = eventVenueName;
+    private void setVenueAddress(String venueAddress) {
+        this.venueAddress = venueAddress;
     }
 
-    private void setEventVenueDetails(String eventVenueDetails) {
-        this.eventVenueDetails = eventVenueDetails;
+    private void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 
-    private void setEventOrganizerName(String eventOrganizerName) {
-        this.eventOrganizerName = eventOrganizerName;
+    private void setCreatorProfilePicture(String creatorProfilePicture) {
+        this.creatorProfilePicture = creatorProfilePicture;
     }
 
-    private void setEventOrganizerType(String eventOrganizerType) {
-        this.eventOrganizerType = eventOrganizerType;
+    private void setImage(String image) {
+        this.image = image;
     }
 
-    private void setEventOrganizerProfilePictureRemote(String eventOrganizerProfilePictureRemote) {
-        this.eventOrganizerProfilePictureRemote = eventOrganizerProfilePictureRemote;
+    public String getCreatorMail() {
+        return creatorMail;
     }
 
-    private void setEventPosterRemote(String eventPosterRemote) {
-        this.eventPosterRemote = eventPosterRemote;
+    private void setCreatorPhone(String creatorPhone) {
+        this.creatorPhone = creatorPhone;
     }
 
-    private void setEventPosterLocal(String eventPosterLocal) {
-        this.eventPosterLocal = eventPosterLocal;
-    }
-
-    private void setEventOrganizerPhotoLocal(String eventOrganizerPhotoLocal) {
-        this.eventOrganizerPhotoLocal = eventOrganizerPhotoLocal;
-    }
-
-    public String getEventOrganizerMail() {
-        return eventOrganizerMail;
-    }
-
-    private void setEventOrganizerPhone(String eventOrganizerPhone) {
-        this.eventOrganizerPhone = eventOrganizerPhone;
-    }
-
-    private void setEventOrganizerMail(String eventOrganizerMail) {
-        this.eventOrganizerMail = eventOrganizerMail;
+    private void setCreatorMail(String creatorMail) {
+        this.creatorMail = creatorMail;
     }
 }

@@ -11,138 +11,136 @@ import java.util.Map;
 
 public class EventModelRemoteDB extends BaseModel {
 
-    private String eventId;
-    private String eventName;
-    private String eventDescription;
-    private String eventPoster;
+    private String id;
+    private String title;
+    private String description;
+    private String image;
 
-    private String eventOrganizer;
-    private HashMap<String, String> eventOrganizerCache;
+    private String creator;
+    private HashMap<String, String> creatorCache;
 
-    private Map <String, Map <String, Map <String, String>>> eventForm;
+    private Map <String, Map <String, Map <String, String>>> form;
 
-    private String eventStatus;
-    private Timestamp eventTimeStart;
-    private Timestamp eventTimeEnd;
+    private String status;
+    private Timestamp startTime;
+    private Timestamp endTime;
 
-    private String eventVenue;
-    private HashMap<String, String> eventVenueCache;
+    private String venue;
+    private HashMap<String, String> venueCache;
 
     private ArrayList<String> tags;
-    private Integer usersRegistered;
-
 
     public EventModelRemoteDB(){
     }
 
-    @PropertyName("eventName")
-    public String getEventName() {
-        return eventName;
+    @PropertyName("title")
+    public String getTitle() {
+        return title;
     }
 
-    @PropertyName("eventName")
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
+    @PropertyName("title")
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    @PropertyName("eventOrganizer")
-    public String getEventOrganizer() {
-        return eventOrganizer;
+    @PropertyName("creator")
+    public String getCreator() {
+        return creator;
     }
 
-    @PropertyName("eventOrganizer")
-    public void setEventOrganizer(String eventOrganizer) {
-        this.eventOrganizer = eventOrganizer;
+    @PropertyName("creator")
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
-    @PropertyName("eventOrganizerCache")
-    public HashMap<String, String> getEventOrganizerCache() {
-        return eventOrganizerCache;
+    @PropertyName("creatorCache")
+    public HashMap<String, String> getCreatorCache() {
+        return creatorCache;
     }
 
-    @PropertyName("eventOrganizerCache")
-    public void setEventOrganizerCache(HashMap<String, String> eventOrganizerCache) {
-        this.eventOrganizerCache = eventOrganizerCache;
+    @PropertyName("creatorCache")
+    public void setCreatorCache(HashMap<String, String> creatorCache) {
+        this.creatorCache = creatorCache;
     }
 
-    @PropertyName("eventDescription")
-    public String getEventDescription() {
-        return eventDescription;
+    @PropertyName("description")
+    public String getDescription() {
+        return description;
     }
 
-    @PropertyName("eventDescription")
-    public void setEventDescription(String eventDescription) {
-        this.eventDescription = eventDescription;
+    @PropertyName("description")
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    @PropertyName("eventForm")
-    public Map<String, Map<String, Map<String, String>>> getEventForm() {
-        return eventForm;
+    @PropertyName("form")
+    public Map<String, Map<String, Map<String, String>>> getForm() {
+        return form;
     }
 
-    @PropertyName("eventForm")
-    public void setEventForm(Map<String, Map<String, Map<String, String>>> eventForm) {
-        this.eventForm = eventForm;
+    @PropertyName("form")
+    public void setForm(Map<String, Map<String, Map<String, String>>> form) {
+        this.form = form;
     }
 
-    @PropertyName("eventPoster")
-    public String getEventPoster() {
-        return eventPoster;
+    @PropertyName("image")
+    public String getImage() {
+        return image;
     }
 
-    @PropertyName("eventPoster")
-    public void setEventPoster(String eventPoster) {
-        this.eventPoster = eventPoster;
+    @PropertyName("image")
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    @PropertyName("eventStatus")
-    public String getEventStatus() {
-        return eventStatus;
+    @PropertyName("status")
+    public String getStatus() {
+        return status;
     }
 
-    @PropertyName("eventStatus")
-    public void setEventStatus(String eventStatus) {
-        this.eventStatus = eventStatus;
+    @PropertyName("status")
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    @PropertyName("eventTimeStart")
-    public Timestamp getEventTimeStart() {
-        return eventTimeStart;
+    @PropertyName("startTime")
+    public Timestamp getStartTime() {
+        return startTime;
     }
 
-    @PropertyName("eventTimeStart")
-    public void setEventTimeStart(Timestamp eventTimeStart) {
-        this.eventTimeStart = eventTimeStart;
+    @PropertyName("startTime")
+    public void setStartTime(Timestamp startTime) {
+        this.startTime = startTime;
     }
 
-    @PropertyName("eventTimeEnd")
-    public Timestamp getEventTimeEnd() {
-        return eventTimeEnd;
+    @PropertyName("endTime")
+    public Timestamp getEndTime() {
+        return endTime;
     }
 
-    @PropertyName("eventTimeEnd")
-    public void setEventTimeEnd(Timestamp eventTimeEnd) {
-        this.eventTimeEnd = eventTimeEnd;
+    @PropertyName("endTime")
+    public void setEndTime(Timestamp endTime) {
+        this.endTime = endTime;
     }
 
-    @PropertyName("eventVenue")
-    public String getEventVenue() {
-        return eventVenue;
+    @PropertyName("venue")
+    public String getVenue() {
+        return venue;
     }
 
-    @PropertyName("eventVenue")
-    public void setEventVenue(String eventVenue) {
-        this.eventVenue = eventVenue;
+    @PropertyName("venue")
+    public void setVenue(String venue) {
+        this.venue = venue;
     }
 
-    @PropertyName("eventVenueCache")
-    public HashMap<String, String> getEventVenueCache() {
-        return eventVenueCache;
+    @PropertyName("venueCache")
+    public HashMap<String, String> getVenueCache() {
+        return venueCache;
     }
 
-    @PropertyName("eventVenueCache")
-    public void setEventVenueCache(HashMap<String, String> eventVenueCache) {
-        this.eventVenueCache = eventVenueCache;
+    @PropertyName("venueCache")
+    public void setVenueCache(HashMap<String, String> venueCache) {
+        this.venueCache = venueCache;
     }
 
     @PropertyName("tags")
@@ -155,24 +153,14 @@ public class EventModelRemoteDB extends BaseModel {
         this.tags = tags;
     }
 
-    @PropertyName("usersRegistered")
-    public Integer getUsersRegistered() {
-        return usersRegistered;
-    }
-
-    @PropertyName("usersRegistered")
-    public void setUsersRegistered(Integer usersRegistered) {
-        this.usersRegistered = usersRegistered;
+    @Exclude
+    public String getId() {
+        return id;
     }
 
     @Exclude
-    public String getEventId() {
-        return eventId;
-    }
-
-    @Exclude
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
+    public void setId(String id) {
+        this.id = id;
     }
 
 }

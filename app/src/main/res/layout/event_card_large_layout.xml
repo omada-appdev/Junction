@@ -40,8 +40,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/event_poster_image"
                 app:layout_constraintVertical_chainStyle="packed"
-                remoteImageUrl="@{eventModel.eventOrganizerProfilePictureRemote}"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.eventOrganizer)}"/>
+                remoteImageUrl="@{eventModel.creatorProfilePicture}"
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/event_name_text"
@@ -52,7 +52,7 @@
                 android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#DE000000"
-                android:text="@{eventModel.eventName}"
+                android:text="@{eventModel.title}"
                 app:layout_constraintTop_toTopOf="@+id/organizer_profile_image"
                 app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -65,11 +65,11 @@
                 android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#8A000000"
-                android:text='@{eventModel.eventOrganizerName}'
+                android:text="@{eventModel.creatorName}"
                 app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/event_name_text"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.eventOrganizer)}"/>
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
 
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -86,7 +86,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/organizer_profile_image"
                 app:layout_constraintVertical_chainStyle="packed"
-                app:remoteImageUrl="@{eventModel.eventPosterRemote}"/>
+                app:remoteImageUrl="@{eventModel.image}"/>
 
             <ImageButton
                 android:id="@+id/peek_button"
@@ -131,7 +131,7 @@
                         android:id="@+id/event_date_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@{TransformUtilities.convertTimestampToDDMM(eventModel.eventTimeStart)}"
+                        android:text="@{TransformUtilities.convertTimestampToDDMM(eventModel.startTime)}"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                         app:layout_constraintBottom_toTopOf="@+id/event_venue_text"
                         app:layout_constraintStart_toStartOf="parent" />
@@ -141,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.eventTimeStart)}"
+                        android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.startTime)}"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/event_time_end_text"
@@ -152,7 +152,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.eventTimeEnd)}"
+                        android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.endTime)}"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -162,7 +162,7 @@
                         android:id="@+id/event_venue_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@{eventModel.eventVenueName}"
+                        android:text="@{eventModel.venueName}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 

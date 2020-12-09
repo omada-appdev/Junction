@@ -82,7 +82,8 @@ public class ArticleDataHandler {
 
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
         Query query = dbInstance
-                .collection("articles")
+                .collection("posts")
+                .whereEqualTo("type", "article")
                 .limit(1);
 
         if(PaginationHelper.lastAllArticle != null){
@@ -95,7 +96,7 @@ public class ArticleDataHandler {
                     ArrayList<ArticleModel> loadedArticles = new ArrayList<>();
                     for(QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
                         ArticleModelRemoteDB item = snapshot.toObject(ArticleModelRemoteDB.class);
-                        item.setArticleId(snapshot.getId());
+                        item.setId(snapshot.getId());
                         loadedArticles.add(new ArticleModel(item));
                     }
                     if(queryDocumentSnapshots.size() > 0) {

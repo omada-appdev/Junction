@@ -1,7 +1,6 @@
 package com.omada.junction.ui.organization;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,7 @@ import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.ShowcaseModel;
 import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardMediumNoTitleBinder;
-import com.omada.junction.ui.uicomponents.binders.header.LargeBoldHeaderBinder;
+import com.omada.junction.ui.uicomponents.binders.misc.LargeBoldHeaderBinder;
 import com.omada.junction.ui.uicomponents.binders.organizationfeed.OrganizationShowcaseThumbnailListBinder;
 import com.omada.junction.ui.uicomponents.models.LargeBoldHeaderModel;
 import com.omada.junction.viewmodels.FeedContentViewModel;

@@ -14,15 +14,19 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.github.rubensousa.gravitysnaphelper.GravitySnapRecyclerView;
 import com.omada.junction.R;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardLargeBinder;
+import com.omada.junction.ui.uicomponents.binders.misc.SmallFooterBinder;
+import com.omada.junction.ui.uicomponents.models.SmallFooterModel;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.HomeFeedViewModel;
 
 import java.util.List;
 
+import mva3.adapter.ItemSection;
 import mva3.adapter.ListSection;
 import mva3.adapter.MultiViewAdapter;
 import mva3.adapter.util.InfiniteLoadingHelper;
@@ -63,18 +67,27 @@ public class ForYouFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
+        FeedContentViewModel feedContentViewModel = new ViewModelProvider(requireParentFragment().requireActivity()).get(FeedContentViewModel.class);
+
         MultiViewAdapter adapter = new MultiViewAdapter();
         contentListSection = new ListSection<>();
 
         adapter.addSection(contentListSection);
 
-        FeedContentViewModel feedContentViewModel = new ViewModelProvider(requireParentFragment().requireActivity()).get(FeedContentViewModel.class);
+        adapter.registerItemBinders(
+                new EventCardLargeBinder(feedContentViewModel),
+                new ArticleCardBinder(feedContentViewModel),
+                new SmallFooterBinder()
+        );
+
+        ItemSection<SmallFooterModel> footerSection = new ItemSection<>(new SmallFooterModel("Nothing more to show"));
+        adapter.addSection(footerSection);
+
+        footerSection.hideSection();
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager( new LinearLayoutManager(getContext()) );
         recyclerView.setAdapter(adapter);
-
-        adapter.registerItemBinders(new EventCardLargeBinder(feedContentViewModel), new ArticleCardBinder(feedContentViewModel));
 
         InfiniteLoadingHelper infiniteLoadingHelper = new InfiniteLoadingHelper(recyclerView, R.layout.loading_footer_layout) {
 
@@ -82,6 +95,7 @@ public class ForYouFragment extends Fragment {
 
             @Override
             public void onLoadNextPage(int page) {
+                recyclerView.scrollToPosition(contentListSection.size());
                 refreshContents = true;
                 homeFeedViewModel.getForYouFeedContent();
             }
@@ -107,12 +121,18 @@ public class ForYouFragment extends Fragment {
                     added = true;
                 }
             }
+
         };
 
         homeFeedViewModel.getLoadedForYou()
                 .observe(getViewLifecycleOwner(), contents->{
                     if(contents.size() == contentListSection.size()){
                         infiniteLoadingHelper.markAllPagesLoaded();
+                        footerSection.showSection();
+                        ((GravitySnapRecyclerView)recyclerView).snapToNextPosition(true);
+                    }
+                    else{
+                        ((GravitySnapRecyclerView)recyclerView).scrollToPosition(contentListSection.size() - 1);
                     }
                     onContentLoaded(contents);
                     infiniteLoadingHelper.markCurrentPageLoaded();
@@ -129,8 +149,6 @@ public class ForYouFragment extends Fragment {
     public void onContentLoaded(List<BaseModel> contents) {
 
         if(refreshContents || contentListSection.size() == 0) {
-
-            Toast.makeText(requireContext(), refreshContents+"  "+contentListSection.size(), Toast.LENGTH_SHORT).show();
 
             contentListSection.addAll(contents.subList(contentListSection.size(), contents.size()));
             refreshContents = false;

@@ -5,6 +5,7 @@ import com.omada.junction.data.handler.ArticleDataHandler;
 import com.omada.junction.data.handler.AuthDataHandler;
 import com.omada.junction.data.handler.EventDataHandler;
 import com.omada.junction.data.handler.OrganizationDataHandler;
+import com.omada.junction.data.handler.PostDataHandler;
 import com.omada.junction.data.handler.ShowcaseDataHandler;
 
 public class DataRepository {
@@ -16,6 +17,7 @@ public class DataRepository {
     private final OrganizationDataHandler organizationDataHandler = new OrganizationDataHandler();
     private final ArticleDataHandler articleDataHandler = new ArticleDataHandler();
     private final ShowcaseDataHandler showcaseDataHandler = new ShowcaseDataHandler();
+    private final PostDataHandler postDataHandler = new PostDataHandler();
 
     //this is only for events
     private final EventDataHandler eventDataHandler = new EventDataHandler();
@@ -54,6 +56,10 @@ public class DataRepository {
 
     public ShowcaseDataHandler getShowcaseDataHandler() {
         return showcaseDataHandler;
+    }
+
+    public PostDataHandler getPostDataHandler() {
+        return postDataHandler;
     }
 
     public void resetHomeFeedContent() {

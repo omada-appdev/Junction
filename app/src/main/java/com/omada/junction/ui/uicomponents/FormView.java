@@ -14,9 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.omada.junction.R;
 import com.omada.junction.data.models.EventModel;
@@ -67,7 +65,7 @@ public class FormView extends FrameLayout {
         try {
 
             // Creation of form class itself handles all the View inflation, etc
-            this.form = new RegistrationForm(eventModel.getEventForm());
+            this.form = new RegistrationForm(eventModel.getForm());
 
             addView(
                     formSectionViews.get(

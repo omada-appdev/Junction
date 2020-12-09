@@ -7,83 +7,83 @@ import java.util.Map;
 
 public class ArticleModelRemoteDB extends BaseModel{
 
-    private String articleId;
-    private String articleTitle;
-    private String articlePublisher;
-    private String articleText;
-    private String articleAuthor;
+    private String id;
+    private String title;
+    private String creator;
+    private String text;
+    private String author;
 
-    private Map<String, String> articlePublisherCache;
+    private Map<String, String> creatorCache;
 
-    private String articlePoster;
-
-    @Exclude
-    public String getArticleId() {
-        return articleId;
-    }
+    private String image;
 
     @Exclude
-    public void setArticleId(String articleId) {
-        this.articleId = articleId;
+    public String getId() {
+        return id;
     }
 
-    @PropertyName("articlePublisher")
-    public String getArticlePublisher() {
-        return articlePublisher;
+    @Exclude
+    public void setId(String id) {
+        this.id = id;
     }
 
-    @PropertyName("articlePublisher")
-    public void setArticlePublisher(String articlePublisher) {
-        this.articlePublisher = articlePublisher;
+    @PropertyName("creator")
+    public String getCreator() {
+        return creator;
     }
 
-    @PropertyName("articleText")
-    public String getArticleText() {
-        return articleText;
+    @PropertyName("creator")
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
-    @PropertyName("articleText")
-    public void setArticleText(String articleText) {
-        this.articleText = articleText;
+    @PropertyName("text")
+    public String getText() {
+        return text;
     }
 
-    @PropertyName("articleTitle")
-    public String getArticleTitle() {
-        return articleTitle;
+    @PropertyName("text")
+    public void setText(String text) {
+        this.text = text;
     }
 
-    @PropertyName("articleTitle")
-    public void setArticleTitle(String articleTitle) {
-        this.articleTitle = articleTitle;
+    @PropertyName("title")
+    public String getTitle() {
+        return title;
     }
 
-    @PropertyName("articleAuthor")
-    public String getArticleAuthor() {
-        return articleAuthor;
+    @PropertyName("title")
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    @PropertyName("articleAuthor")
-    public void setArticleAuthor(String articleAuthor) {
-        this.articleAuthor = articleAuthor;
+    @PropertyName("author")
+    public String getAuthor() {
+        return author;
     }
 
-    @PropertyName("articlePoster")
-    public String getArticlePoster() {
-        return articlePoster;
+    @PropertyName("author")
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    @PropertyName("articlePoster")
-    public void setArticlePoster(String articlePoster) {
-        this.articlePoster = articlePoster;
+    @PropertyName("image")
+    public String getImage() {
+        return image;
     }
 
-    @PropertyName("articlePublisherCache")
-    public Map<String, String> getArticlePublisherCache() {
-        return articlePublisherCache;
+    @PropertyName("image")
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    @PropertyName("articlePublisherCache")
-    public void setArticlePublisherCache(Map<String, String> articlePublisherCache) {
-        this.articlePublisherCache = articlePublisherCache;
+    @PropertyName("creatorCache")
+    public Map<String, String> getCreatorCache() {
+        return creatorCache;
+    }
+
+    @PropertyName("creatorCache")
+    public void setCreatorCache(Map<String, String> creatorCache) {
+        this.creatorCache = creatorCache;
     }
 }

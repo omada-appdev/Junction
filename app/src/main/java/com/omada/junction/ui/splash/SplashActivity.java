@@ -8,11 +8,19 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.omada.junction.R;
 import com.omada.junction.data.handler.AuthDataHandler;
 import com.omada.junction.ui.home.HomeActivity;
 import com.omada.junction.ui.login.LoginActivity;
 import com.omada.junction.viewmodels.SplashViewModel;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class SplashActivity extends AppCompatActivity {

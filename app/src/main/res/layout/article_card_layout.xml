@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp">
 
@@ -36,8 +37,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/article_poster_image"
                 app:layout_constraintVertical_chainStyle="packed"
-                remoteImageUrl="@{articleModel.articlePublisherProfilePictureRemote}"
-                android:onClick="@{()->viewModel.goToOrganization(articleModel.articlePublisher)}"/>
+                remoteImageUrl="@{articleModel.creatorProfilePicture}"
+                android:onClick="@{()->viewModel.goToOrganization(articleModel.creator)}"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/article_title_text"
@@ -48,7 +49,7 @@
                 android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#DE000000"
-                android:text="@{articleModel.articleTitle}"
+                android:text="@{articleModel.title}"
                 app:layout_constraintTop_toTopOf="@+id/publisher_profile_image"
                 app:layout_constraintStart_toEndOf="@+id/publisher_profile_image"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -61,11 +62,11 @@
                 android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#8A000000"
-                android:text='@{articleModel.articlePublisherName}'
+                android:text="@{articleModel.creatorName}"
                 app:layout_constraintStart_toEndOf="@+id/publisher_profile_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/article_title_text"
-                android:onClick="@{()->viewModel.goToOrganization(articleModel.articlePublisher)}"/>
+                android:onClick="@{()->viewModel.goToOrganization(articleModel.creator)}"/>
 
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -74,7 +75,7 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
                 android:background="@color/colorPrimaryDark"
-                remoteImageUrl="@{articleModel.articlePoster}"
+                remoteImageUrl="@{articleModel.image}"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toTopOf="@+id/more_details_button"
                 app:layout_constraintDimensionRatio="H,3:4"
