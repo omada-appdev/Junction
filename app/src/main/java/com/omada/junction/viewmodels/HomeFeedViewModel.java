@@ -2,7 +2,6 @@ package com.omada.junction.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
@@ -11,7 +10,6 @@ import com.omada.junction.data.models.ArticleModel;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.utils.taskhandler.LiveDataAggregator;
-import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +60,7 @@ public class HomeFeedViewModel extends ViewModel {
     private void initializeDataLoaders(){
 
         loadedForYouEvents = Transformations.map(
-                DataRepository.getInstance().getEventDataHandler().getLoadedAllEventsNotifier(), allEvents-> allEvents);
+                DataRepository.getInstance().getEventDataHandler().getLoadedForYouEventsNotifier(), allEvents-> allEvents);
         loadedForYouArticles = Transformations.map(
                 DataRepository.getInstance().getArticleDataHandler().getLoadedAllArticlesNotifier(), allArticles -> allArticles);
     }
@@ -98,7 +96,7 @@ public class HomeFeedViewModel extends ViewModel {
         DataRepository
                 .getInstance()
                 .getEventDataHandler()
-                .getAllEvents();
+                .getForYouEvents();
 
         DataRepository
                 .getInstance()

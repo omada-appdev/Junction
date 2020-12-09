@@ -42,8 +42,7 @@ public class EventDataHandler {
     # OUTPUT FIELDS TO VIEWMODEL #
     ##############################
      */
-    private MediatorLiveData<List<EventModel>> loadedAllEventsNotifier = new MediatorLiveData<>();
-    private final MediatorLiveData<List<EventModel>> loadedAForYouEventsNotifier = new MediatorLiveData<>();
+    private MediatorLiveData<List<EventModel>> loadedForYouEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedLearnEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedCompeteEventsNotifier = new MediatorLiveData<>();
 
@@ -55,7 +54,7 @@ public class EventDataHandler {
     # FIELDS FOR INTERNAL USE #
     ###########################
     */
-    private EventsAggregator allEventsAggregator = new EventsAggregator(loadedAllEventsNotifier);
+    private EventsAggregator ForYouEventsAggregator = new EventsAggregator(loadedForYouEventsNotifier);
 
     public EventDataHandler(){
     }
@@ -92,34 +91,43 @@ public class EventDataHandler {
     /*
     This function gets all events
      */
-    public void getAllEvents(){
+    public void getForYouEvents(){
 
         MutableLiveData<List<EventModel>> localEvents = new MutableLiveData<>();
         MutableLiveData<List<EventModel>> remoteEvents = new MutableLiveData<>();
 
-        loadedAllEventsNotifier.addSource(localEvents, eventModels -> {
-            allEventsAggregator.holdData(EventType.EVENT_TYPE_LOCAL, eventModels);
+        loadedForYouEventsNotifier.addSource(localEvents, eventModels -> {
+            ForYouEventsAggregator.holdData(EventType.EVENT_TYPE_LOCAL, eventModels);
         });
-        loadedAllEventsNotifier.addSource(remoteEvents, eventModels -> {
-            allEventsAggregator.holdData(EventType.EVENT_TYPE_REMOTE, eventModels);
+        loadedForYouEventsNotifier.addSource(remoteEvents, eventModels -> {
+            ForYouEventsAggregator.holdData(EventType.EVENT_TYPE_REMOTE, eventModels);
         });
 
-        getAllEventsFromRemote(remoteEvents);
+        getForYouEventsFromRemote(remoteEvents);
         //getAllEventsFromLocal(localEvents)
     }
 
-    private void getAllEventsFromRemote(final MutableLiveData<List<EventModel>> destinationLiveData){
+    private void getForYouEventsFromRemote(final MutableLiveData<List<EventModel>> destinationLiveData){
 
         //TODO add query to check what the latest timestamp in local events is and get all after that
+
+        List<String> following = new ArrayList<>(
+                DataRepository.getInstance()
+                .getUserDataHandler()
+                .getCurrentUserModel()
+                .getUserFollowing()
+                .keySet()
+        );
 
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
         Query query = dbInstance
                 .collection("posts")
                 .whereEqualTo("type", "event")
+                .whereIn("creator", following)
                 .limit(1);
 
-        if(PaginationHelper.lastAllEvent != null){
-            query = query.startAfter(PaginationHelper.lastAllEvent);
+        if(PaginationHelper.lastForYouEvent != null){
+            query = query.startAfter(PaginationHelper.lastForYouEvent);
         }
 
         query.get()
@@ -130,7 +138,7 @@ public class EventDataHandler {
                         item.setId(snapshot.getId());
                         loadedEvents.add(new EventModel(item));
                     }
-                    if(queryDocumentSnapshots.size() > 0) PaginationHelper.lastAllEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                    if(queryDocumentSnapshots.size() > 0) PaginationHelper.lastForYouEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                     destinationLiveData.setValue(loadedEvents);
                 })
                 .addOnFailureListener(e -> Log.d("TAG", Objects.requireNonNull(e.getMessage())));
@@ -213,8 +221,8 @@ public class EventDataHandler {
 
     }
 
-    public LiveData<List<EventModel>> getLoadedAllEventsNotifier(){
-        return loadedAllEventsNotifier;
+    public LiveData<List<EventModel>> getLoadedForYouEventsNotifier(){
+        return loadedForYouEventsNotifier;
     }
 
     public LiveData<List<EventModel>> getLoadedInstituteHighlightEventsNotifier(){
@@ -223,7 +231,6 @@ public class EventDataHandler {
 
     // This class will be used to get cursors for pagination
     private static class PaginationHelper{
-        public static DocumentSnapshot lastAllEvent = null;
         public static DocumentSnapshot lastForYouEvent = null;
         public static DocumentSnapshot lastLearnEvent = null;
         public static DocumentSnapshot lastCompeteEvent = null;
@@ -231,9 +238,9 @@ public class EventDataHandler {
     }
 
     public void resetLastForYouEvent(){
-        PaginationHelper.lastAllEvent = null;
-        loadedAllEventsNotifier = new MediatorLiveData<>();
-        allEventsAggregator = new EventsAggregator(loadedAllEventsNotifier);
+        PaginationHelper.lastForYouEvent = null;
+        loadedForYouEventsNotifier = new MediatorLiveData<>();
+        ForYouEventsAggregator = new EventsAggregator(loadedForYouEventsNotifier);
     }
 
     private static class EventsAggregator extends LiveDataAggregator<EventType, List<EventModel>, List<EventModel>>{
