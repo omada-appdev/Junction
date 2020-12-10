@@ -58,17 +58,17 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<LiveEvent<String>> toastMessageAction = new MutableLiveData<>();
 
     //data fields from UI
-    public final MutableLiveData<String> userDisplayName = new MutableLiveData<>();
+    public final MutableLiveData<String> name = new MutableLiveData<>();
     public final MutableLiveData<String> password = new MutableLiveData<>();
     public final MutableLiveData<String> email = new MutableLiveData<>();
     public final MutableLiveData<String> dateOfBirth = new MutableLiveData<>();
-    public final MutableLiveData<String> userGender = new MutableLiveData<>();
-    public final MutableLiveData<String> userInstitute = new MutableLiveData<>();
+    public final MutableLiveData<String> gender = new MutableLiveData<>();
+    public final MutableLiveData<String> institute = new MutableLiveData<>();
 
     private final List<InterestModel> selectedInterests = new ArrayList<>();
     private final List<InterestModel> allInterests = new ArrayList<>();
 
-    private String profilePhotoUrl;
+    private String profilePicture;
 
     //process fields (keep track of state)
     private final DataValidator dataValidator = new DataValidator();
@@ -173,7 +173,7 @@ public class LoginViewModel extends ViewModel {
         password.setValue(null);
         dateOfBirth.setValue(null);
         email.setValue(null);
-        userGender.setValue(null);
+        gender.setValue(null);
         fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_FORGOTPASSWORD_FRAGMENT));
     }
 
@@ -195,7 +195,7 @@ public class LoginViewModel extends ViewModel {
 
         dataValidator.validateDateOfBirth(dateOfBirth.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserDateOfBirth(
+                userModel.setDateOfBirth(
                         new Timestamp(TransformUtilities.convertDDMMYYYYtoDate(dateOfBirth.getValue(), "/"))
                 );
             }
@@ -203,30 +203,30 @@ public class LoginViewModel extends ViewModel {
             notifyValidity(dataValidationInformation);
         });
 
-        dataValidator.validateGender(userGender.getValue(), dataValidationInformation -> {
+        dataValidator.validateGender(gender.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserGender(
-                        Character.toString(userGender.getValue().charAt(0))
+                userModel.setGender(
+                        Character.toString(gender.getValue().charAt(0))
                 );
             }
             else anyDetailsEntryInvalid.set(true);
             notifyValidity(dataValidationInformation);
         });
 
-        dataValidator.validateInstitute(userInstitute.getValue(), dataValidationInformation -> {
+        dataValidator.validateInstitute(institute.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserInstitute(
-                        userInstitute.getValue()
+                userModel.setInstitute(
+                        institute.getValue()
                 );
             }
             else anyDetailsEntryInvalid.set(true);
             notifyValidity(dataValidationInformation);
         });
 
-        dataValidator.validateName(userDisplayName.getValue(), dataValidationInformation -> {
+        dataValidator.validateName(name.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserDisplayName(
-                        userDisplayName.getValue()
+                userModel.setName(
+                        name.getValue()
                 );
             }
             else anyDetailsEntryInvalid.set(true);
@@ -235,7 +235,7 @@ public class LoginViewModel extends ViewModel {
 
         dataValidator.validateEmail(email.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserEmail(
+                userModel.setEmail(
                         email.getValue()
                 );
             }
@@ -253,7 +253,7 @@ public class LoginViewModel extends ViewModel {
 
 
         if(selectedInterests.size()>0){
-            userModel.setUserInterests(selectedInterests);
+            userModel.setInterests(selectedInterests);
         }
 
 
@@ -301,9 +301,9 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void exitInterestsScreen(){
-        userDisplayName.setValue(null);
-        userInstitute.setValue(null);
-        userGender.setValue(null);
+        name.setValue(null);
+        institute.setValue(null);
+        gender.setValue(null);
         password.setValue(null);
         email.setValue(null);
         dateOfBirth.setValue(null);

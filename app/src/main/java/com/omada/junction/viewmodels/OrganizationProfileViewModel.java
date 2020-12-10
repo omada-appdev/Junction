@@ -1,12 +1,7 @@
 package com.omada.junction.viewmodels;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
@@ -15,7 +10,6 @@ import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.data.models.OrganizationModel;
 import com.omada.junction.data.models.ShowcaseModel;
-import com.omada.junction.ui.organization.OrganizationProfileFragment;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
@@ -101,7 +95,7 @@ public class OrganizationProfileViewModel extends ViewModel {
                 .getUserDataHandler()
                 .getCurrentUserModel();
 
-        Object val = currentUserModel.getUserFollowing().get(organizationID);
+        Object val = currentUserModel.getFollowing().get(organizationID);
 
         return val != null;
 

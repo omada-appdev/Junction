@@ -115,9 +115,11 @@ public class EventDataHandler {
                 DataRepository.getInstance()
                 .getUserDataHandler()
                 .getCurrentUserModel()
-                .getUserFollowing()
+                .getFollowing()
                 .keySet()
         );
+
+        following.add("null");
 
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
         Query query = dbInstance
@@ -138,7 +140,10 @@ public class EventDataHandler {
                         item.setId(snapshot.getId());
                         loadedEvents.add(new EventModel(item));
                     }
-                    if(queryDocumentSnapshots.size() > 0) PaginationHelper.lastForYouEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                    if(queryDocumentSnapshots.size() > 0) {
+                        PaginationHelper.lastForYouEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                    }
+
                     destinationLiveData.setValue(loadedEvents);
                 })
                 .addOnFailureListener(e -> Log.d("TAG", Objects.requireNonNull(e.getMessage())));
@@ -153,7 +158,7 @@ public class EventDataHandler {
         String instituteID = DataRepository.getInstance()
                 .getUserDataHandler()
                 .getCurrentUserModel()
-                .getUserInstitute();
+                .getInstitute();
 
         FirebaseFirestore.getInstance()
                 .collection("posts")
@@ -270,8 +275,10 @@ public class EventDataHandler {
                 else{
                     return true;
                 }
-
                  */
+
+                Log.e("Pagination", "aggregable events " + (remoteEvents != null));
+
                 return remoteEvents != null;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -283,6 +290,7 @@ public class EventDataHandler {
         @Override
         protected void aggregateData() {
 
+            Log.e("Pagination", "aggregated events");
             //TODO result.addAll(dataOnHold.get("localEvents"));
             List<EventModel> result = new ArrayList<>(dataOnHold.get(EventType.EVENT_TYPE_REMOTE));
 

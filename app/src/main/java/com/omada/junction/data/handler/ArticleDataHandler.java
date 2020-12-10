@@ -78,12 +78,20 @@ public class ArticleDataHandler {
 
     private void getAllArticlesFromRemote(final MutableLiveData<List<ArticleModel>> destinationLiveData){
 
-        //TODO add query to check what the latest timestamp in local articles is and get all after that
+        List<String> following = new ArrayList<>(
+                DataRepository.getInstance()
+                .getUserDataHandler()
+                .getCurrentUserModel()
+                .getFollowing()
+                .keySet()
+        );
+        following.add("null");
 
         FirebaseFirestore dbInstance = FirebaseFirestore.getInstance();
         Query query = dbInstance
                 .collection("posts")
                 .whereEqualTo("type", "article")
+                .whereIn("creator", following)
                 .limit(1);
 
         if(PaginationHelper.lastAllArticle != null){
@@ -116,7 +124,7 @@ public class ArticleDataHandler {
         String instituteID = DataRepository.getInstance()
                 .getUserDataHandler()
                 .getCurrentUserModel()
-                .getUserInstitute();
+                .getInstitute();
 
         FirebaseFirestore.getInstance()
                 .collection("articles")
@@ -203,6 +211,9 @@ public class ArticleDataHandler {
                 }
 
                  */
+
+                Log.e("Pagination", "aggregable articles " + (remoteArticles != null));
+
                 return remoteArticles != null;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -214,6 +225,7 @@ public class ArticleDataHandler {
         @Override
         protected void aggregateData() {
 
+            Log.e("Pagination", "aggregated articles");
             //TODO result.addAll(dataOnHold.get("localArticles"));
             List<ArticleModel> result = new ArrayList<>(dataOnHold.get(ArticleType.ARTICLE_TYPE_REMOTE));
 

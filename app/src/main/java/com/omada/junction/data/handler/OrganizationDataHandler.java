@@ -52,7 +52,7 @@ public class OrganizationDataHandler {
                 .getInstance()
                 .getUserDataHandler()
                 .getCurrentUserModel()
-                .getUserInstitute();
+                .getInstitute();
 
         FirebaseFirestore.getInstance()
                 .collection("organizations")

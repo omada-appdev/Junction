@@ -1,5 +1,7 @@
 package com.omada.junction.viewmodels;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Transformations;
@@ -42,8 +44,6 @@ public class HomeFeedViewModel extends ViewModel {
     # FIELDS FOR INTERNAL USE #
     ###########################
      */
-    private boolean forYouLoadingInProgress = false;
-    private final List<BaseModel> loadedForYouCache = new ArrayList<>();
     private ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou);
 
 
@@ -93,6 +93,8 @@ public class HomeFeedViewModel extends ViewModel {
 
     public void getForYouFeedContent(){
 
+        Log.e("For you", "called feed content");
+
         DataRepository
                 .getInstance()
                 .getEventDataHandler()
@@ -108,7 +110,6 @@ public class HomeFeedViewModel extends ViewModel {
 
         loadedForYou = new MediatorLiveData<>();
         forYouAggregator = new ForYouAggregator(loadedForYou);
-
     }
 
     public void resetLearnFeedContent(){
@@ -184,6 +185,9 @@ public class HomeFeedViewModel extends ViewModel {
         @SuppressWarnings({"ConstantConditions"})
         @Override
         protected void aggregateData() {
+
+            Log.e("Pagination", "aggregated for you");
+
             List<BaseModel> aggregatedList = new ArrayList<>();
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_EVENT));
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE));

@@ -38,6 +38,7 @@ public class ForYouFragment extends Fragment {
     private ListSection<BaseModel> contentListSection;
 
     private boolean refreshContents = true;
+    private boolean allPagesLoaded = false;
 
     public ForYouFragment() {
         // Required empty public constructor
@@ -95,6 +96,9 @@ public class ForYouFragment extends Fragment {
 
             @Override
             public void onLoadNextPage(int page) {
+                if(allPagesLoaded) {
+                    return;
+                }
                 recyclerView.scrollToPosition(contentListSection.size());
                 refreshContents = true;
                 homeFeedViewModel.getForYouFeedContent();
@@ -107,17 +111,20 @@ public class ForYouFragment extends Fragment {
                 }
                 else{
                     adapter.setInfiniteLoadingHelper(this);
+                    super.markCurrentPageLoaded();
                     added = true;
                 }
             }
 
             @Override
             public void markAllPagesLoaded() {
+                allPagesLoaded = true;
                 if(added) {
                     super.markAllPagesLoaded();
                 }
                 else{
                     adapter.setInfiniteLoadingHelper(this);
+                    super.markAllPagesLoaded();
                     added = true;
                 }
             }
@@ -126,16 +133,30 @@ public class ForYouFragment extends Fragment {
 
         homeFeedViewModel.getLoadedForYou()
                 .observe(getViewLifecycleOwner(), contents->{
-                    if(contents.size() == contentListSection.size()){
+
+                    int oldSize = contentListSection.size();
+
+                    onContentLoaded(contents);
+
+                    infiniteLoadingHelper.markCurrentPageLoaded();
+
+                    if(contents.size() <= 1){
+                        infiniteLoadingHelper.onLoadNextPage(2);
+                    }
+
+                    if(contents.size() == oldSize){
                         infiniteLoadingHelper.markAllPagesLoaded();
+
+                        if(oldSize == 0 && footerSection.getItem() != null){
+                            footerSection.getItem().setFooterText("Follow your favourite organizations to see them here");
+                        }
                         footerSection.showSection();
+
                         ((GravitySnapRecyclerView)recyclerView).snapToNextPosition(true);
                     }
                     else{
-                        ((GravitySnapRecyclerView)recyclerView).scrollToPosition(contentListSection.size() - 1);
+                        ((GravitySnapRecyclerView)recyclerView).scrollToPosition(oldSize - 1);
                     }
-                    onContentLoaded(contents);
-                    infiniteLoadingHelper.markCurrentPageLoaded();
                 });
 
 

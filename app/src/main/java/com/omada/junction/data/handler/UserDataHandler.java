@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -158,9 +157,9 @@ public class UserDataHandler {
         else{
 
             signedInUser.setUID(newUser.getUid());
-            signedInUser.setUserDisplayName(newUser.getDisplayName());
-            signedInUser.setUserEmail(newUser.getEmail());
-            signedInUser.setUserPhoneNumber(newUser.getPhoneNumber());
+            signedInUser.setName(newUser.getDisplayName());
+            signedInUser.setEmail(newUser.getEmail());
+            signedInUser.setPhone(newUser.getPhoneNumber());
 
             FirebaseFirestore.getInstance()
                     .collection("users")
@@ -168,34 +167,56 @@ public class UserDataHandler {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
 
-                        signedInUser.setUserDateOfBirth(documentSnapshot.getTimestamp("userDateOfBirth"));
-                        signedInUser.setUserInstitute(documentSnapshot.getString("userInstitute"));
+                        signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
+                        signedInUser.setInstitute(documentSnapshot.getString("institute"));
 
-                        signedInUser.setUserDisplayName(documentSnapshot.getString("userDisplayName"));
-                        signedInUser.setUserGender(documentSnapshot.getString("userGender"));
+                        signedInUser.setName(documentSnapshot.getString("name"));
+                        signedInUser.setGender(documentSnapshot.getString("gender"));
 
                         try {
                             @SuppressWarnings("unchecked")
-                            List<Map<String, Object>> interestsTempRaw = (List<Map<String, Object>>)documentSnapshot.get("userInterests");
+                            List<Map<String, Object>> interestsTempRaw = (List<Map<String, Object>>)documentSnapshot.get("interestsRating");
                             if(interestsTempRaw != null && interestsTempRaw.size()>0) {
 
-                                List<InterestModel> userInterests = new ArrayList<>(interestsTempRaw.size());
+                                List<InterestModel> interestsRating = new ArrayList<>(interestsTempRaw.size());
 
                                 for (Map<String, Object> elem : interestsTempRaw) {
 
-                                    InterestModel interestModel = new InterestModel((String) elem.get("interestString"));
-                                    userInterests.add(interestModel);
+                                    InterestModel interestModel = new InterestModel((String) elem.get("interestsRating"));
+                                    interestsRating.add(interestModel);
                                 }
-                                signedInUser.setUserInterests(userInterests);
+                                signedInUser.setInterests(interestsRating);
                             }
 
                         }
                         catch (Exception e){
-                            signedInUser.setUserInterests(null);
+                            signedInUser.setInterests(null);
                         }
 
-                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
-                        signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
+                        FirebaseDatabase.getInstance()
+                                .getReference()
+                                .child("follows")
+                                .child(signedInUser.getUID())
+                                .addValueEventListener(new ValueEventListener(){
+
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        HashMap<String, Object> dataMap = new HashMap<>();
+                                        for (DataSnapshot childSnapshot: snapshot.getChildren()) {
+                                            dataMap.put(childSnapshot.getKey(), childSnapshot.getValue());
+                                        }
+                                        signedInUser.following = dataMap;
+
+                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
+                                        signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
 
                     })
                     .addOnFailureListener(e -> authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE)));
@@ -212,13 +233,13 @@ public class UserDataHandler {
      */
     public void getCurrentUserDetails(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null && user.getUid() != null){
+        if(user != null){
 
             prevUserUID = signedInUser.getUID();
 
             signedInUser.setUID(user.getUid());
-            signedInUser.setUserDisplayName(user.getDisplayName());
-            signedInUser.setUserEmail(user.getEmail());
+            signedInUser.setName(user.getDisplayName());
+            signedInUser.setEmail(user.getEmail());
 
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_SUCCESS));
             getUserDetailsFromRemote();
@@ -234,7 +255,7 @@ public class UserDataHandler {
      */
     private void getUserDetailsFromRemote(){
 
-        if(!signedInUser.getUID().equals("") && !(signedInUser == null)){
+        if(!signedInUser.getUID().equals("")){
             //TODO get data from local and then remote if that fails
 
             FirebaseFirestore.getInstance()
@@ -243,30 +264,32 @@ public class UserDataHandler {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
 
-                        signedInUser.setUserDateOfBirth(documentSnapshot.getTimestamp("userDateOfBirth"));
-                        signedInUser.setUserInstitute(documentSnapshot.getString("userInstitute"));
+                        signedInUser.setName(documentSnapshot.getString("name"));
+                        signedInUser.setEmail(documentSnapshot.getString("email"));
+                        signedInUser.setPhone(documentSnapshot.getString("phone"));
 
-                        signedInUser.setUserDisplayName(documentSnapshot.getString("userDisplayName"));
-                        signedInUser.setUserGender(documentSnapshot.getString("userGender"));
+                        signedInUser.setGender(documentSnapshot.getString("gender"));
+                        signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
+                        signedInUser.setInstitute(documentSnapshot.getString("institute"));
 
                         try {
                             @SuppressWarnings("unchecked")
-                            List<Map<String, Object>> interestsTempRaw = (List<Map<String, Object>>)documentSnapshot.get("userInterests");
+                            List<Map<String, Object>> interestsTempRaw = (List<Map<String, Object>>)documentSnapshot.get("interestsRating");
                             if(interestsTempRaw != null && interestsTempRaw.size()>0) {
 
                                 List<InterestModel> userInterests = new ArrayList<>(interestsTempRaw.size());
 
                                 for (Map<String, Object> elem : interestsTempRaw) {
 
-                                    InterestModel interestModel = new InterestModel((String) elem.get("interestString"));
+                                    InterestModel interestModel = new InterestModel((String) elem.get("interests"));
                                     userInterests.add(interestModel);
                                 }
-                                signedInUser.setUserInterests(userInterests);
+                                signedInUser.setInterests(userInterests);
                             }
 
                         }
                         catch (Exception e){
-                            signedInUser.setUserInterests(null);
+                            signedInUser.setInterests(null);
                         }
 
                         FirebaseDatabase.getInstance()
@@ -281,9 +304,7 @@ public class UserDataHandler {
                                         for (DataSnapshot childSnapshot: snapshot.getChildren()) {
                                             dataMap.put(childSnapshot.getKey(), childSnapshot.getValue());
                                         }
-                                        signedInUser.userFollowing = dataMap;
-
-                                        Log.e("Following", dataMap.toString());
+                                        signedInUser.following = dataMap;
 
                                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_LOGIN_SUCCESS));
                                         signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
@@ -318,16 +339,16 @@ public class UserDataHandler {
                 .collection("users")
                 .document(getCurrentUserModel().UID)
                 .update(
-                        "userDisplayName", updatedUserModel.userDisplayName,
-                        "userGender", updatedUserModel.userGender,
-                        "userDateOfBirth", updatedUserModel.userDateOfBirth
+                        "name", updatedUserModel.name,
+                        "gender", updatedUserModel.gender,
+                        "dateOfBirth", updatedUserModel.dateOfBirth
                 )
                 .addOnSuccessListener(aVoid -> {
                     Log.e("Update", "success");
-                    signedInUser.userDateOfBirth = updatedUserModel.userDateOfBirth;
-                    signedInUser.userGender = updatedUserModel.userGender;
-                    signedInUser.userDisplayName = updatedUserModel.userDisplayName;
-                    signedInUser.userInstitute = updatedUserModel.userInstitute;
+                    signedInUser.dateOfBirth = updatedUserModel.dateOfBirth;
+                    signedInUser.gender = updatedUserModel.gender;
+                    signedInUser.name = updatedUserModel.name;
+                    signedInUser.institute = updatedUserModel.institute;
                 })
                 .addOnFailureListener(e -> Log.e("Update", e.getMessage()));
 
@@ -387,16 +408,19 @@ public class UserDataHandler {
         // Variables are package-private to prevent subclasses of MutableUserModel
         // gaining access to fields
         @NonNull String UID = "";
-        String userEmail;
-        String userDisplayName;
-        String userPhoneNumber;
+        String email;
+        String name;
+        String phone;
 
-        List<InterestModel> userInterests;
-        List<String> userInterestsString;
-        Timestamp userDateOfBirth;
-        String userGender;
-        String userInstitute;
-        Map<String, Object> userFollowing;
+        List<InterestModel> interestsRating;
+        List<String> interests;
+
+        Timestamp dateOfBirth;
+        String gender;
+        String institute;
+
+        // get this from realtime database
+        Map<String, Object> following;
 
         private UserModel(){}
 
@@ -405,51 +429,52 @@ public class UserDataHandler {
             return UID;
         }
 
-        public String getUserEmail() {
-            return userEmail;
+        public String getEmail() {
+            return email;
         }
 
-        public String getUserDisplayName() {
-            return userDisplayName;
+        public String getName() {
+            return name;
         }
 
-        public String getUserPhoneNumber() {
-            return userPhoneNumber;
+        public String getPhone() {
+            return phone;
         }
 
-        public List<InterestModel> getUserInterests() {
-            return userInterests;
+        public List<InterestModel> getInterestsRating() {
+            return interestsRating;
         }
 
-        public Map<String, Object> getUserFollowing() {
-            return userFollowing;
+        public Map<String, Object> getFollowing() {
+            return following;
         }
 
-        public List<String> getUserInterestsString(){
-            return userInterestsString;
+        public List<String> getInterests(){
+            return interests;
         }
 
-        public Timestamp getUserDateOfBirth() {
-            return userDateOfBirth;
+        public Timestamp getDateOfBirth() {
+            return dateOfBirth;
         }
 
-        public String getUserGender() {
-            return userGender;
+        public String getGender() {
+            return gender;
         }
 
-        public String getUserInstitute() {
-            return userInstitute;
+        public String getInstitute() {
+            return institute;
         }
 
         public Map<String, Object> toMapObject(){
 
             Map<String, Object> mapUserModel = new HashMap<>();
-            mapUserModel.put("userInstitute", userInstitute);
-            mapUserModel.put("userGender", userGender);
-            mapUserModel.put("userDateOfBirth", userDateOfBirth);
-            mapUserModel.put("userInterests", userInterests);
-            mapUserModel.put("userDisplayName", userDisplayName);
-            mapUserModel.put("userInterestsString", userInterestsString);
+            mapUserModel.put("institute", institute);
+            mapUserModel.put("gender", gender);
+            mapUserModel.put("dateOfBirth", dateOfBirth);
+            mapUserModel.put("interestsRating", interestsRating);
+            mapUserModel.put("name", name);
+            mapUserModel.put("interests", interests);
+            mapUserModel.put("email", email);
 
             return mapUserModel;
         }
@@ -463,40 +488,40 @@ public class UserDataHandler {
     public static class MutableUserModel extends UserModel{
 
 
-        public void setUserEmail(String emailID) {
-            this.userEmail = emailID;
+        public void setEmail(String email) {
+            this.email = email;
         }
 
-        public void setUserDisplayName(String displayName) {
-            this.userDisplayName = displayName;
+        public void setName(String name) {
+            this.name = name;
         }
 
-        public void setUserPhoneNumber(String phoneNumber) {
-            this.userPhoneNumber = phoneNumber;
+        public void setPhone(String phone) {
+            this.phone = phone;
         }
 
-        public void setUserInterests(List<InterestModel> userInterestsModel) {
+        public void setInterests(List<InterestModel> interestsRating) {
 
-            this.userInterests = userInterestsModel;
+            this.interestsRating = interestsRating;
 
-            if(userInterests != null) {
-                this.userInterestsString = new ArrayList<>(userInterests.size());
-                for (InterestModel i : userInterests) {
-                    userInterestsString.add(i.interestString);
+            if(this.interestsRating != null) {
+                this.interests = new ArrayList<>(this.interestsRating.size());
+                for (InterestModel i : this.interestsRating) {
+                    interests.add(i.interestString);
                 }
             }
         }
 
-        public void setUserDateOfBirth(Timestamp userDOB) {
-            this.userDateOfBirth = userDOB;
+        public void setDateOfBirth(Timestamp dateOfBirth) {
+            this.dateOfBirth = dateOfBirth;
         }
 
-        public void setUserGender(String userGender) {
-            this.userGender = userGender;
+        public void setGender(String gender) {
+            this.gender = gender;
         }
 
-        public void setUserInstitute(String userInstitute) {
-            this.userInstitute = userInstitute;
+        public void setInstitute(String institute) {
+            this.institute = institute;
         }
 
     }
@@ -512,14 +537,14 @@ public class UserDataHandler {
 
         public void resetUser(){
             UID = "";
-            userEmail = null;
-            userDisplayName = null;
-            userPhoneNumber = null;
-            userInterests = null;
-            userInterestsString = null;
-            userDateOfBirth = null;
-            userGender = null;
-            userInstitute = null;
+            email = null;
+            name = null;
+            phone = null;
+            interestsRating = null;
+            interests = null;
+            dateOfBirth = null;
+            gender = null;
+            institute = null;
         }
     }
 }

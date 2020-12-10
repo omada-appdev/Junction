@@ -70,7 +70,7 @@
                         android:layout_width="match_parent"
                         android:id="@+id/name_input"
                         android:inputType="textEmailAddress"
-                        android:text="@={viewModel.userDisplayName}"/>
+                        android:text="@={viewModel.name}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -87,7 +87,7 @@
                         android:layout_width="match_parent"
                         android:id="@+id/date_of_birth_input"
                         android:inputType="textPersonName"
-                        android:text="@={viewModel.userDateOfBirth}"/>
+                        android:text="@={viewModel.dateOfBirth}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -104,7 +104,7 @@
                         android:layout_width="match_parent"
                         android:id="@+id/gender_input"
                         android:inputType="text"
-                        android:text="@={viewModel.userGender}" />
+                        android:text="@={viewModel.gender}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -125,7 +125,7 @@
                         android:layout_width="match_parent"
                         android:id="@+id/institute_input"
                         android:inputType="textPostalAddress"
-                        android:text="@={viewModel.userInstitute}"/>
+                        android:text="@={viewModel.institute}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>

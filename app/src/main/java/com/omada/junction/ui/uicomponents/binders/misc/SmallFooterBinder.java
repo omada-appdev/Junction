@@ -19,7 +19,7 @@ public class SmallFooterBinder extends ItemBinder<SmallFooterModel, SmallFooterB
 
     @Override
     public void bindViewHolder(FooterViewHolder holder, SmallFooterModel item) {
-        holder.footerTextView.setText(item.getHeaderText());
+        holder.footerTextView.setText(item.getFooterText());
     }
 
     @Override

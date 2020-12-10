@@ -63,7 +63,7 @@
                         android:layout_marginBottom="4dp"
                         android:maxWidth="200dp"
                         android:maxHeight="120dp"
-                        android:text="@{viewModel.userDisplayName}"
+                        android:text="@{viewModel.name}"
                         android:textAlignment="textEnd"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                         android:theme="@style/Theme.AppTheme"

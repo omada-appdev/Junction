@@ -21,11 +21,11 @@ public class UserProfileViewModel extends ViewModel {
     private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> signOutTrigger;
     private final MutableLiveData<LiveEvent<DataValidator.DataValidationInformation>> dataValidationAction = new MutableLiveData<>();
 
-    public MutableLiveData<String> userDisplayName = new MutableLiveData<>();
-    public MutableLiveData<String> userInstitute = new MutableLiveData<>();
-    public MutableLiveData<String> userDateOfBirth = new MutableLiveData<>();
-    public MutableLiveData<String> userGender = new MutableLiveData<>();
-    public MutableLiveData<String> userEmail = new MutableLiveData<>();
+    public MutableLiveData<String> name = new MutableLiveData<>();
+    public MutableLiveData<String> institute = new MutableLiveData<>();
+    public MutableLiveData<String> dateOfBirth = new MutableLiveData<>();
+    public MutableLiveData<String> gender = new MutableLiveData<>();
+    public MutableLiveData<String> email = new MutableLiveData<>();
 
     public UserProfileViewModel(){
 
@@ -41,11 +41,11 @@ public class UserProfileViewModel extends ViewModel {
                 .getUserDataHandler()
                 .getCurrentUserModel();
 
-        userDisplayName.setValue(currentUserModel.getUserDisplayName());
-        userInstitute.setValue(currentUserModel.getUserInstitute());
-        userDateOfBirth.setValue(TransformUtilities.convertTimestampToDDMMYYYY(currentUserModel.getUserDateOfBirth()));
-        userGender.setValue(currentUserModel.getUserGender());
-        userEmail.setValue(currentUserModel.getUserEmail());
+        name.setValue(currentUserModel.getName());
+        institute.setValue(currentUserModel.getInstitute());
+        dateOfBirth.setValue(TransformUtilities.convertTimestampToDDMMYYYY(currentUserModel.getDateOfBirth()));
+        gender.setValue(currentUserModel.getGender());
+        email.setValue(currentUserModel.getEmail());
     }
 
 
@@ -56,34 +56,34 @@ public class UserProfileViewModel extends ViewModel {
         DataValidator validator = new DataValidator();
         AtomicBoolean anyDetailsEntryInvalid = new AtomicBoolean(false);
 
-        validator.validateName(userDisplayName.getValue(), dataValidationInformation -> {
+        validator.validateName(name.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setUserDisplayName(userDisplayName.getValue());
+                mutableUserModel.setName(name.getValue());
             }
             else anyDetailsEntryInvalid.set(true);
         });
 
-        validator.validateGender(userGender.getValue(), dataValidationInformation -> {
+        validator.validateGender(gender.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setUserDisplayName(userDisplayName.getValue());
+                mutableUserModel.setName(name.getValue());
             }
             else anyDetailsEntryInvalid.set(true);
         });
 
-        validator.validateDateOfBirth(userDateOfBirth.getValue(), dataValidationInformation -> {
+        validator.validateDateOfBirth(dateOfBirth.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setUserDateOfBirth(
+                mutableUserModel.setDateOfBirth(
                         new Timestamp(
-                                TransformUtilities.convertDDMMYYYYtoDate(userDateOfBirth.getValue(), "/")
+                                TransformUtilities.convertDDMMYYYYtoDate(dateOfBirth.getValue(), "/")
                         )
                 );
             }
             else anyDetailsEntryInvalid.set(true);
         });
 
-        validator.validateInstitute(userInstitute.getValue(), dataValidationInformation -> {
+        validator.validateInstitute(institute.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setUserInstitute(userInstitute.getValue());
+                mutableUserModel.setInstitute(institute.getValue());
             }
             else anyDetailsEntryInvalid.set(true);
         });
