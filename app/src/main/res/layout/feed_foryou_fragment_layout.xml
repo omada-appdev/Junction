@@ -15,7 +15,6 @@
         app:snapEnabled="true"
         app:snapLastItem="false"
         app:snapMaxFlingSizeFraction="0.6"
-        app:snapScrollMsPerInch="50"
-        android:background="@color/backdrop"/>
+        app:snapScrollMsPerInch="50"/>
 
 </LinearLayout>

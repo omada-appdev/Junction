@@ -97,6 +97,8 @@ public class ForYouFragment extends Fragment {
             @Override
             public void onLoadNextPage(int page) {
                 if(allPagesLoaded) {
+                    markCurrentPageLoaded();
+                    markAllPagesLoaded();
                     return;
                 }
                 recyclerView.scrollToPosition(contentListSection.size());

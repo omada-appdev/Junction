@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/feed_view_pager" />
+        app:layout_constraintBottom_toTopOf="@id/feed_view_pager"
+        android:elevation="4dp"/>
 
    <androidx.viewpager2.widget.ViewPager2
        android:id="@+id/feed_view_pager"

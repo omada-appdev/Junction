@@ -77,8 +77,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/institute_feed_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/backdrop"/>
+                android:layout_height="match_parent"/>
         </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

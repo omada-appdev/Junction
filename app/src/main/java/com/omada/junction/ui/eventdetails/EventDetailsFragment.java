@@ -11,9 +11,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.omada.junction.R;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.databinding.EventDetailsFragmentLayoutBinding;
@@ -22,6 +24,7 @@ import com.omada.junction.viewmodels.FeedContentViewModel;
 public class EventDetailsFragment extends Fragment {
 
     private EventModel eventModel;
+    private EventDetailsFragmentLayoutBinding binding;
 
     public static EventDetailsFragment newInstance(EventModel eventModel) {
 
@@ -49,11 +52,16 @@ public class EventDetailsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        EventDetailsFragmentLayoutBinding binding = DataBindingUtil.inflate(inflater, R.layout.event_details_fragment_layout, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.event_details_fragment_layout, container, false);
         binding.setViewModel(new ViewModelProvider(requireActivity()).get(FeedContentViewModel.class));
         binding.setEventDetails(eventModel);
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

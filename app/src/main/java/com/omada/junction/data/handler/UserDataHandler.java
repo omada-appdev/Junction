@@ -372,7 +372,6 @@ public class UserDataHandler {
                     .child(organizationID)
                     .removeValue();
         }
-
     }
 
     /*
