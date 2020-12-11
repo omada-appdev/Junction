@@ -23,18 +23,17 @@
             android:id="@+id/appbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_behavior=".ui.uicomponents.behaviors.FlingBehavior">
+            android:background="@color/transparent"
+            app:elevation="2dp">
 
             <net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
                 android:id="@+id/collapsing_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:title="@{eventDetails.title}"
-                app:expandedTitleTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                app:expandedTitleMarginBottom="-40sp"
-                app:contentScrim="@color/colorPrimaryDark"
+                app:contentScrim="#99FFFFFF"
+                android:background="@color/transparent"
                 app:maxLines="3">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,21 +43,60 @@
                     app:layout_collapseParallaxMultiplier="0.3">
 
                     <com.google.android.material.imageview.ShapeableImageView
+                        app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
+                        android:id="@+id/organizer_profile_image"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginStart="12dp"
+                        android:padding="4dp"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/event_poster_image"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        remoteImageUrl="@{eventDetails.creatorProfilePicture}"/>
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/title_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="16dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                        android:textColor="#DE000000"
+                        android:text="@{eventDetails.title}"
+                        app:layout_constraintTop_toTopOf="@+id/organizer_profile_image"
+                        app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/organization_name_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="16dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                        android:textColor="#8A000000"
+                        android:text="@{eventDetails.creatorName}"
+                        app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/title_text"/>
+
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/event_poster_image"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         app:layout_constraintDimensionRatio="W, 4:3"
                         remoteImageUrl="@{eventDetails.image}"
                         android:scaleType="centerCrop"
-                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="12dp"
+                        app:layout_constraintTop_toBottomOf="@id/organizer_profile_image"
                         app:layout_constraintBottom_toBottomOf="parent"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.appcompat.widget.Toolbar
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin"
-                    app:subtitle="@{eventDetails.creatorName}"/>
 
             </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
@@ -116,7 +154,7 @@
                     android:text="email"
                     app:layout_constraintStart_toEndOf="@+id/call_button"
                     app:layout_constraintTop_toBottomOf="@+id/event_time_start_text"
-                    android:onClick="@{()->viewModel.eventViewHandler.mailOrganizer(eventDetails.creatorMail)}"/>
+                    android:onClick="@{()->viewModel.eventViewHandler.mailOrganizer(eventDetails.title, eventDetails.creatorMail)}"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/register_button"

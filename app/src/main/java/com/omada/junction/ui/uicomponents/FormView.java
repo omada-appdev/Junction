@@ -86,8 +86,11 @@ public class FormView extends FrameLayout {
         assert inflater != null;
         ConstraintLayout inflatedSectionView = (ConstraintLayout) inflater.inflate(R.layout.form_section_layout, this, false);
 
+        // TODO check section button types here
+
         inflatedSectionView.findViewById(R.id.section_action_button)
                 .setOnClickListener(v->
+                        // TODO add any validation code here
                         viewModel.registerForEvent(this.eventModel, form.getFormMap())
                 );
         return inflatedSectionView;

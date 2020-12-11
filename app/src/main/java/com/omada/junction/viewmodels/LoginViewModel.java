@@ -164,7 +164,7 @@ public class LoginViewModel extends ViewModel {
             ));
             DataRepository.getInstance()
                     .getUserDataHandler()
-                    .authenticateUser(email.getValue(), password.getValue());
+                    .authenticateUser(email.getValue().trim(), password.getValue().trim());
         }
 
     }

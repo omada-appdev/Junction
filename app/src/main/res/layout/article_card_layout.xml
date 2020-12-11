@@ -75,7 +75,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
-                android:background="@color/colorPrimaryDark"
+                android:background="@color/backdrop"
                 remoteImageUrl="@{articleModel.image}"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toTopOf="@+id/more_details_button"

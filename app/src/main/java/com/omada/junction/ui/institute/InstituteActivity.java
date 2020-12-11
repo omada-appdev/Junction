@@ -1,8 +1,10 @@
 package com.omada.junction.ui.institute;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -104,14 +106,34 @@ public class InstituteActivity extends AppCompatActivity {
         feedContentViewModel
                 .getEventViewHandler()
                 .getCallOrganizerTrigger().observe(this, stringLiveEvent -> {
-            //TODO call organizer from here
-        });
 
+            if(stringLiveEvent.getData() != null){
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+
+        });
 
         feedContentViewModel
                 .getEventViewHandler()
-                .getMailOrganizerTrigger().observe(this, stringLiveEvent -> {
-            //TODO mail organizer from here
+                .getMailOrganizerTrigger().observe(this, pairLiveEvent -> {
+
+            if(pairLiveEvent.getData() != null) {
+
+                Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+
         });
 
         feedContentViewModel.getOrganizationDetailsTrigger()
