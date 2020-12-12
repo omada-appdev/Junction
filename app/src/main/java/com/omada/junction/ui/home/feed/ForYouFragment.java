@@ -151,21 +151,25 @@ public class ForYouFragment extends Fragment {
                         infiniteLoadingHelper.onLoadNextPage(2);
                     }
 
-                    if(contents.size() == oldSize){
+                    if(contents.size() != oldSize){
+                        ((GravitySnapRecyclerView)recyclerView).scrollToPosition(oldSize - 1);
+                    }
+                });
+
+        homeFeedViewModel.getForYouCompleteNotifier()
+                .observe(getViewLifecycleOwner(), booleanLiveEvent -> {
+                    if(booleanLiveEvent.getData() != null && booleanLiveEvent.getDataOnceAndReset()){
+
                         infiniteLoadingHelper.markAllPagesLoaded();
 
-                        if(oldSize == 0 && footerSection.getItem() != null){
+                        if(contentListSection.size() == 0 && footerSection.getItem() != null){
                             footerSection.getItem().setFooterText("Follow your favourite organizations to see them here");
                         }
                         footerSection.showSection();
 
                         ((GravitySnapRecyclerView)recyclerView).snapToNextPosition(true);
                     }
-                    else{
-                        ((GravitySnapRecyclerView)recyclerView).scrollToPosition(oldSize - 1);
-                    }
                 });
-
 
     }
 

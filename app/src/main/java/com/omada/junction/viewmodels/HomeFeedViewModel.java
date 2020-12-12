@@ -4,6 +4,7 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
@@ -12,6 +13,7 @@ import com.omada.junction.data.models.ArticleModel;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.utils.taskhandler.LiveDataAggregator;
+import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +41,14 @@ public class HomeFeedViewModel extends ViewModel {
     private MediatorLiveData<List<BaseModel>> loadedLearn = new MediatorLiveData<>();
     private MediatorLiveData<List<BaseModel>> loadedCompete = new MediatorLiveData<>();
 
+    private final MutableLiveData<LiveEvent<Boolean>> forYouCompleteNotifier = new MutableLiveData<>();
+
     /*
     ###########################
     # FIELDS FOR INTERNAL USE #
     ###########################
      */
-    private ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou);
+    private ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou, forYouCompleteNotifier);
 
 
     public HomeFeedViewModel(){
@@ -109,7 +113,7 @@ public class HomeFeedViewModel extends ViewModel {
     public void resetForYouFeedContent(){
 
         loadedForYou = new MediatorLiveData<>();
-        forYouAggregator = new ForYouAggregator(loadedForYou);
+        forYouAggregator = new ForYouAggregator(loadedForYou, forYouCompleteNotifier);
     }
 
     public void resetLearnFeedContent(){
@@ -142,6 +146,10 @@ public class HomeFeedViewModel extends ViewModel {
         distributeLoadedData();
     }
 
+    public MutableLiveData<LiveEvent<Boolean>> getForYouCompleteNotifier() {
+        return forYouCompleteNotifier;
+    }
+
     private enum ContentTypeIdentifier {
         CONTENT_TYPE_EVENT,
         CONTENT_TYPE_ARTICLE,
@@ -158,8 +166,11 @@ public class HomeFeedViewModel extends ViewModel {
     // Apply things like sorting, etc. in aggregator
     private static class ForYouAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>>{
 
-        public ForYouAggregator(MediatorLiveData<List<BaseModel>> destination) {
+        private MutableLiveData<LiveEvent<Boolean>> completeNotifier;
+
+        public ForYouAggregator(MediatorLiveData<List<BaseModel>> destination, MutableLiveData<LiveEvent<Boolean>> completeNotifier) {
             super(destination);
+            this.completeNotifier = completeNotifier;
         }
 
         @Override
@@ -192,6 +203,10 @@ public class HomeFeedViewModel extends ViewModel {
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_EVENT));
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE));
 
+            if(aggregatedList.size() == 0){
+                completeNotifier.setValue(new LiveEvent<>(true));
+            }
+
             dataOnHold.put(ContentTypeIdentifier.CONTENT_TYPE_EVENT, null);
             dataOnHold.put(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE, null);
 
@@ -200,6 +215,7 @@ public class HomeFeedViewModel extends ViewModel {
                 aggregatedList.addAll(0, destinationLiveData.getValue());
             }
             destinationLiveData.setValue(aggregatedList);
+
         }
 
     }
