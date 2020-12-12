@@ -16,11 +16,13 @@ import com.omada.junction.R;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.ShowcaseModel;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
 import com.omada.junction.ui.home.HomeActivity;
 import com.omada.junction.ui.more.MoreActivity;
 import com.omada.junction.ui.organization.OrganizationProfileFragment;
+import com.omada.junction.ui.organization.OrganizationShowcaseFragment;
 import com.omada.junction.viewmodels.ApplicationViewModel;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.InstituteFeedViewModel;
@@ -146,6 +148,25 @@ public class InstituteActivity extends AppCompatActivity {
                                 .addToBackStack(null)
                                 .commit();
                     }
+                });
+
+        feedContentViewModel
+                .getOrganizationViewHandler()
+                .getOrganizationShowcaseDetailsTrigger()
+                .observe(this, showcaseModelLiveEvent -> {
+
+                    if(showcaseModelLiveEvent.getData() != null){
+
+                        ShowcaseModel model = showcaseModelLiveEvent.getDataOnceAndReset();
+
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.institute_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
+                                .addToBackStack(null)
+                                .commit();
+
+                    }
+
                 });
     }
 

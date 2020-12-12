@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
 import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.ShowcaseModel;
 import com.omada.junction.ui.articledetails.ArticleDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
@@ -19,6 +20,7 @@ import com.omada.junction.ui.institute.InstituteActivity;
 import com.omada.junction.ui.home.feed.FeedFragment;
 import com.omada.junction.ui.more.MoreActivity;
 import com.omada.junction.ui.organization.OrganizationProfileFragment;
+import com.omada.junction.ui.organization.OrganizationShowcaseFragment;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.HomeFeedViewModel;
 
@@ -180,6 +182,25 @@ public class HomeActivity extends AppCompatActivity {
                                 .commit();
 
                     }
+                });
+
+        feedContentViewModel
+                .getOrganizationViewHandler()
+                .getOrganizationShowcaseDetailsTrigger()
+                .observe(this, showcaseModelLiveEvent -> {
+
+                    if(showcaseModelLiveEvent.getData() != null){
+
+                        ShowcaseModel model = showcaseModelLiveEvent.getDataOnceAndReset();
+
+                        getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
+                                .addToBackStack(null)
+                                .commit();
+
+                    }
+
                 });
     }
 

@@ -8,7 +8,7 @@ public final class ShowcaseModelRemoteDB {
     private String showcaseID;
     private String showcaseTitle;
 
-    private String showcaseCreator;
+    private String creator;
     private String showcaseCreatorType;
     private String showcasePhoto;
 
@@ -22,14 +22,14 @@ public final class ShowcaseModelRemoteDB {
         this.showcaseID = showcaseID;
     }
 
-    @PropertyName("showcaseCreator")
-    public void setShowcaseCreator(String showcaseCreator) {
-        this.showcaseCreator = showcaseCreator;
+    @PropertyName("creator")
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
-    @PropertyName("showcaseCreator")
-    public String getShowcaseCreator() {
-        return showcaseCreator;
+    @PropertyName("creator")
+    public String getCreator() {
+        return creator;
     }
 
     @PropertyName("showcaseCreatorType")

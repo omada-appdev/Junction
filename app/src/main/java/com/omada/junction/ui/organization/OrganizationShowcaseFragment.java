@@ -20,6 +20,8 @@ import com.omada.junction.utils.factory.ShowcaseFeedViewModelFactory;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.ShowcaseFeedViewModel;
 
+import java.util.List;
+
 import mva3.adapter.ListSection;
 import mva3.adapter.MultiViewAdapter;
 
@@ -32,6 +34,7 @@ public class OrganizationShowcaseFragment extends Fragment {
 
     private final MultiViewAdapter adapter = new MultiViewAdapter();
     private final ListSection<BaseModel> showcaseItemsListSection = new ListSection<>();
+    private boolean refreshContents = true;
 
 
     public static OrganizationShowcaseFragment newInstance(String organizationID, String showcaseID) {
@@ -49,7 +52,7 @@ public class OrganizationShowcaseFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        showcaseID = getArguments().getString("organizationID");
+        showcaseID = getArguments().getString("showcaseID");
         organizationID = getArguments().getString("organizationID");
 
         adapter.addSection(showcaseItemsListSection);
@@ -80,11 +83,21 @@ public class OrganizationShowcaseFragment extends Fragment {
         if(getView() == null) return;
         RecyclerView recyclerView = getView().findViewById(R.id.recycler_view);
 
+        showcaseFeedViewModel.getLoadedShowcaseItems()
+                .observe(getViewLifecycleOwner(), this::onShowcaseItemsLoaded);
+
         recyclerView.setLayoutManager(
                 new GridLayoutManager(getContext(), 2, RecyclerView.VERTICAL, false)
         );
 
         recyclerView.setAdapter(adapter);
+    }
+
+    private void onShowcaseItemsLoaded(List<BaseModel> items){
+        if(refreshContents || showcaseItemsListSection.size() == 0){
+            showcaseItemsListSection.addAll(items);
+            refreshContents = false;
+        }
     }
 
     @Override

@@ -166,7 +166,7 @@ public class HomeFeedViewModel extends ViewModel {
     // Apply things like sorting, etc. in aggregator
     private static class ForYouAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>>{
 
-        private MutableLiveData<LiveEvent<Boolean>> completeNotifier;
+        private final MutableLiveData<LiveEvent<Boolean>> completeNotifier;
 
         public ForYouAggregator(MediatorLiveData<List<BaseModel>> destination, MutableLiveData<LiveEvent<Boolean>> completeNotifier) {
             super(destination);
