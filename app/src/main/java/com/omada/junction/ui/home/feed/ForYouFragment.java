@@ -53,8 +53,7 @@ public class ForYouFragment extends Fragment {
 
         homeFeedViewModel = viewModelProvider.get(HomeFeedViewModel.class);
 
-        if(savedInstanceState == null ||
-                homeFeedViewModel.getLoadedForYou().getValue() == null || homeFeedViewModel.getLoadedForYou().getValue().size() == 0){
+        if(homeFeedViewModel.getLoadedForYou().getValue() == null || homeFeedViewModel.getLoadedForYou().getValue().size() == 0){
             homeFeedViewModel.getForYouFeedContent();
         }
     }
@@ -72,6 +71,12 @@ public class ForYouFragment extends Fragment {
 
         MultiViewAdapter adapter = new MultiViewAdapter();
         contentListSection = new ListSection<>();
+
+        if(homeFeedViewModel.getLoadedForYou().getValue() != null) {
+            contentListSection.addAll(
+                    homeFeedViewModel.getLoadedForYou().getValue()
+            );
+        }
 
         adapter.addSection(contentListSection);
 
