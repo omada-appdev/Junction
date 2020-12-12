@@ -71,7 +71,7 @@ public class HomeActivity extends AppCompatActivity {
                             .commit();
                 }
                 else {
-                    getSupportFragmentManager().popBackStack("bottom", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    getSupportFragmentManager().popBackStack("stack", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
             }
             else if (itemId == R.id.more_button){
@@ -113,8 +113,7 @@ public class HomeActivity extends AppCompatActivity {
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder, EventDetailsFragment.newInstance(eventModel))
                                 .addToBackStack(
-                                        getSupportFragmentManager().getBackStackEntryCount() == 0
-                                        ? "bottom" : null
+                                        "stack"
                                 )
                                 .commit();
                     }
@@ -131,8 +130,7 @@ public class HomeActivity extends AppCompatActivity {
                                 .replace(R.id.home_content_placeholder,
                                         OrganizationProfileFragment.newInstance(stringLiveEvent.getDataOnceAndReset()))
                                 .addToBackStack(
-                                        getSupportFragmentManager().getBackStackEntryCount() == 0
-                                        ? "bottom" : null
+                                        "stack"
                                 )
                                 .commit();
                     }
@@ -150,8 +148,7 @@ public class HomeActivity extends AppCompatActivity {
                             .beginTransaction()
                             .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
                             .addToBackStack(
-                                    getSupportFragmentManager().getBackStackEntryCount() == 0
-                                    ? "bottom" : null
+                                    "stack"
                             )
                             .commit();
         });
@@ -199,8 +196,7 @@ public class HomeActivity extends AppCompatActivity {
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder, ArticleDetailsFragment.newInstance(articleModelLiveEvent.getDataOnceAndReset()))
                                 .addToBackStack(
-                                        getSupportFragmentManager().getBackStackEntryCount() == 0
-                                        ? "bottom" : null
+                                        "stack"
                                 )
                                 .commit();
 
@@ -220,8 +216,7 @@ public class HomeActivity extends AppCompatActivity {
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
                                 .addToBackStack(
-                                        getSupportFragmentManager().getBackStackEntryCount() == 0
-                                        ? "bottom" : null
+                                        "stack"
                                 )
                                 .commit();
 
