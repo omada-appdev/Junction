@@ -49,6 +49,8 @@ public class ForYouFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
+        Log.e("ForYou", "called onCreate");
+
         ViewModelProvider viewModelProvider = new ViewModelProvider(requireParentFragment().requireActivity());
 
         homeFeedViewModel = viewModelProvider.get(HomeFeedViewModel.class);

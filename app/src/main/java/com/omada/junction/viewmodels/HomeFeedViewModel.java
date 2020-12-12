@@ -110,40 +110,47 @@ public class HomeFeedViewModel extends ViewModel {
                 .getAllArticles();
     }
 
-    public void resetForYouFeedContent(){
+    private void resetFeed(){
+        resetForYouFeedContent();
+        resetLearnFeedContent();
+        resetCompeteFeedContent();
+    }
+
+    private void resetForYouFeedContent(){
 
         loadedForYou = new MediatorLiveData<>();
         forYouAggregator = new ForYouAggregator(loadedForYou, forYouCompleteNotifier);
     }
 
-    public void resetLearnFeedContent(){
+    private void resetLearnFeedContent(){
 
         loadedLearn = new MediatorLiveData<>();
         //forYouAggregator = new ForYouAggregator(loadedForYou);
 
     }
 
-    public void resetCompeteFeedContent(){
+    private void resetCompeteFeedContent(){
 
         loadedCompete = new MediatorLiveData<>();
         //forYouAggregator = new ForYouAggregator(loadedForYou);
 
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
+    public void reinitializeFeed(){
 
         DataRepository.getInstance()
                 .resetHomeFeedContent();
 
         initializeDataLoaders();
-
-        resetForYouFeedContent();
-        resetLearnFeedContent();
-        resetCompeteFeedContent();
-
+        resetFeed();
         distributeLoadedData();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
+        reinitializeFeed();
     }
 
     public MutableLiveData<LiveEvent<Boolean>> getForYouCompleteNotifier() {

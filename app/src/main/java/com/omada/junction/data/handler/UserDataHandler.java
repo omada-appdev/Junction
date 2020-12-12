@@ -363,6 +363,8 @@ public class UserDataHandler {
                     .child(getCurrentUserModel().getUID())
                     .child(organizationID)
                     .setValue(true);
+
+            getCurrentUserModel().getFollowing().put(organizationID, true);
         }
         else {
             FirebaseDatabase.getInstance()
@@ -371,6 +373,8 @@ public class UserDataHandler {
                     .child(getCurrentUserModel().getUID())
                     .child(organizationID)
                     .removeValue();
+
+            getCurrentUserModel().getFollowing().remove(organizationID);
         }
     }
 

@@ -93,29 +93,29 @@ public class InstituteActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getEventFormTrigger().observe(this, eventModelLiveEvent -> {
 
-            if(eventModelLiveEvent == null || eventModelLiveEvent.getData() == null){
-                return;
-            }
+                    if(eventModelLiveEvent == null || eventModelLiveEvent.getData() == null){
+                        return;
+                    }
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.institute_content_placeholder,
-                            EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
-                    .addToBackStack(null)
-                    .commit();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.institute_content_placeholder,
+                                    EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
+                            .addToBackStack(null)
+                            .commit();
         });
 
         feedContentViewModel
                 .getEventViewHandler()
                 .getCallOrganizerTrigger().observe(this, stringLiveEvent -> {
 
-            if(stringLiveEvent.getData() != null){
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                }
-            }
+                    if(stringLiveEvent.getData() != null){
+                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                        intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
+                        if (intent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
+                    }
 
         });
 
@@ -123,18 +123,18 @@ public class InstituteActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getMailOrganizerTrigger().observe(this, pairLiveEvent -> {
 
-            if(pairLiveEvent.getData() != null) {
+                    if(pairLiveEvent.getData() != null) {
 
-                Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+                        Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
 
-                Intent intent = new Intent(Intent.ACTION_SENDTO);
-                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                }
-            }
+                        Intent intent = new Intent(Intent.ACTION_SENDTO);
+                        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
+                        if (intent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
+                    }
 
         });
 
