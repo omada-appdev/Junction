@@ -82,4 +82,13 @@ public class InstituteFeedViewModel extends ViewModel {
         }
     }
 
+    // TODO define this function to nuke all the existing propagation variables
+    public void reinitializeFeed() {
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        reinitializeFeed();
+    }
 }

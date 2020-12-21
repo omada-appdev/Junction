@@ -112,9 +112,7 @@ public class HomeActivity extends AppCompatActivity {
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder, EventDetailsFragment.newInstance(eventModel))
-                                .addToBackStack(
-                                        "stack"
-                                )
+                                .addToBackStack("stack")
                                 .commit();
                     }
 
@@ -129,9 +127,7 @@ public class HomeActivity extends AppCompatActivity {
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder,
                                         OrganizationProfileFragment.newInstance(stringLiveEvent.getDataOnceAndReset()))
-                                .addToBackStack(
-                                        "stack"
-                                )
+                                .addToBackStack("stack")
                                 .commit();
                     }
                 });
@@ -147,9 +143,7 @@ public class HomeActivity extends AppCompatActivity {
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
-                            .addToBackStack(
-                                    "stack"
-                            )
+                            .addToBackStack("stack")
                             .commit();
         });
 
@@ -195,9 +189,7 @@ public class HomeActivity extends AppCompatActivity {
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder, ArticleDetailsFragment.newInstance(articleModelLiveEvent.getDataOnceAndReset()))
-                                .addToBackStack(
-                                        "stack"
-                                )
+                                .addToBackStack("stack")
                                 .commit();
 
                     }
@@ -215,9 +207,7 @@ public class HomeActivity extends AppCompatActivity {
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
-                                .addToBackStack(
-                                        "stack"
-                                )
+                                .addToBackStack("stack")
                                 .commit();
 
                     }
