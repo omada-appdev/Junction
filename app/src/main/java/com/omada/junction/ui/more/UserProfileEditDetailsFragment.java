@@ -29,7 +29,7 @@ public class UserProfileEditDetailsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        UserProfileDetailsFragmentLayoutBinding binding = DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
                 inflater, R.layout.user_profile_details_fragment_layout, container, false
         );
 
@@ -48,11 +48,35 @@ public class UserProfileEditDetailsFragment extends Fragment {
             if(dataValidationInformationLiveEvent.getData() != null){
                 DataValidator.DataValidationInformation information = dataValidationInformationLiveEvent.getDataOnceAndReset();
 
-                if(information.getValidationPoint() == DataValidator.DataValidationPoint.VALIDATION_POINT_ALL
-                    && information.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
+                boolean valid = (information.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID);
 
-                    binding.nextButton.setEnabled(false);
+                switch (information.getValidationPoint()){
 
+                    case VALIDATION_POINT_ALL:
+                        if(valid){
+                            binding.nextButton.setEnabled(false);
+                        }
+                        break;
+                    case VALIDATION_POINT_NAME:
+                        if(!valid){
+                            binding.nameLayout.setError("Invalid name");
+                        }
+                        break;
+                    case VALIDATION_POINT_GENDER:
+                        if(!valid){
+                            binding.genderLayout.setError("Invalid gender");
+                        }
+                        break;
+                    case VALIDATION_POINT_DATE_OF_BIRTH:
+                        if(!valid){
+                            binding.dateOfBirthLayout.setError("Invalid date of birth");
+                        }
+                        break;
+                    case VALIDATION_POINT_INSTITUTE:
+                        if(!valid){
+                            binding.instituteLayout.setError("Invalid institute");
+                        }
+                        break;
                 }
             }
 

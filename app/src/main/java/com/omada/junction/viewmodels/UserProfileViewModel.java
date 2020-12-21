@@ -1,5 +1,7 @@
 package com.omada.junction.viewmodels;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -12,6 +14,7 @@ import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 import com.omada.junction.utils.transform.TransformUtilities;
 
+import java.net.HttpCookie;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserProfileViewModel extends ViewModel {
@@ -25,7 +28,6 @@ public class UserProfileViewModel extends ViewModel {
     public MutableLiveData<String> institute = new MutableLiveData<>();
     public MutableLiveData<String> dateOfBirth = new MutableLiveData<>();
     public MutableLiveData<String> gender = new MutableLiveData<>();
-    public MutableLiveData<String> email = new MutableLiveData<>();
 
     public UserProfileViewModel(){
 
@@ -45,61 +47,79 @@ public class UserProfileViewModel extends ViewModel {
         institute.setValue(currentUserModel.getInstitute());
         dateOfBirth.setValue(TransformUtilities.convertTimestampToDDMMYYYY(currentUserModel.getDateOfBirth()));
         gender.setValue(currentUserModel.getGender());
-        email.setValue(currentUserModel.getEmail());
     }
 
 
     public void updateUserDetails(){
 
-        UserDataHandler.MutableUserModel mutableUserModel = new UserDataHandler.MutableUserModel();
+        DataValidator dataValidator = new DataValidator();
 
-        DataValidator validator = new DataValidator();
+        UserDataHandler.MutableUserModel updatedUserModel = new UserDataHandler.MutableUserModel();
         AtomicBoolean anyDetailsEntryInvalid = new AtomicBoolean(false);
 
-        validator.validateName(name.getValue(), dataValidationInformation -> {
+        dataValidator.validateDateOfBirth(dateOfBirth.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setName(name.getValue());
-            }
-            else anyDetailsEntryInvalid.set(true);
-        });
-
-        validator.validateGender(gender.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setName(name.getValue());
-            }
-            else anyDetailsEntryInvalid.set(true);
-        });
-
-        validator.validateDateOfBirth(dateOfBirth.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setDateOfBirth(
-                        new Timestamp(
-                                TransformUtilities.convertDDMMYYYYtoDate(dateOfBirth.getValue(), "/")
-                        )
+                updatedUserModel.setDateOfBirth(
+                        new Timestamp(TransformUtilities.convertDDMMYYYYtoDate(dateOfBirth.getValue(), "/"))
                 );
             }
-            else anyDetailsEntryInvalid.set(true);
+            else {
+                anyDetailsEntryInvalid.set(true);
+            }
+            notifyValidity(dataValidationInformation);
         });
 
-        validator.validateInstitute(institute.getValue(), dataValidationInformation -> {
+        dataValidator.validateGender(gender.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                mutableUserModel.setInstitute(institute.getValue());
+                updatedUserModel.setGender(
+                        Character.toString(gender.getValue().charAt(0))
+                );
             }
-            else anyDetailsEntryInvalid.set(true);
+            else {
+                anyDetailsEntryInvalid.set(true);
+            }
+            notifyValidity(dataValidationInformation);
+        });
+
+        dataValidator.validateInstitute(institute.getValue(), dataValidationInformation -> {
+            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
+                updatedUserModel.setInstitute(
+                        institute.getValue()
+                );
+            }
+            else {
+                anyDetailsEntryInvalid.set(true);
+            }
+            notifyValidity(dataValidationInformation);
+        });
+
+        dataValidator.validateName(name.getValue(), dataValidationInformation -> {
+            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
+                updatedUserModel.setName(
+                        name.getValue()
+                );
+            }
+            else {
+                anyDetailsEntryInvalid.set(true);
+            }
+            notifyValidity(dataValidationInformation);
         });
 
         if(!anyDetailsEntryInvalid.get()) {
+            Log.e("UpdateUser", "Added details to firebase");
+            notifyValidity(new DataValidator.DataValidationInformation(
+                    DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
+                    DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
+            ));
             DataRepository.getInstance()
                     .getUserDataHandler()
-                    .updateCurrentUserDetails(mutableUserModel);
-
-            dataValidationAction.setValue(new LiveEvent<>(
-                    new DataValidator.DataValidationInformation(
-                        DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
-                        DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
-                    )
-            ));
+                    .updateCurrentUserDetails(updatedUserModel);
         }
+
+    }
+
+    private void notifyValidity(DataValidator.DataValidationInformation dataValidationInformation) {
+        dataValidationAction.setValue(new LiveEvent<>(dataValidationInformation));
     }
 
     public void goToEditProfile(){
