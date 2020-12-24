@@ -2,9 +2,10 @@ package com.omada.junction.data;
 
 import com.omada.junction.data.handler.AppDataHandler;
 import com.omada.junction.data.handler.ArticleDataHandler;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.data.handler.EventDataHandler;
 import com.omada.junction.data.handler.OrganizationDataHandler;
+import com.omada.junction.data.handler.PostDataHandler;
 import com.omada.junction.data.handler.ShowcaseDataHandler;
 
 public class DataRepository {
@@ -12,10 +13,11 @@ public class DataRepository {
     private static DataRepository dataRepository;
 
     private final AppDataHandler appDataHandler = new AppDataHandler();
-    private final AuthDataHandler authDataHandler = new AuthDataHandler();
+    private final UserDataHandler userDataHandler = new UserDataHandler();
     private final OrganizationDataHandler organizationDataHandler = new OrganizationDataHandler();
     private final ArticleDataHandler articleDataHandler = new ArticleDataHandler();
     private final ShowcaseDataHandler showcaseDataHandler = new ShowcaseDataHandler();
+    private final PostDataHandler postDataHandler = new PostDataHandler();
 
     //this is only for events
     private final EventDataHandler eventDataHandler = new EventDataHandler();
@@ -36,8 +38,8 @@ public class DataRepository {
         return appDataHandler;
     }
 
-    public AuthDataHandler getAuthDataHandler() {
-        return authDataHandler;
+    public UserDataHandler getUserDataHandler() {
+        return userDataHandler;
     }
 
     public EventDataHandler getEventDataHandler() {
@@ -54,5 +56,26 @@ public class DataRepository {
 
     public ShowcaseDataHandler getShowcaseDataHandler() {
         return showcaseDataHandler;
+    }
+
+    public PostDataHandler getPostDataHandler() {
+        return postDataHandler;
+    }
+
+    public void resetHomeFeedContent() {
+        resetForYouFeedContent();
+        resetLearnFeedContent();
+        resetCompeteFeedContent();
+    }
+
+    private void resetForYouFeedContent() {
+        eventDataHandler.resetLastForYouEvent();
+        articleDataHandler.resetLastForYouArticle();
+    }
+
+    private void resetLearnFeedContent() {
+    }
+
+    private void resetCompeteFeedContent() {
     }
 }

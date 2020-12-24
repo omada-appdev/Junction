@@ -72,7 +72,7 @@
         <com.google.android.material.button.MaterialButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/new_user"
+            android:id="@+id/forgot_password_button"
             android:text="Forgot password"
             style = "@style/Widget.MaterialComponents.Button.TextButton"
             app:layout_constraintLeft_toLeftOf="parent"

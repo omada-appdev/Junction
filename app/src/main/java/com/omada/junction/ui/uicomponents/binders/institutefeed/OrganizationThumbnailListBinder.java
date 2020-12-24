@@ -20,7 +20,6 @@ public class OrganizationThumbnailListBinder extends ItemBinder<ListSection<Orga
     private final MultiViewAdapter adapter = new MultiViewAdapter();
     private boolean addedSection = false;
 
-
     public OrganizationThumbnailListBinder(FeedContentViewModel viewModel){
         adapter.registerItemBinders(new OrganizationThumbnailBinder(viewModel));
     }

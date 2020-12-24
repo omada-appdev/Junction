@@ -9,7 +9,6 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.handler.AuthDataHandler;
 import com.omada.junction.data.models.ArticleModel;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
@@ -20,21 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFeedViewModel extends ViewModel {
-
-    private enum ContentTypeIdentifier {
-        CONTENT_TYPE_EVENT,
-        CONTENT_TYPE_ARTICLE,
-        CONTENT_TYPE_ANNOUNCEMENT,
-        CONTENT_TYPE_ADVERTISEMENT
-    }
-
-
-    /*
-    ########################
-    #   REMOVE THIS FIELD  #
-    ########################
-     */
-    public final MutableLiveData<String> test = new MutableLiveData<>();
 
     /*
     ################################
@@ -53,22 +37,18 @@ public class HomeFeedViewModel extends ViewModel {
     # OUTPUT FIELDS TO VIEW #
     #########################
      */
+    private MediatorLiveData<List<BaseModel>> loadedForYou = new MediatorLiveData<>();
+    private MediatorLiveData<List<BaseModel>> loadedLearn = new MediatorLiveData<>();
+    private MediatorLiveData<List<BaseModel>> loadedCompete = new MediatorLiveData<>();
 
-    private final MediatorLiveData<List<BaseModel>> loadedForYou = new MediatorLiveData<>();
-    private final MediatorLiveData<List<BaseModel>> loadedLearn = new MediatorLiveData<>();
-    private final MediatorLiveData<List<BaseModel>> loadedCompete = new MediatorLiveData<>();
-
-    // TODO remove if not needed
-    private final LiveData<LiveEvent<Boolean>> forYouRefreshNotifier = new MutableLiveData<>();
-    private final LiveData<LiveEvent<Boolean>> learnRefreshNotifier = new MutableLiveData<>();
-    private final LiveData<LiveEvent<Boolean>> competeRefreshNotifier = new MutableLiveData<>();
+    private final MutableLiveData<LiveEvent<Boolean>> forYouCompleteNotifier = new MutableLiveData<>();
 
     /*
     ###########################
     # FIELDS FOR INTERNAL USE #
     ###########################
      */
-    private final ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou);
+    private ForYouAggregator forYouAggregator = new ForYouAggregator(loadedForYou, forYouCompleteNotifier);
 
 
     public HomeFeedViewModel(){
@@ -84,7 +64,7 @@ public class HomeFeedViewModel extends ViewModel {
     private void initializeDataLoaders(){
 
         loadedForYouEvents = Transformations.map(
-                DataRepository.getInstance().getEventDataHandler().getLoadedAllEventsNotifier(), allEvents-> allEvents);
+                DataRepository.getInstance().getEventDataHandler().getLoadedForYouEventsNotifier(), allEvents-> allEvents);
         loadedForYouArticles = Transformations.map(
                 DataRepository.getInstance().getArticleDataHandler().getLoadedAllArticlesNotifier(), allArticles -> allArticles);
     }
@@ -115,13 +95,14 @@ public class HomeFeedViewModel extends ViewModel {
         return loadedCompete;
     }
 
-    //get all required content and store internally or in live data
-    public void getHomeFeed(){
+    public void getForYouFeedContent(){
+
+        Log.e("For you", "called feed content");
 
         DataRepository
                 .getInstance()
                 .getEventDataHandler()
-                .getAllEvents();
+                .getForYouEvents();
 
         DataRepository
                 .getInstance()
@@ -129,40 +110,88 @@ public class HomeFeedViewModel extends ViewModel {
                 .getAllArticles();
     }
 
+    private void resetFeed(){
+        resetForYouFeedContent();
+        resetLearnFeedContent();
+        resetCompeteFeedContent();
+    }
+
+    private void resetForYouFeedContent(){
+
+        loadedForYou = new MediatorLiveData<>();
+        forYouAggregator = new ForYouAggregator(loadedForYou, forYouCompleteNotifier);
+    }
+
+    private void resetLearnFeedContent(){
+
+        loadedLearn = new MediatorLiveData<>();
+        //forYouAggregator = new ForYouAggregator(loadedForYou);
+
+    }
+
+    private void resetCompeteFeedContent(){
+
+        loadedCompete = new MediatorLiveData<>();
+        //forYouAggregator = new ForYouAggregator(loadedForYou);
+
+    }
+
+    public void reinitializeFeed(){
+
+        DataRepository.getInstance()
+                .resetHomeFeedContent();
+
+        initializeDataLoaders();
+        resetFeed();
+        distributeLoadedData();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+
+        reinitializeFeed();
+    }
+
+    public MutableLiveData<LiveEvent<Boolean>> getForYouCompleteNotifier() {
+        return forYouCompleteNotifier;
+    }
+
+    private enum ContentTypeIdentifier {
+        CONTENT_TYPE_EVENT,
+        CONTENT_TYPE_ARTICLE,
+        CONTENT_TYPE_ANNOUNCEMENT,
+        CONTENT_TYPE_ADVERTISEMENT
+    }
+
+    /*
+    ############################
+    # STATIC CLASSES AND ENUMS #
+    ############################
+     */
 
     // Apply things like sorting, etc. in aggregator
     private static class ForYouAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>>{
 
-        public ForYouAggregator(MediatorLiveData<List<BaseModel>> destination) {
+        private final MutableLiveData<LiveEvent<Boolean>> completeNotifier;
+
+        public ForYouAggregator(MediatorLiveData<List<BaseModel>> destination, MutableLiveData<LiveEvent<Boolean>> completeNotifier) {
             super(destination);
+            this.completeNotifier = completeNotifier;
         }
 
         @Override
         public void holdData(ContentTypeIdentifier typeOfData, List<? extends BaseModel> data) {
 
-            if(data == null || data.size() == 0){
+            if(data == null){
                 return;
             }
-            
-            switch (typeOfData) {
-                case CONTENT_TYPE_EVENT:
-                    if (!(data.get(0) instanceof EventModel)) return;
-                    break;
-                case CONTENT_TYPE_ARTICLE:
-                    if (!(data.get(0) instanceof ArticleModel)) return;
-                    break;
-                case CONTENT_TYPE_ANNOUNCEMENT:
-                    break;
-                case CONTENT_TYPE_ADVERTISEMENT:
-                    break;
-            }
-
             super.holdData(typeOfData, data);
         }
 
         @Override
         protected List<BaseModel> mergeWithExistingData(ContentTypeIdentifier typeOfData, List<? extends BaseModel> oldData, List<? extends BaseModel> newData) {
-            return null;
+            return (List<BaseModel>) newData;
         }
 
         @Override
@@ -174,10 +203,26 @@ public class HomeFeedViewModel extends ViewModel {
         @SuppressWarnings({"ConstantConditions"})
         @Override
         protected void aggregateData() {
+
+            Log.e("Pagination", "aggregated for you");
+
             List<BaseModel> aggregatedList = new ArrayList<>();
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_EVENT));
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE));
+
+            if(aggregatedList.size() == 0){
+                completeNotifier.setValue(new LiveEvent<>(true));
+            }
+
+            dataOnHold.put(ContentTypeIdentifier.CONTENT_TYPE_EVENT, null);
+            dataOnHold.put(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE, null);
+
+            //to retain existing data in destination live data
+            if(destinationLiveData.getValue() != null){
+                aggregatedList.addAll(0, destinationLiveData.getValue());
+            }
             destinationLiveData.setValue(aggregatedList);
+
         }
 
     }

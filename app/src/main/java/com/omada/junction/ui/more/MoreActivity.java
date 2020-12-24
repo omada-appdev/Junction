@@ -2,7 +2,6 @@ package com.omada.junction.ui.more;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.ui.institute.InstituteActivity;
 import com.omada.junction.ui.home.HomeActivity;
 import com.omada.junction.ui.login.LoginActivity;
@@ -63,7 +62,6 @@ public class MoreActivity extends AppCompatActivity {
                 return true;
 
             } else {
-                Log.e("HomeActivity", "invalid bottom button press id" + itemId + " " + R.id.more_details_button);
                 return false;
             }
 
@@ -92,7 +90,7 @@ public class MoreActivity extends AppCompatActivity {
 
                     if(authStatusLiveEvent != null && authStatusLiveEvent.getData() != null){
 
-                        if(authStatusLiveEvent.getDataOnceAndReset() == AuthDataHandler.AuthStatus.USER_SIGNED_OUT) {
+                        if(authStatusLiveEvent.getDataOnceAndReset() == UserDataHandler.AuthStatus.USER_SIGNED_OUT) {
                             Intent i = new Intent(this, LoginActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 

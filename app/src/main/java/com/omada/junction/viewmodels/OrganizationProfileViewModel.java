@@ -1,20 +1,15 @@
 package com.omada.junction.viewmodels;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.data.models.BaseModel;
 import com.omada.junction.data.models.EventModel;
 import com.omada.junction.data.models.OrganizationModel;
 import com.omada.junction.data.models.ShowcaseModel;
-import com.omada.junction.ui.organization.OrganizationProfileFragment;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
@@ -50,10 +45,6 @@ public class OrganizationProfileViewModel extends ViewModel {
     public LiveData<LiveEvent<OrganizationModel>> getOrganizationDetails(){
 
         organizationID = organizationID == null ? (organizationModel == null ? null : organizationModel.getOrganizationID()) : organizationID;
-
-        if(organizationID == null){
-            Log.e("WTF", "ID is null");
-        }
 
         return DataRepository
                 .getInstance()
@@ -98,8 +89,22 @@ public class OrganizationProfileViewModel extends ViewModel {
         return loadedOrganizationShowcases;
     }
 
-    public void doFollowAction(){
-        Log.e("Favorite", "followed organization");
+    public boolean getFollowingStatus(){
+
+        UserDataHandler.UserModel currentUserModel = DataRepository.getInstance()
+                .getUserDataHandler()
+                .getCurrentUserModel();
+
+        Object val = currentUserModel.getFollowing().get(organizationID);
+
+        return val != null;
+
+    }
+
+    public void updateFollowingStatus(boolean following){
+        DataRepository.getInstance()
+                .getUserDataHandler()
+                .updateFollow(organizationID, following);
     }
 
 }

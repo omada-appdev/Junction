@@ -1,16 +1,13 @@
 package com.omada.junction.data.handler;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.OrganizationModel;
-import com.omada.junction.data.models.OrganizationModelLocalDB;
 import com.omada.junction.data.models.OrganizationModelRemoteDB;
-import com.omada.junction.data.models.ShowcaseModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
@@ -53,9 +50,9 @@ public class OrganizationDataHandler {
 
         String instituteID = DataRepository
                 .getInstance()
-                .getAuthDataHandler()
+                .getUserDataHandler()
                 .getCurrentUserModel()
-                .getUserInstitute();
+                .getInstitute();
 
         FirebaseFirestore.getInstance()
                 .collection("organizations")

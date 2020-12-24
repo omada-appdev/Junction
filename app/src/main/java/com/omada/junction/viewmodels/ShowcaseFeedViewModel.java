@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ShowcaseFeedViewModel extends ViewModel {
 
-    private LiveData<List<BaseModel>> showcaseItems;
+    private LiveData<List<BaseModel>> loadedShowcaseItems;
 
     private final String organizationID;
     private final String showcaseID;
@@ -25,14 +25,14 @@ public class ShowcaseFeedViewModel extends ViewModel {
     }
 
     private void initializeDataLoaders(){
-        showcaseItems = Transformations.map(
+        loadedShowcaseItems = Transformations.map(
                 DataRepository.getInstance().getShowcaseDataHandler().getOrganizationShowcaseItems(showcaseID),
                 baseModels -> baseModels
         );
     }
 
-    public LiveData<List<BaseModel>> getShowcaseItems(){
-        return showcaseItems;
+    public LiveData<List<BaseModel>> getLoadedShowcaseItems(){
+        return loadedShowcaseItems;
     }
 
 }

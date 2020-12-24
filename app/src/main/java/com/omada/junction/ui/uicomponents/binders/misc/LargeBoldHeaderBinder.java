@@ -1,4 +1,4 @@
-package com.omada.junction.ui.uicomponents.binders.header;
+package com.omada.junction.ui.uicomponents.binders.misc;
 
 import android.view.View;
 import android.view.ViewGroup;

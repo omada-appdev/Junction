@@ -150,8 +150,6 @@ public abstract class Form <S, Q, R> {
     */
     public Form( @NonNull Map<String, Map<String, Map<String, String>>> formData) throws ParseException {
 
-        Log.e("FORM", formData.toString());
-
         Map<String, Map<String, String>> sectionsData;
         Map<String, Map<String, String>> questionsData;
         Map<String, Map<String, String>> optionsData;
@@ -440,7 +438,7 @@ public abstract class Form <S, Q, R> {
 
         public void setResponse(String response){
             this.response = response;
-            formMap.get("questions").get(this.getID()).put("response", response);
+            formMap.get(FormKey.KEY_FORM_QUESTIONS_DATA.getKey()).get(this.getID()).put(FormKey.KEY_QUESTION_RESPONSE.getKey(), response);
         }
 
         public List<Option> getQuestionOptions() {

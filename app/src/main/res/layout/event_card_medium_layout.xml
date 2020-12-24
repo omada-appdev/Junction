@@ -39,7 +39,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/event_poster_image"
                 app:layout_constraintVertical_chainStyle="packed"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.eventOrganizer)}"/>
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/event_name_text"
@@ -50,7 +50,7 @@
                 android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#DE000000"
-                android:text="@{eventModel.eventName}"
+                android:text="@{eventModel.title}"
                 app:layout_constraintTop_toTopOf="@+id/organizer_profile_image"
                 app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -63,11 +63,11 @@
                 android:layout_marginEnd="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#8A000000"
-                android:text='@{eventModel.eventOrganizerName}'
+                android:text="@{eventModel.creatorName}"
                 app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/event_name_text"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.eventOrganizer)}"/>
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
 
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -84,7 +84,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/organizer_profile_image"
                 app:layout_constraintVertical_chainStyle="packed"
-                app:remoteImageUrl="@{eventModel.eventPosterRemote}"/>
+                app:remoteImageUrl="@{eventModel.image}"/>
 
             <ImageButton
                 android:id="@+id/more_details_button"

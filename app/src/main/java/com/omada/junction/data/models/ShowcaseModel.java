@@ -5,7 +5,7 @@ public final class ShowcaseModel extends BaseModel{
     private String showcaseID = null;
     private String showcaseTitle = null;
 
-    private String showcaseCreator = null;
+    private String creator = null;
     private String showcaseCreatorType = null;
     private String showcasePhoto = null;
 
@@ -16,7 +16,7 @@ public final class ShowcaseModel extends BaseModel{
 
         showcaseID = modelRemoteDB.getShowcaseID();
         showcaseTitle = modelRemoteDB.getShowcaseTitle();
-        showcaseCreator = modelRemoteDB.getShowcaseTitle();
+        creator = modelRemoteDB.getCreator();
         showcaseCreatorType = modelRemoteDB.getShowcaseCreatorType();
         showcasePhoto = modelRemoteDB.getShowcasePhoto();
 
@@ -30,8 +30,8 @@ public final class ShowcaseModel extends BaseModel{
         return showcaseTitle;
     }
 
-    public String getShowcaseCreator() {
-        return showcaseCreator;
+    public String getCreator() {
+        return creator;
     }
 
     public String getShowcaseCreatorType() {
