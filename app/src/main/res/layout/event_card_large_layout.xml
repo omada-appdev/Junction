@@ -12,51 +12,55 @@
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        app:cardCornerRadius="4dp"
-        app:cardElevation="4dp"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
+        android:clipChildren="false"
         android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <com.google.android.material.imageview.ShapeableImageView
-                app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
                 android:id="@+id/organizer_profile_image"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="12dp"
+                remoteImageUrl="@{eventModel.creatorProfilePicture}"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="12dp"
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"
                 android:padding="4dp"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_avatar_40dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/event_poster_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
-                remoteImageUrl="@{eventModel.creatorProfilePicture}"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
+                app:srcCompat="@drawable/ic_avatar_40dp" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/event_name_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
+                android:text="@{eventModel.title}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#DE000000"
-                android:text="@{eventModel.title}"
-                app:layout_constraintTop_toTopOf="@+id/organizer_profile_image"
+                app:layout_constraintBottom_toTopOf="@+id/organizer_name_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toTopOf="@id/organizer_profile_image"
+                app:layout_constraintVertical_chainStyle="packed" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/organizer_name_text"
@@ -64,13 +68,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="16dp"
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"
+                android:text="@{eventModel.creatorName}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#8A000000"
-                android:text="@{eventModel.creatorName}"
-                app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                app:layout_constraintBottom_toBottomOf="@+id/organizer_profile_image"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/event_name_text"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                app:layout_constraintTop_toBottomOf="@+id/event_name_text" />
 
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -79,6 +85,8 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
                 android:background="#ACA9B1"
+                android:elevation="4dp"
+                android:translationZ="2dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toTopOf="@+id/more_details_button"
                 app:layout_constraintDimensionRatio="H,3:4"
@@ -87,18 +95,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/organizer_profile_image"
                 app:layout_constraintVertical_chainStyle="packed"
-                app:remoteImageUrl="@{eventModel.image}"/>
+                app:remoteImageUrl="@{eventModel.image}"
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance" />
 
             <ImageButton
                 android:id="@+id/peek_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="#00FFFFFF"
+                android:onClick="@{()->peekCard.getVisibility()==View.GONE ? peekCard.setVisibility(View.VISIBLE) : peekCard.setVisibility(View.GONE)}"
                 android:padding="12dp"
-                app:srcCompat="@drawable/ic_bookmark_black_24dp"
-                app:layout_constraintTop_toTopOf="@+id/more_details_button"
                 app:layout_constraintEnd_toStartOf="@+id/more_details_button"
-                android:onClick="@{()->peekCard.getVisibility()==View.GONE ? peekCard.setVisibility(View.VISIBLE) : peekCard.setVisibility(View.GONE)}"/>
+                app:layout_constraintTop_toTopOf="@+id/more_details_button"
+                app:srcCompat="@drawable/ic_bookmark_black_24dp" />
 
             <ImageButton
                 android:id="@+id/more_details_button"
@@ -106,72 +115,76 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:background="#00FFFFFF"
+                android:onClick="@{()->viewModel.eventViewHandler.goToEventCardDetails(eventModel)}"
                 android:padding="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/event_poster_image"
-                app:srcCompat="@drawable/ic_right_24dp"
-                android:onClick="@{()->viewModel.eventViewHandler.goToEventCardDetails(eventModel)}"/>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/peek_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/event_poster_image"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="2dp"
-                android:visibility="gone">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/peek_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp">
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/event_date_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@{TransformUtilities.convertTimestampToDDMM(eventModel.startTime)}"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                        app:layout_constraintBottom_toTopOf="@+id/event_venue_text"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/event_time_start_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.startTime)}"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/event_time_end_text"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/event_time_end_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.endTime)}"
-                        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/event_venue_text"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="@{eventModel.venueName}"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                app:srcCompat="@drawable/ic_right_24dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/peek_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="68dp"
+            android:visibility="gone"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="0dp"
+            android:layout_gravity="bottom">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/peek_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/event_date_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@{TransformUtilities.convertTimestampToDDMM(eventModel.startTime)}"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    app:layout_constraintBottom_toTopOf="@+id/event_venue_text"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/event_time_start_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.startTime)}"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/event_time_end_text"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/event_time_end_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.endTime)}"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/event_venue_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@{eventModel.venueName}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </FrameLayout>
+
 </layout>
