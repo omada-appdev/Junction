@@ -97,8 +97,6 @@ public class HomeFeedViewModel extends ViewModel {
 
     public void getForYouFeedContent(){
 
-        Log.e("For you", "called feed content");
-
         DataRepository
                 .getInstance()
                 .getEventDataHandler()
@@ -149,7 +147,6 @@ public class HomeFeedViewModel extends ViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-
         reinitializeFeed();
     }
 

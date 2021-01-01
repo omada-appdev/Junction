@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,6 +21,7 @@ import com.omada.junction.data.models.ShowcaseModel;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
 import com.omada.junction.ui.home.HomeActivity;
+import com.omada.junction.ui.home.feed.FeedFragment;
 import com.omada.junction.ui.more.MoreActivity;
 import com.omada.junction.ui.organization.OrganizationProfileFragment;
 import com.omada.junction.ui.organization.OrganizationShowcaseFragment;
@@ -29,24 +31,26 @@ import com.omada.junction.viewmodels.InstituteFeedViewModel;
 
 public class InstituteActivity extends AppCompatActivity {
 
+    private InstituteFeedViewModel instituteFeedViewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.institute_activity_layout);
 
-        InstituteFeedViewModel instituteFeedViewModel = new ViewModelProvider(this).get(InstituteFeedViewModel.class);
+        instituteFeedViewModel = new ViewModelProvider(this).get(InstituteFeedViewModel.class);
 
         if(savedInstanceState == null) {
+
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.institute_content_placeholder, new InstituteFeedFragment())
                     .commit();
 
             instituteFeedViewModel.loadInstituteOrganizations();
             instituteFeedViewModel.loadInstituteHighlights();
+
         }
         else if(!instituteFeedViewModel.checkInstituteContentLoaded()){
-
-            Toast.makeText(getBaseContext(), "loaded again", Toast.LENGTH_SHORT).show();
 
             instituteFeedViewModel.loadInstituteOrganizations();
             instituteFeedViewModel.loadInstituteHighlights();
@@ -70,7 +74,7 @@ public class InstituteActivity extends AppCompatActivity {
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.institute_content_placeholder, OrganizationProfileFragment.newInstance(organizationModel))
-                                .addToBackStack(null)
+                                .addToBackStack("stack")
                                 .commit();
                     }
 
@@ -84,7 +88,7 @@ public class InstituteActivity extends AppCompatActivity {
 
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.institute_content_placeholder, EventDetailsFragment.newInstance(model))
-                                .addToBackStack(null)
+                                .addToBackStack("stack")
                                 .commit();
                     }
                 });
@@ -101,7 +105,7 @@ public class InstituteActivity extends AppCompatActivity {
                             .beginTransaction()
                             .replace(R.id.institute_content_placeholder,
                                     EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
-                            .addToBackStack(null)
+                            .addToBackStack("stack")
                             .commit();
         });
 
@@ -145,7 +149,7 @@ public class InstituteActivity extends AppCompatActivity {
 
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.institute_content_placeholder, OrganizationProfileFragment.newInstance(organizationID))
-                                .addToBackStack(null)
+                                .addToBackStack("stack")
                                 .commit();
                     }
                 });
@@ -162,7 +166,7 @@ public class InstituteActivity extends AppCompatActivity {
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.institute_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
-                                .addToBackStack(null)
+                                .addToBackStack("stack")
                                 .commit();
 
                     }
@@ -187,6 +191,18 @@ public class InstituteActivity extends AppCompatActivity {
 
             }
             else if (itemId == R.id.institute_button){
+
+                if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+
+                    instituteFeedViewModel.reinitializeFeed();
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.home_content_placeholder, new FeedFragment())
+                            .commit();
+                }
+                else {
+                    getSupportFragmentManager().popBackStack("stack", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
             }
 
             if (i != null) {
