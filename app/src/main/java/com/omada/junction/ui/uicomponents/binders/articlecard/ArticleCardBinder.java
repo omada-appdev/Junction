@@ -17,7 +17,7 @@ import mva3.adapter.ItemViewHolder;
 public class ArticleCardBinder extends ItemBinder<ArticleModel, ArticleCardBinder.ArticleCardViewHolder> {
 
 
-    private FeedContentViewModel viewModel;
+    private final FeedContentViewModel viewModel;
 
     public ArticleCardBinder(FeedContentViewModel viewModel){
         this.viewModel = viewModel;

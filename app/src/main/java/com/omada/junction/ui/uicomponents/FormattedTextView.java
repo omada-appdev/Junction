@@ -2,6 +2,8 @@ package com.omada.junction.ui.uicomponents;
 
 import android.content.Context;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
@@ -27,6 +29,7 @@ public class FormattedTextView extends MaterialTextView {
     }
 
     public void setFormattedText(String text){
+        setMovementMethod(LinkMovementMethod.getInstance());
         setText(Html.fromHtml(text));
     }
 }
