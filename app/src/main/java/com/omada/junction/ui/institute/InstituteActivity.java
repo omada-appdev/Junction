@@ -46,9 +46,6 @@ public class InstituteActivity extends AppCompatActivity {
                     .replace(R.id.institute_content_placeholder, new InstituteFeedFragment())
                     .commit();
 
-            instituteFeedViewModel.loadInstituteOrganizations();
-            instituteFeedViewModel.loadInstituteHighlights();
-
         }
         else if(!instituteFeedViewModel.checkInstituteContentLoaded()){
 
@@ -197,7 +194,7 @@ public class InstituteActivity extends AppCompatActivity {
                     instituteFeedViewModel.reinitializeFeed();
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.home_content_placeholder, new FeedFragment())
+                            .replace(R.id.institute_content_placeholder, new InstituteFeedFragment())
                             .commit();
                 }
                 else {

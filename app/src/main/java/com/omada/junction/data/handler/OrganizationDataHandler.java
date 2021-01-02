@@ -1,6 +1,7 @@
 package com.omada.junction.data.handler;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -27,7 +28,7 @@ public class OrganizationDataHandler {
     # OUTPUT FIELDS TO VIEWMODEL #
     ##############################
      */
-    private final MutableLiveData<LiveEvent<List<OrganizationModel>>> loadedInstituteOrganizationsNotifier = new MutableLiveData<>();
+    private MutableLiveData<LiveEvent<List<OrganizationModel>>> loadedInstituteOrganizationsNotifier = new MutableLiveData<>();
 
     /*
     ###########################
@@ -88,6 +89,10 @@ public class OrganizationDataHandler {
 
     public LiveData<LiveEvent<List<OrganizationModel>>> getLoadedInstituteOrganizationsNotifier(){
         return loadedInstituteOrganizationsNotifier;
+    }
+
+    public void resetLastInstituteOrganization() {
+        loadedInstituteOrganizationsNotifier = new MutableLiveData<>();
     }
 
 
