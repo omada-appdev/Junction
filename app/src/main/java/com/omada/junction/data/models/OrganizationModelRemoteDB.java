@@ -2,26 +2,25 @@ package com.omada.junction.data.models;
 
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
-import com.omada.junction.data.models.BaseModel;
 
 import java.util.List;
 
 public class OrganizationModelRemoteDB extends BaseModel {
 
     private String organizationID;
-    private String organizationName;
+    private String name;
 
-    private String organizationProfilePhoto;
+    private String profilePhoto;
 
-    private String attendedUsersNumber;
-    private String heldEventsNumber;
-    private String organizationInstitute;
+    private Integer attendedUsersNumber;
+    private Integer heldEventsNumber;
+    private String institute;
 
-    private List<String> organizationInterests;
-    private String organizationMail;
-    private String organizationPhone;
+    private List<String> interests;
+    private String mail;
+    private String phone;
 
-    private String organizationType;
+    private String type;
 
     @Exclude
     public String getOrganizationID() {
@@ -33,93 +32,93 @@ public class OrganizationModelRemoteDB extends BaseModel {
         this.organizationID = organizationID;
     }
 
-    @PropertyName("organizationName")
-    public String getOrganizationName() {
-        return organizationName;
+    @PropertyName("name")
+    public String getName() {
+        return name;
     }
 
-    @PropertyName("organizationName")
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
+    @PropertyName("name")
+    public void setName(String name) {
+        this.name = name;
     }
 
     @PropertyName("attendedUsersNumber")
-    public String getAttendedUsersNumber() {
+    public Integer getAttendedUsersNumber() {
         return attendedUsersNumber;
     }
 
     @PropertyName("attendedUsersNumber")
-    public void setAttendedUsersNumber(String attendedUsersNumber) {
+    public void setAttendedUsersNumber(Integer attendedUsersNumber) {
         this.attendedUsersNumber = attendedUsersNumber;
     }
 
     @PropertyName("heldEventsNumber")
-    public String getHeldEventsNumber() {
+    public Integer getHeldEventsNumber() {
         return heldEventsNumber;
     }
 
     @PropertyName("heldEventsNumber")
-    public void setHeldEventsNumber(String heldEventsNumber) {
+    public void setHeldEventsNumber(Integer heldEventsNumber) {
         this.heldEventsNumber = heldEventsNumber;
     }
 
-    @PropertyName("organizationInstitute")
-    public String getOrganizationInstitute() {
-        return organizationInstitute;
+    @PropertyName("institute")
+    public String getInstitute() {
+        return institute;
     }
 
-    @PropertyName("organizationInstitute")
-    public void setOrganizationInstitute(String organizationInstitute) {
-        this.organizationInstitute = organizationInstitute;
+    @PropertyName("institute")
+    public void setInstitute(String institute) {
+        this.institute = institute;
     }
 
-    @PropertyName("organizationInterests")
-    public List<String> getOrganizationInterests() {
-        return organizationInterests;
+    @PropertyName("interests")
+    public List<String> getInterests() {
+        return interests;
     }
 
-    @PropertyName("organizationInterests")
-    public void setOrganizationInterests(List<String> organizationInterests) {
-        this.organizationInterests = organizationInterests;
+    @PropertyName("interests")
+    public void setInterests(List<String> interests) {
+        this.interests = interests;
     }
 
-    @PropertyName("organizationMail")
-    public String getOrganizationMail() {
-        return organizationMail;
+    @PropertyName("mail")
+    public String getMail() {
+        return mail;
     }
 
-    @PropertyName("organizationMail")
-    public void setOrganizationMail(String organizationMail) {
-        this.organizationMail = organizationMail;
+    @PropertyName("mail")
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
-    @PropertyName("organizationPhone")
-    public String getOrganizationPhone() {
-        return organizationPhone;
+    @PropertyName("phone")
+    public String getPhone() {
+        return phone;
     }
 
-    @PropertyName("organizationPhone")
-    public void setOrganizationPhone(String organizationPhone) {
-        this.organizationPhone = organizationPhone;
+    @PropertyName("phone")
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    @PropertyName("organizationType")
-    public String getOrganizationType() {
-        return organizationType;
+    @PropertyName("type")
+    public String getType() {
+        return type;
     }
 
-    @PropertyName("organizationType")
-    public void setOrganizationType(String organizationType) {
-        this.organizationType = organizationType;
+    @PropertyName("type")
+    public void setType(String type) {
+        this.type = type;
     }
 
-    @PropertyName("organizationProfilePicture")
-    public String getOrganizationProfilePhoto() {
-        return organizationProfilePhoto;
+    @PropertyName("profilePicture")
+    public String getProfilePhoto() {
+        return profilePhoto;
     }
 
-    @PropertyName("organizationProfilePicture")
-    public void setOrganizationProfilePhoto(String organizationProfilePhoto) {
-        this.organizationProfilePhoto = organizationProfilePhoto;
+    @PropertyName("profilePicture")
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
     }
 }

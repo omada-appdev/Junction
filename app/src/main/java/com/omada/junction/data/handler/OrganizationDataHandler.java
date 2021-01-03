@@ -57,7 +57,7 @@ public class OrganizationDataHandler {
 
         FirebaseFirestore.getInstance()
                 .collection("organizations")
-                .whereEqualTo("organizationInstitute", instituteID)
+                .whereEqualTo("institute", instituteID)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
