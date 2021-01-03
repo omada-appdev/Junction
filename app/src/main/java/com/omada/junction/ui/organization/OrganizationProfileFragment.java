@@ -1,8 +1,6 @@
 package com.omada.junction.ui.organization;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -138,10 +136,10 @@ public class OrganizationProfileFragment extends Fragment {
     }
 
     private void populateViews(){
-        binding.organizationNameText.setText(organizationProfileViewModel.getOrganizationModel().getOrganizationName());
+        binding.organizationNameText.setText(organizationProfileViewModel.getOrganizationModel().getName());
         CustomBindings.loadImage(
                 binding.organizationProfilePictureImage,
-                organizationProfileViewModel.getOrganizationModel().getOrganizationProfilePhoto()
+                organizationProfileViewModel.getOrganizationModel().getProfilePhoto()
         );
     }
 

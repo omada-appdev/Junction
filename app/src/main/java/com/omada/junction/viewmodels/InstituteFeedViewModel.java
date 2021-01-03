@@ -17,9 +17,9 @@ import java.util.List;
 
 public class InstituteFeedViewModel extends ViewModel {
 
-    private final MediatorLiveData<List<BaseModel>> loadedHighlights = new MediatorLiveData<>();
-    private LiveData<List<OrganizationModel>> loadedInstituteOrganizations;
+    private MediatorLiveData<List<BaseModel>> loadedHighlights = new MediatorLiveData<>();
 
+    private LiveData<List<OrganizationModel>> loadedInstituteOrganizations;
     private LiveData<List<EventModel>> loadedHighlightEvents;
 
     public InstituteFeedViewModel(){
@@ -28,6 +28,7 @@ public class InstituteFeedViewModel extends ViewModel {
     }
 
     private void initializeDataLoaders() {
+
         loadedHighlightEvents = Transformations.map(
                 DataRepository.getInstance().getEventDataHandler().getLoadedInstituteHighlightEventsNotifier(),
                 eventList-> eventList
@@ -84,6 +85,11 @@ public class InstituteFeedViewModel extends ViewModel {
 
     // TODO define this function to nuke all the existing propagation variables
     public void reinitializeFeed() {
+        DataRepository.getInstance().resetInstituteFeedContent();
+
+        initializeDataLoaders();
+        loadedHighlights = new MediatorLiveData<>();
+        distributeLoadedData();
     }
 
     @Override

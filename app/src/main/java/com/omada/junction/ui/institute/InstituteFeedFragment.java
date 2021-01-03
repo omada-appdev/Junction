@@ -1,6 +1,7 @@
 package com.omada.junction.ui.institute;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -59,10 +60,13 @@ public class InstituteFeedFragment extends Fragment {
         instituteFeedViewModel = viewModelProvider.get(InstituteFeedViewModel.class);
         FeedContentViewModel feedContentViewModel = viewModelProvider.get(FeedContentViewModel.class);
 
-        if(savedInstanceState != null){
-            refreshHighlights = true;
-            refreshOrganizations = true;
+        if(savedInstanceState == null){
+            instituteFeedViewModel.loadInstituteOrganizations();
+            instituteFeedViewModel.loadInstituteHighlights();
         }
+
+        refreshHighlights = true;
+        refreshOrganizations = true;
 
         adapter.addSection(organizationSection);
         adapter.addSection(highlightSection);
@@ -97,7 +101,10 @@ public class InstituteFeedFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         instituteFeedViewModel.getLoadedHighlights()
-                .observe(getViewLifecycleOwner(), this::onHighlightsLoaded);
+                .observe(getViewLifecycleOwner(), baseModels-> {
+                    onHighlightsLoaded(baseModels);
+                    Log.e("highlights loaded", String.valueOf(baseModels.size()));
+                });
 
         instituteFeedViewModel.getLoadedInstituteOrganizations()
                 .observe(getViewLifecycleOwner(), this::onOrganizationsLoaded);

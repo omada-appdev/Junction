@@ -341,7 +341,8 @@ public class UserDataHandler {
                 .update(
                         "name", updatedUserModel.name,
                         "gender", updatedUserModel.gender,
-                        "dateOfBirth", updatedUserModel.dateOfBirth
+                        "dateOfBirth", updatedUserModel.dateOfBirth,
+                        "institute", updatedUserModel.institute
                 )
                 .addOnSuccessListener(aVoid -> {
                     Log.e("Update", "success");

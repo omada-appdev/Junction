@@ -18,7 +18,7 @@
         android:layout_width="80dp"
         android:onClick="@{()->viewModel.organizationViewHandler.goToOrganization(organizationModel)}"
         android:src="@color/colorAccent"
-        remoteImageUrl="@{organizationModel.organizationProfilePhoto}"
+        remoteImageUrl="@{organizationModel.profilePhoto}"
         android:layout_margin="8dp"
         app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
         android:elevation="2dp"

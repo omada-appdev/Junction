@@ -5,85 +5,85 @@ import java.util.List;
 public class OrganizationModel extends BaseModel {
 
     private final String organizationID;
-    private final String organizationName;
+    private final String name;
 
-    private final String organizationProfilePhoto;
+    private final String profilePhoto;
 
-    private final String attendedUsersNumber;
-    private final String heldEventsNumber;
-    private final String organizationInstitute;
+    private final Integer attendedUsersNumber;
+    private final Integer heldEventsNumber;
+    private final String institute;
 
-    private final List<String> organizationInterests;
-    private final String organizationMail;
-    private final String organizationPhone;
+    private final List<String> interests;
+    private final String mail;
+    private final String phone;
 
-    private final String organizationType;
+    private final String type;
 
     //dummy model initializer
     public OrganizationModel(){
 
         organizationID = null;
-        organizationName = null;
+        name = null;
         attendedUsersNumber = null;
         heldEventsNumber = null;
-        organizationInstitute = null;
-        organizationInterests = null;
-        organizationMail = null;
-        organizationPhone = null;
-        organizationType = null;
-        organizationProfilePhoto =null;
+        institute = null;
+        interests = null;
+        mail = null;
+        phone = null;
+        type = null;
+        profilePhoto =null;
     }
 
     public OrganizationModel(OrganizationModelRemoteDB modelRemote){
         attendedUsersNumber = modelRemote.getAttendedUsersNumber();
         heldEventsNumber = modelRemote.getHeldEventsNumber();
-        organizationInstitute = modelRemote.getOrganizationInstitute();
+        institute = modelRemote.getInstitute();
         organizationID = modelRemote.getOrganizationID();
-        organizationName = modelRemote.getOrganizationName();
-        organizationInterests = modelRemote.getOrganizationInterests();
-        organizationMail = modelRemote.getOrganizationMail();
-        organizationPhone = modelRemote.getOrganizationPhone();
-        organizationType = modelRemote.getOrganizationType();
-        organizationProfilePhoto = modelRemote.getOrganizationProfilePhoto();
+        name = modelRemote.getName();
+        interests = modelRemote.getInterests();
+        mail = modelRemote.getMail();
+        phone = modelRemote.getPhone();
+        type = modelRemote.getType();
+        profilePhoto = modelRemote.getProfilePhoto();
     }
 
-    public String getOrganizationName() {
-        return organizationName;
+    public String getName() {
+        return name;
     }
 
-    public String getAttendedUsersNumber() {
+    public Integer getAttendedUsersNumber() {
         return attendedUsersNumber;
     }
 
-    public String getHeldEventsNumber() {
+    public Integer getHeldEventsNumber() {
         return heldEventsNumber;
     }
 
-    public String getOrganizationInstitute() {
-        return organizationInstitute;
+    public String getInstitute() {
+        return institute;
     }
 
-    public List<String> getOrganizationInterests() {
-        return organizationInterests;
+    public List<String> getInterests() {
+        return interests;
     }
 
-    public String getOrganizationMail() {
-        return organizationMail;
+    public String getMail() {
+        return mail;
     }
 
-    public String getOrganizationPhone() {
-        return organizationPhone;
+    public String getPhone() {
+        return phone;
     }
 
-    public String getOrganizationType() {
-        return organizationType;
+    public String getType() {
+        return type;
     }
 
     public String getOrganizationID() {
         return organizationID;
     }
 
-    public String getOrganizationProfilePhoto() {
-        return organizationProfilePhoto;
+    public String getProfilePhoto() {
+        return profilePhoto;
     }
 }

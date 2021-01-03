@@ -78,4 +78,9 @@ public class DataRepository {
 
     private void resetCompeteFeedContent() {
     }
+
+    public void resetInstituteFeedContent() {
+        eventDataHandler.resetLastInstituteHighlightEvent();
+        organizationDataHandler.resetLastInstituteOrganization();
+    }
 }
