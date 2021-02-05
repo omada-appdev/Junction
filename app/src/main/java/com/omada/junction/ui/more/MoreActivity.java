@@ -2,10 +2,12 @@ package com.omada.junction.ui.more;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -69,41 +71,50 @@ public class MoreActivity extends AppCompatActivity {
 
     }
 
-    private void setupTriggers(){
+    private void setupTriggers() {
+
         userProfileViewModel.getEditProfileTrigger()
                 .observe(this, booleanLiveEvent -> {
 
-                    if(booleanLiveEvent != null && booleanLiveEvent.getDataOnceAndReset()){
+                    if (booleanLiveEvent != null && booleanLiveEvent.getDataOnceAndReset()) {
 
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.more_content_placeholder, new UserProfileEditDetailsFragment())
-                                .addToBackStack(null)
+                                .addToBackStack("edit")
                                 .commit();
 
                     }
 
                 });
 
-        userProfileViewModel.getSignOutTrigger()
-                .observe(this, authStatusLiveEvent -> {
+        userProfileViewModel.getAuthStatusTrigger().observe(this, authStatusLiveEvent -> {
+            if (authStatusLiveEvent == null) {
+                return;
+            }
+            UserDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
+            if (authStatus == null) {
+                return;
+            }
+            switch (authStatus) {
+                case UPDATE_USER_DETAILS_SUCCESS:
+                    Toast.makeText(this, "Update successful", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().popBackStack("edit", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    break;
+                case UPDATE_USER_DETAILS_FAILURE:
+                    Toast.makeText(this, "Please try again", Toast.LENGTH_SHORT).show();
+                    break;
+                case USER_SIGNED_OUT:
+                    Intent i = new Intent(this, LoginActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                    finish();
+                    break;
+                default:
+                    break;
+            }
+        });
 
-                    if(authStatusLiveEvent != null){
-
-                        UserDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
-                        if(authStatus == null) {
-                            return;
-                        }
-
-                        if(authStatus == UserDataHandler.AuthStatus.USER_SIGNED_OUT) {
-                            Intent i = new Intent(this, LoginActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                            startActivity(i);
-                            finish();
-                        }
-                    }
-                });
     }
 
     @Override

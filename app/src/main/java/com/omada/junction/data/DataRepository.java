@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 
 import com.omada.junction.data.handler.AppDataHandler;
 import com.omada.junction.data.handler.ArticleDataHandler;
+import com.omada.junction.data.handler.ImageUploadHandler;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.data.handler.EventDataHandler;
 import com.omada.junction.data.handler.OrganizationDataHandler;
@@ -29,7 +30,7 @@ public class DataRepository {
     private final ArticleDataHandler articleDataHandler = new ArticleDataHandler();
     private final ShowcaseDataHandler showcaseDataHandler = new ShowcaseDataHandler();
     private final PostDataHandler postDataHandler = new PostDataHandler();
-
+    private final ImageUploadHandler imageUploadHandler = new ImageUploadHandler();
     //this is only for events
     private final EventDataHandler eventDataHandler = new EventDataHandler();
 
@@ -93,6 +94,10 @@ public class DataRepository {
                 StringUtilities.randomAlphabetGenerator(6)
         );
 
+    }
+
+    public ImageUploadHandler getImageUploadHandler() {
+        return imageUploadHandler;
     }
 
     // This class identifies the data repository accessor so that state can be tracked without

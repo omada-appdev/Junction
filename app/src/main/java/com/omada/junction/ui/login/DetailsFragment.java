@@ -1,7 +1,13 @@
 package com.omada.junction.ui.login;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -12,22 +18,42 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.imageview.ShapeableImageView;
 import com.omada.junction.R;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.databinding.LoginDetailsFragmentLayoutBinding;
+import com.omada.junction.utils.ImageUtilities;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.TransformUtilities;
 import com.omada.junction.viewmodels.LoginViewModel;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class DetailsFragment extends Fragment {
+
+    // Some arbitrary identifier
+    private static final int REQUEST_CODE_PROFILE_PICTURE_CHOOSER = 4;
+    private final AtomicBoolean compressingImage = new AtomicBoolean(false);
+
+    private final ActivityResultLauncher<String> storagePermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    startFilePicker();
+                }
+            });
 
     private LoginDetailsFragmentLayoutBinding binding;
 
@@ -139,6 +165,26 @@ public class DetailsFragment extends Fragment {
                     }
                 });
 
+        binding.profilePictureImage.setOnClickListener(v -> {
+
+            if(compressingImage.get()){
+                Toast.makeText(requireContext(), "Please wait", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            ((ShapeableImageView)v).setStrokeColor(null);
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                startFilePicker();
+            }
+            else {
+                storagePermissionLauncher.launch(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+
+        });
+
         binding.nextButton.setOnClickListener(v->{
 
             binding.emailLayout.setError("");
@@ -228,7 +274,7 @@ public class DetailsFragment extends Fragment {
 
         ArrayAdapter<String> adapter =
                 new ArrayAdapter<>(
-                        getContext(),
+                        requireContext(),
                         R.layout.drop_down_menu_layout,
                         GENDERS);
 
@@ -271,5 +317,79 @@ public class DetailsFragment extends Fragment {
             }
         });
 
+    }
+
+    private void startFilePicker() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_CODE_PROFILE_PICTURE_CHOOSER);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        if(data == null) {
+            return;
+        }
+
+        if( requestCode == REQUEST_CODE_PROFILE_PICTURE_CHOOSER) {
+
+            compressingImage.set(true);
+            Uri selectedImage = data.getData();
+
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("Details", "Compressing image... " + bitmap.getWidth() + "  " + bitmap.getHeight());
+            ImageUtilities
+                    .scaleToProfilePictureGetBitmap(requireActivity(), bitmap)
+                    .observe(getViewLifecycleOwner(), bitmapLiveEvent -> {
+                        if(bitmapLiveEvent != null){
+                            Bitmap picture = bitmapLiveEvent.getDataOnceAndReset();
+                            if(picture != null) {
+                                binding.profilePictureImage.setColorFilter(getResources().getColor(R.color.transparent, requireActivity().getTheme()));
+                                binding.profilePictureImage.setImageBitmap(picture);
+                            }
+                            else {
+                                // Handle null case
+                            }
+                        }
+                        else{
+                            Log.e("Details", "Error ");
+                        }
+                    });
+
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            ImageUtilities
+                    .scaleToProfilePictureGetFile(requireActivity(), bitmap)
+                    .observe(getViewLifecycleOwner(), fileLiveEvent -> {
+                        compressingImage.set(false);
+                        if(fileLiveEvent != null){
+                            File file = fileLiveEvent.getDataOnceAndReset();
+                            if(file != null) {
+                                binding.getViewModel().profilePicture.setValue(Uri.fromFile(file));
+                            }
+                            else {
+                                // Handle null case
+                            }
+                        }
+                        else{
+                            Log.e("Details", "Error ");
+                        }
+                    });
+
+        }
     }
 }

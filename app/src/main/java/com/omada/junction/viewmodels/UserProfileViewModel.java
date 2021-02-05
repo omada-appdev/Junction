@@ -1,5 +1,6 @@
 package com.omada.junction.viewmodels;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -7,6 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.Timestamp;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
@@ -14,23 +17,51 @@ import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 import com.omada.junction.utils.TransformUtilities;
 
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserProfileViewModel extends ViewModel {
 
+    private LiveData<LiveEvent<UserDataHandler.AuthStatus>> authStatusTrigger;
+
+    // No live event because the changes should always be subscribed to by all observers
+    private LiveData<UserDataHandler.UserModel> userUpdateAction;
 
     private final MutableLiveData<LiveEvent<Boolean>> editProfileTrigger = new MutableLiveData<>();
-    private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> signOutTrigger;
     private final MutableLiveData<LiveEvent<DataValidator.DataValidationInformation>> dataValidationAction = new MutableLiveData<>();
+    private UserDataHandler.UserModel currentUserModel;
 
     public MutableLiveData<String> name = new MutableLiveData<>();
     public MutableLiveData<String> institute = new MutableLiveData<>();
     public MutableLiveData<String> dateOfBirth = new MutableLiveData<>();
     public MutableLiveData<String> gender = new MutableLiveData<>();
+    public MutableLiveData<Uri> profilePicture = new MutableLiveData<>();
 
     public UserProfileViewModel(){
 
-        signOutTrigger = Transformations.map(
+        initCalendar();
+
+        // TODO since multiple possible observers, remember to make it thread safe just in case
+        userUpdateAction = Transformations.map(
+                DataRepository.getInstance()
+                        .getUserDataHandler()
+                        .getSignedInUserNotifier(),
+
+                userModelLiveEvent -> {
+                    if(userModelLiveEvent == null) {
+                        return null;
+                    }
+                    UserDataHandler.UserModel temp = userModelLiveEvent.getDataOnceAndReset();
+                    if(temp != null) {
+                        currentUserModel = temp;
+                        return currentUserModel;
+                    }
+                    return null;
+                }
+        );
+
+        authStatusTrigger = Transformations.map(
                 DataRepository.getInstance()
                 .getUserDataHandler()
                 .getAuthResponseNotifier(),
@@ -38,7 +69,7 @@ public class UserProfileViewModel extends ViewModel {
                 authStatusLiveEvent -> authStatusLiveEvent
         );
 
-        UserDataHandler.UserModel currentUserModel = DataRepository.getInstance()
+        currentUserModel = DataRepository.getInstance()
                 .getUserDataHandler()
                 .getCurrentUserModel();
 
@@ -71,7 +102,7 @@ public class UserProfileViewModel extends ViewModel {
         dataValidator.validateGender(gender.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
                 updatedUserModel.setGender(
-                        Character.toString(gender.getValue().charAt(0))
+                        gender.getValue()
                 );
             }
             else {
@@ -105,6 +136,8 @@ public class UserProfileViewModel extends ViewModel {
         });
 
         if(!anyDetailsEntryInvalid.get()) {
+
+            updatedUserModel.setProfilePicturePath(profilePicture.getValue());
             Log.e("UpdateUser", "Added details to firebase");
             notifyValidity(new DataValidator.DataValidationInformation(
                     DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
@@ -155,8 +188,54 @@ public class UserProfileViewModel extends ViewModel {
         return dataValidationAction;
     }
 
-    public LiveData<LiveEvent<UserDataHandler.AuthStatus>> getSignOutTrigger() {
-        return signOutTrigger;
+    public LiveData<UserDataHandler.UserModel> getUserUpdateAction() {
+        return userUpdateAction;
+    }
+
+    public LiveData<LiveEvent<UserDataHandler.AuthStatus>> getAuthStatusTrigger() {
+        return authStatusTrigger;
+    }
+
+    public UserDataHandler.UserModel getUserModel() {
+        return currentUserModel;
+    }
+
+    private long endTime;
+    private long startTime;
+
+    private void initCalendar() {
+        long today = MaterialDatePicker.todayInUtcMilliseconds();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.clear();
+        calendar.setTimeInMillis(today);
+
+        calendar.roll(Calendar.YEAR, -5);
+        endTime = calendar.getTimeInMillis();
+
+        calendar.roll(Calendar.YEAR, -70);
+        startTime = calendar.getTimeInMillis();
+    }
+
+    public MaterialDatePicker.Builder<?> setupDateSelectorBuilder() {
+
+        int inputMode = MaterialDatePicker.INPUT_MODE_CALENDAR;
+
+        MaterialDatePicker.Builder<Long> builder = MaterialDatePicker.Builder.datePicker();
+        builder.setSelection(endTime);
+        builder.setInputMode(inputMode);
+
+        return builder;
+    }
+
+    public CalendarConstraints.Builder setupConstraintsBuilder() {
+
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+
+        constraintsBuilder.setStart(startTime);
+        constraintsBuilder.setEnd(endTime);
+        constraintsBuilder.setOpenAt(endTime);
+
+        return constraintsBuilder;
     }
 
 

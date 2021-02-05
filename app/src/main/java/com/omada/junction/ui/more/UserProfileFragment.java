@@ -19,6 +19,7 @@ import com.omada.junction.R;
 import com.omada.junction.data.models.external.AchievementModel;
 import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.databinding.UserProfileFragmentLayoutBinding;
+import com.omada.junction.ui.uicomponents.CustomBindings;
 import com.omada.junction.viewmodels.UserProfileViewModel;
 
 import mva3.adapter.ListSection;
@@ -55,6 +56,14 @@ public class UserProfileFragment extends Fragment implements AppBarLayout.OnOffs
 
         MultiViewAdapter upcomingEventsAdapter = new MultiViewAdapter();
         MultiViewAdapter achievementsAdapter = new MultiViewAdapter();
+
+        binding.getViewModel().getUserUpdateAction()
+                .observe(getViewLifecycleOwner(), userModel -> {
+                    if(userModel == null) {
+                        return;
+                    }
+                    CustomBindings.loadImageHttp(binding.userProfileImage, userModel.getProfilePicture());
+                });
 
         binding.userProfileUpcomingEventsRecyclerView.setLayoutManager(
                 new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false)
