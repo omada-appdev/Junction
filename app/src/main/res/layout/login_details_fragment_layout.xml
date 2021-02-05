@@ -51,13 +51,11 @@
                     android:layout_height="160dp"
                     android:layout_gravity="center"
                     android:layout_margin="32dp"
-                    android:src="@drawable/ic_person_profile"
-                    app:tint="@color/grey"
+                    app:tint="#A0A0A0"
                     android:background="@color/white"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
-                    android:elevation="8dp"
-                    android:onClick="@{()->viewModel.goToProfilePictureChooser()}"/>
+                    android:elevation="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/email_layout"

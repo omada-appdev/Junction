@@ -1,9 +1,11 @@
 package com.omada.junction.data.handler;
 
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -15,6 +17,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.omada.junction.BuildConfig;
+import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.external.InterestModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
@@ -113,14 +117,22 @@ public class UserDataHandler {
             do not use the local cached variable named signed in user because it might not yet be updated by the
             auth state listener and do not update it from here because the auth state listener will take care of it
             */
-            FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(user.getUid())
-                    .set(details.toMapObject())
-                    .addOnSuccessListener(task -> {
-                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.ADD_EXTRA_DETAILS_SUCCESS));
-                    })
-                    .addOnFailureListener(task-> authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.ADD_EXTRA_DETAILS_FAILURE)));
+
+            DataRepository
+                    .getInstance()
+                    .getImageUploadHandler()
+                    .uploadProfilePictureWithTask(details.profilePicturePath, user.getUid())
+                    .addOnCompleteListener(uri -> {
+                        details.profilePicture = uri.getResult().toString();
+                        FirebaseFirestore.getInstance()
+                                .collection("users")
+                                .document(user.getUid())
+                                .set(details.toMapObject())
+                                .addOnSuccessListener(task -> {
+                                    authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.ADD_EXTRA_DETAILS_SUCCESS));
+                                })
+                                .addOnFailureListener(task -> authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.ADD_EXTRA_DETAILS_FAILURE)));
+                    });
         }
     }
 
@@ -169,6 +181,7 @@ public class UserDataHandler {
 
                         signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
                         signedInUser.setInstitute(documentSnapshot.getString("institute"));
+                        signedInUser.setProfilePicture(documentSnapshot.getString("profilePicture"));
 
                         signedInUser.setName(documentSnapshot.getString("name"));
                         signedInUser.setGender(documentSnapshot.getString("gender"));
@@ -271,6 +284,7 @@ public class UserDataHandler {
                         signedInUser.setGender(documentSnapshot.getString("gender"));
                         signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
                         signedInUser.setInstitute(documentSnapshot.getString("institute"));
+                        signedInUser.setProfilePicture(documentSnapshot.getString("profilePicture"));
 
                         try {
                             @SuppressWarnings("unchecked")
@@ -335,24 +349,64 @@ public class UserDataHandler {
 
     public void updateCurrentUserDetails(UserModel updatedUserModel){
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (BuildConfig.DEBUG && !(user != null && user.getUid() != null && !user.getUid().equals(""))) {
+            throw new AssertionError("Assertion failed");
+        }
+
+        // Filesystem path
+        Uri newProfilePicture = updatedUserModel.getProfilePicturePath();
+        if (newProfilePicture != null) {
+            DataRepository.getInstance()
+                    .getImageUploadHandler()
+                    .uploadProfilePictureWithTask(newProfilePicture, user.getUid())
+                    .addOnCompleteListener(uri -> {
+                        String httpUrl = uri.getResult().toString();
+                        updatedUserModel.profilePicture = httpUrl;
+                        updateDatabaseDetails(updatedUserModel, httpUrl);
+                    });
+        }
+        else {
+            updateDatabaseDetails(updatedUserModel, null);
+        }
+
+    }
+
+    private void updateDatabaseDetails(UserModel updatedUserModel, @Nullable String httpUrl) {
+
+        Map<String, Object> updates = new HashMap<>();
+
+        updates.put("name", updatedUserModel.name);
+        updates.put("gender", updatedUserModel.gender);
+        updates.put("dateOfBirth", updatedUserModel.dateOfBirth);
+        updates.put("institute", updatedUserModel.institute);
+
+        if(httpUrl != null) {
+            updates.put("profilePicture", httpUrl);
+        }
+
         FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(getCurrentUserModel().UID)
-                .update(
-                        "name", updatedUserModel.name,
-                        "gender", updatedUserModel.gender,
-                        "dateOfBirth", updatedUserModel.dateOfBirth,
-                        "institute", updatedUserModel.institute
-                )
+                .update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Log.e("Update", "success");
                     signedInUser.dateOfBirth = updatedUserModel.dateOfBirth;
                     signedInUser.gender = updatedUserModel.gender;
                     signedInUser.name = updatedUserModel.name;
                     signedInUser.institute = updatedUserModel.institute;
-                })
-                .addOnFailureListener(e -> Log.e("Update", e.getMessage()));
+                    if(updatedUserModel.profilePicture != null) {
+                        signedInUser.profilePicture = updatedUserModel.profilePicture;
+                    }
 
+                    signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
+                    authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.UPDATE_USER_DETAILS_SUCCESS));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Update", e.getMessage());
+                    authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.UPDATE_USER_DETAILS_FAILURE));
+                });
     }
 
     public void updateFollow(String organizationID, boolean following) {
@@ -414,6 +468,9 @@ public class UserDataHandler {
         String email;
         String name;
         String phone;
+        String profilePicture;
+
+        protected Uri profilePicturePath = null;
 
         List<InterestModel> interestsRating;
         List<String> interests;
@@ -468,6 +525,14 @@ public class UserDataHandler {
             return institute;
         }
 
+        public String getProfilePicture() {
+            return profilePicture;
+        }
+
+        public Uri getProfilePicturePath() {
+            return profilePicturePath;
+        }
+
         public Map<String, Object> toMapObject(){
 
             Map<String, Object> mapUserModel = new HashMap<>();
@@ -478,6 +543,7 @@ public class UserDataHandler {
             mapUserModel.put("name", name);
             mapUserModel.put("interests", interests);
             mapUserModel.put("email", email);
+            mapUserModel.put("profilePicture", profilePicture);
 
             return mapUserModel;
         }
@@ -489,7 +555,6 @@ public class UserDataHandler {
     to auth handler but without being able to set a UID
     */
     public static class MutableUserModel extends UserModel{
-
 
         public void setEmail(String email) {
             this.email = email;
@@ -527,6 +592,14 @@ public class UserDataHandler {
             this.institute = institute;
         }
 
+        public void setProfilePicture(String profilePicture) {
+            this.profilePicture = profilePicture;
+        }
+
+        public void setProfilePicturePath(Uri profilePicturePath) {
+            this.profilePicturePath = profilePicturePath;
+        }
+
     }
 
     /*
@@ -548,6 +621,7 @@ public class UserDataHandler {
             dateOfBirth = null;
             gender = null;
             institute = null;
+            profilePicture = null;
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.omada.junction.viewmodels;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
@@ -64,11 +65,11 @@ public class LoginViewModel extends ViewModel {
     public final MutableLiveData<String> dateOfBirth = new MutableLiveData<>();
     public final MutableLiveData<String> gender = new MutableLiveData<>();
     public final MutableLiveData<String> institute = new MutableLiveData<>();
+    public final MutableLiveData<Uri> profilePicture = new MutableLiveData<>();
 
     private final List<InterestModel> selectedInterests = new ArrayList<>();
     private final List<InterestModel> allInterests = new ArrayList<>();
 
-    private String profilePicture;
 
     //process fields (keep track of state)
     private final DataValidator dataValidator = new DataValidator();
@@ -205,9 +206,7 @@ public class LoginViewModel extends ViewModel {
 
         dataValidator.validateGender(gender.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setGender(
-                        Character.toString(gender.getValue().charAt(0))
-                );
+                userModel.setGender(gender.getValue());
             }
             else anyDetailsEntryInvalid.set(true);
             notifyValidity(dataValidationInformation);
@@ -256,6 +255,7 @@ public class LoginViewModel extends ViewModel {
             userModel.setInterests(selectedInterests);
         }
 
+        userModel.setProfilePicturePath(profilePicture.getValue());
 
         if(!anyDetailsEntryInvalid.get()) {
             notifyValidity(new DataValidator.DataValidationInformation(
@@ -312,10 +312,6 @@ public class LoginViewModel extends ViewModel {
     public void exitSignInScreen(){
         email.setValue(null);
         password.setValue(null);
-    }
-
-    public void goToProfilePictureChooser(){
-        //TODO add code to select avatar photo
     }
 
     public LiveData<LiveEvent<UserDataHandler.AuthStatus>> getAuthResultAction(){

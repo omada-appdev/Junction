@@ -101,6 +101,9 @@ public class InstituteFeedFragment extends Fragment {
 
         instituteFeedViewModel.getLoadedHighlights()
                 .observe(getViewLifecycleOwner(), postModels-> {
+                    if(postModels == null) {
+                        return;
+                    }
                     onHighlightsLoaded(postModels);
                     Log.e("highlights loaded", String.valueOf(postModels.size()));
                 });
