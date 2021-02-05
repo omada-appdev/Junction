@@ -15,10 +15,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.InterestModel;
+import com.omada.junction.data.models.external.InterestModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -358,14 +358,14 @@ public class UserDataHandler {
     public void updateFollow(String organizationID, boolean following) {
 
         if(following) {
+            getCurrentUserModel().getFollowing().put(organizationID, true);
+
             FirebaseDatabase.getInstance()
                     .getReference()
                     .child("follows")
                     .child(getCurrentUserModel().getUID())
                     .child(organizationID)
                     .setValue(true);
-
-            getCurrentUserModel().getFollowing().put(organizationID, true);
         }
         else {
             FirebaseDatabase.getInstance()
@@ -374,7 +374,6 @@ public class UserDataHandler {
                     .child(getCurrentUserModel().getUID())
                     .child(organizationID)
                     .removeValue();
-
             getCurrentUserModel().getFollowing().remove(organizationID);
         }
     }
@@ -407,7 +406,7 @@ public class UserDataHandler {
     this class is shown to outside world there is only one instance of this
     class and the derived class they contain all the data needed
     */
-    public static class UserModel extends BaseModel {
+    public static class UserModel implements Serializable {
 
         // Variables are package-private to prevent subclasses of MutableUserModel
         // gaining access to fields

@@ -12,9 +12,8 @@ import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
-import com.omada.junction.utils.transform.TransformUtilities;
+import com.omada.junction.utils.TransformUtilities;
 
-import java.net.HttpCookie;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserProfileViewModel extends ViewModel {

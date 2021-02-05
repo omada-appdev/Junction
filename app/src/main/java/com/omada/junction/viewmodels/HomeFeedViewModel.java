@@ -9,9 +9,9 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.ArticleModel;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.ArticleModel;
+import com.omada.junction.data.models.external.EventModel;
+import com.omada.junction.data.models.external.PostModel;
 import com.omada.junction.utils.taskhandler.LiveDataAggregator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
@@ -37,9 +37,9 @@ public class HomeFeedViewModel extends ViewModel {
     # OUTPUT FIELDS TO VIEW #
     #########################
      */
-    private MediatorLiveData<List<BaseModel>> loadedForYou = new MediatorLiveData<>();
-    private MediatorLiveData<List<BaseModel>> loadedLearn = new MediatorLiveData<>();
-    private MediatorLiveData<List<BaseModel>> loadedCompete = new MediatorLiveData<>();
+    private MediatorLiveData<List<PostModel>> loadedForYou = new MediatorLiveData<>();
+    private MediatorLiveData<List<PostModel>> loadedLearn = new MediatorLiveData<>();
+    private MediatorLiveData<List<PostModel>> loadedCompete = new MediatorLiveData<>();
 
     private final MutableLiveData<LiveEvent<Boolean>> forYouCompleteNotifier = new MutableLiveData<>();
 
@@ -83,15 +83,15 @@ public class HomeFeedViewModel extends ViewModel {
         });
     }
 
-    public LiveData<List<BaseModel>> getLoadedForYou(){
+    public LiveData<List<PostModel>> getLoadedForYou(){
         return loadedForYou;
     }
 
-    public LiveData<List<BaseModel>> getLoadedLearn(){
+    public LiveData<List<PostModel>> getLoadedLearn(){
         return loadedLearn;
     }
 
-    public LiveData<List<BaseModel>> getLoadedCompete(){
+    public LiveData<List<PostModel>> getLoadedCompete(){
         return loadedCompete;
     }
 
@@ -168,17 +168,17 @@ public class HomeFeedViewModel extends ViewModel {
      */
 
     // Apply things like sorting, etc. in aggregator
-    private static class ForYouAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>>{
+    private static class ForYouAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends PostModel>, List<PostModel>>{
 
         private final MutableLiveData<LiveEvent<Boolean>> completeNotifier;
 
-        public ForYouAggregator(MediatorLiveData<List<BaseModel>> destination, MutableLiveData<LiveEvent<Boolean>> completeNotifier) {
+        public ForYouAggregator(MediatorLiveData<List<PostModel>> destination, MutableLiveData<LiveEvent<Boolean>> completeNotifier) {
             super(destination);
             this.completeNotifier = completeNotifier;
         }
 
         @Override
-        public void holdData(ContentTypeIdentifier typeOfData, List<? extends BaseModel> data) {
+        public void holdData(ContentTypeIdentifier typeOfData, List<? extends PostModel> data) {
 
             if(data == null){
                 return;
@@ -187,8 +187,8 @@ public class HomeFeedViewModel extends ViewModel {
         }
 
         @Override
-        protected List<BaseModel> mergeWithExistingData(ContentTypeIdentifier typeOfData, List<? extends BaseModel> oldData, List<? extends BaseModel> newData) {
-            return (List<BaseModel>) newData;
+        protected List<PostModel> mergeWithExistingData(ContentTypeIdentifier typeOfData, List<? extends PostModel> oldData, List<? extends PostModel> newData) {
+            return (List<PostModel>) newData;
         }
 
         @Override
@@ -203,7 +203,7 @@ public class HomeFeedViewModel extends ViewModel {
 
             Log.e("Pagination", "aggregated for you");
 
-            List<BaseModel> aggregatedList = new ArrayList<>();
+            List<PostModel> aggregatedList = new ArrayList<>();
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_EVENT));
             aggregatedList.addAll(dataOnHold.get(ContentTypeIdentifier.CONTENT_TYPE_ARTICLE));
 
@@ -224,14 +224,14 @@ public class HomeFeedViewModel extends ViewModel {
 
     }
 
-    private static class LearnAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>> {
+    private static class LearnAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends PostModel>, List<PostModel>> {
 
-        public LearnAggregator(MediatorLiveData<List<BaseModel>> destination) {
+        public LearnAggregator(MediatorLiveData<List<PostModel>> destination) {
             super(destination);
         }
 
         @Override
-        protected List<? extends BaseModel> mergeWithExistingData(ContentTypeIdentifier typeofData, List<? extends BaseModel> oldData, List<? extends BaseModel> newData) {
+        protected List<? extends PostModel> mergeWithExistingData(ContentTypeIdentifier typeofData, List<? extends PostModel> oldData, List<? extends PostModel> newData) {
             return null;
         }
 
@@ -246,14 +246,14 @@ public class HomeFeedViewModel extends ViewModel {
         }
     }
 
-    private static class CompeteAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends BaseModel>, List<BaseModel>> {
+    private static class CompeteAggregator extends LiveDataAggregator<ContentTypeIdentifier, List<? extends PostModel>, List<PostModel>> {
 
-        public CompeteAggregator(MediatorLiveData<List<BaseModel>> destination) {
+        public CompeteAggregator(MediatorLiveData<List<PostModel>> destination) {
             super(destination);
         }
 
         @Override
-        protected List<? extends BaseModel> mergeWithExistingData(ContentTypeIdentifier typeofData, List<? extends BaseModel> oldData, List<? extends BaseModel> newData) {
+        protected List<? extends PostModel> mergeWithExistingData(ContentTypeIdentifier typeofData, List<? extends PostModel> oldData, List<? extends PostModel> newData) {
             return null;
         }
 

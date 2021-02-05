@@ -6,15 +6,17 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.omada.junction.data.BaseDataHandler;
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.OrganizationModel;
-import com.omada.junction.data.models.OrganizationModelRemoteDB;
+import com.omada.junction.data.models.converter.OrganizationModelConverter;
+import com.omada.junction.data.models.external.OrganizationModel;
+import com.omada.junction.data.models.internal.remote.OrganizationModelRemoteDB;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrganizationDataHandler {
+public class OrganizationDataHandler extends BaseDataHandler {
 
     /*
    #############################
@@ -35,6 +37,7 @@ public class OrganizationDataHandler {
     # FIELDS FOR INTERNAL USE #
     ###########################
     */
+    private OrganizationModelConverter organizationModelConverter = new OrganizationModelConverter();
 
 
     public LiveData<LiveEvent<OrganizationModel>> getOrganizationDetails(String organizationID) {
@@ -65,8 +68,11 @@ public class OrganizationDataHandler {
                     for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots){
 
                         OrganizationModelRemoteDB modelRemoteDB = documentSnapshot.toObject(OrganizationModelRemoteDB.class);
-                        modelRemoteDB.setOrganizationID(documentSnapshot.getId());
-                        models.add(new OrganizationModel(modelRemoteDB));
+                        if(modelRemoteDB == null) {
+                            return;
+                        }
+                        modelRemoteDB.setId(documentSnapshot.getId());
+                        models.add(organizationModelConverter.convertRemoteDBToExternalModel(modelRemoteDB));
                     }
                     loadedInstituteOrganizationsNotifier.setValue(new LiveEvent<>(models));
 
@@ -79,8 +85,12 @@ public class OrganizationDataHandler {
                 .document(organizationID)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    OrganizationModel model = new OrganizationModel(documentSnapshot.toObject(OrganizationModelRemoteDB.class));
-                    remoteData.setValue(new LiveEvent<>(model));
+                    OrganizationModelRemoteDB modelRemoteDB = documentSnapshot.toObject(OrganizationModelRemoteDB.class);
+                    if(modelRemoteDB == null) {
+                        return;
+                    }
+                    modelRemoteDB.setId(documentSnapshot.getId());
+                    remoteData.setValue(new LiveEvent<>(organizationModelConverter.convertRemoteDBToExternalModel(modelRemoteDB)));
                 });
     }
 

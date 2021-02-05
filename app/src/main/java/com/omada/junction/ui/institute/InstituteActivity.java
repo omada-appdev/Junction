@@ -15,9 +15,9 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.OrganizationModel;
-import com.omada.junction.data.models.ShowcaseModel;
+import com.omada.junction.data.models.external.EventModel;
+import com.omada.junction.data.models.external.OrganizationModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
 import com.omada.junction.ui.home.HomeActivity;
@@ -65,9 +65,12 @@ public class InstituteActivity extends AppCompatActivity {
                 .getOrganizationModelDetailsTrigger()
                 .observe(this, organizationModelLiveEvent -> {
 
-                    if(organizationModelLiveEvent != null && organizationModelLiveEvent.getData() != null){
-                        OrganizationModel organizationModel = organizationModelLiveEvent.getDataOnceAndReset();
+                    if(organizationModelLiveEvent != null){
 
+                        OrganizationModel organizationModel = organizationModelLiveEvent.getDataOnceAndReset();
+                        if(organizationModel == null) {
+                            return;
+                        }
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.institute_content_placeholder, OrganizationProfileFragment.newInstance(organizationModel))
@@ -80,9 +83,11 @@ public class InstituteActivity extends AppCompatActivity {
         feedContentViewModel.getEventViewHandler()
                 .getEventCardDetailsTrigger()
                 .observe(this, eventModelLiveEvent -> {
-                    if(eventModelLiveEvent != null && eventModelLiveEvent.getData() != null){
+                    if(eventModelLiveEvent != null){
                         EventModel model = eventModelLiveEvent.getDataOnceAndReset();
-
+                        if(model == null) {
+                            return;
+                        }
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.institute_content_placeholder, EventDetailsFragment.newInstance(model))
                                 .addToBackStack("stack")
@@ -94,7 +99,12 @@ public class InstituteActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getEventFormTrigger().observe(this, eventModelLiveEvent -> {
 
-                    if(eventModelLiveEvent == null || eventModelLiveEvent.getData() == null){
+                    if(eventModelLiveEvent == null){
+                        return;
+                    }
+
+                    EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
+                    if(eventModel == null) {
                         return;
                     }
 
@@ -110,7 +120,13 @@ public class InstituteActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getCallOrganizerTrigger().observe(this, stringLiveEvent -> {
 
-                    if(stringLiveEvent.getData() != null){
+                    if(stringLiveEvent != null){
+
+                        String phone = stringLiveEvent.getDataOnceAndReset();
+                        if(phone == null) {
+                            return;
+                        }
+
                         Intent intent = new Intent(Intent.ACTION_DIAL);
                         intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
                         if (intent.resolveActivity(getPackageManager()) != null) {
@@ -124,9 +140,12 @@ public class InstituteActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getMailOrganizerTrigger().observe(this, pairLiveEvent -> {
 
-                    if(pairLiveEvent.getData() != null) {
+                    if(pairLiveEvent != null) {
 
                         Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+                        if(data == null) {
+                            return;
+                        }
 
                         Intent intent = new Intent(Intent.ACTION_SENDTO);
                         intent.setData(Uri.parse("mailto:")); // only email apps should handle this
@@ -141,8 +160,12 @@ public class InstituteActivity extends AppCompatActivity {
 
         feedContentViewModel.getOrganizationDetailsTrigger()
                 .observe(this, organizationIDLiveEvent -> {
-                    if(organizationIDLiveEvent != null && organizationIDLiveEvent.getData() != null){
+                    if(organizationIDLiveEvent != null){
+
                         String organizationID = organizationIDLiveEvent.getDataOnceAndReset();
+                        if(organizationID == null) {
+                            return;
+                        }
 
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.institute_content_placeholder, OrganizationProfileFragment.newInstance(organizationID))
@@ -156,13 +179,16 @@ public class InstituteActivity extends AppCompatActivity {
                 .getOrganizationShowcaseDetailsTrigger()
                 .observe(this, showcaseModelLiveEvent -> {
 
-                    if(showcaseModelLiveEvent.getData() != null){
+                    if(showcaseModelLiveEvent != null){
 
                         ShowcaseModel model = showcaseModelLiveEvent.getDataOnceAndReset();
+                        if(model == null) {
+                            return;
+                        }
 
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.institute_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
+                                .replace(R.id.institute_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getId()))
                                 .addToBackStack("stack")
                                 .commit();
 

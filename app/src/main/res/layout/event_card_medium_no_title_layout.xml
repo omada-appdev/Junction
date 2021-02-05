@@ -2,11 +2,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="com.omada.junction.utils.transform.TransformUtilities"/>
+        <import type="com.omada.junction.utils.TransformUtilities"/>
         <import type="android.view.View"/>
         <variable
             name="eventModel"
-            type="com.omada.junction.data.models.EventModel" />
+            type="com.omada.junction.data.models.external.EventModel" />
         <variable
             name="viewModel"
             type="com.omada.junction.viewmodels.FeedContentViewModel" />

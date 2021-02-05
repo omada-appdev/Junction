@@ -16,7 +16,7 @@ public class LiveEvent<T> {
         this.data = data;
     }
 
-    public T getDataOnce(){
+    private T getDataOnce(){
         if(eventHandled){
             return null;
         }
@@ -32,7 +32,7 @@ public class LiveEvent<T> {
         return _data;
     }
 
-    public T getData(){
+    private T getData(){
         return data;
     }
 }

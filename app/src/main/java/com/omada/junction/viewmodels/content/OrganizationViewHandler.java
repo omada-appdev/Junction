@@ -3,8 +3,8 @@ package com.omada.junction.viewmodels.content;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.omada.junction.data.models.OrganizationModel;
-import com.omada.junction.data.models.ShowcaseModel;
+import com.omada.junction.data.models.external.OrganizationModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import javax.annotation.Nonnull;

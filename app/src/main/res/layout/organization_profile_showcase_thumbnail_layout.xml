@@ -8,7 +8,7 @@
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
         <variable
             name="showcaseModel"
-            type="com.omada.junction.data.models.ShowcaseModel" />
+            type="com.omada.junction.data.models.external.ShowcaseModel" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="160dp"
@@ -18,7 +18,7 @@
         android:layout_marginEnd="2dp"
         app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance"
         android:onClick="@{()->viewModel.organizationViewHandler.goToOrganizationShowcase(showcaseModel)}"
-        android:visibility="@{showcaseModel.showcaseID == null ? View.GONE : View.VISIBLE}">
+        android:visibility="@{showcaseModel.id == null ? View.GONE : View.VISIBLE}">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:foreground="@drawable/gradient_bottom_fade_black"
@@ -26,7 +26,7 @@
             android:layout_height="match_parent"
             app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance"
             android:background="@color/colorAccent"
-            remoteImageUrl="@{showcaseModel.showcasePhoto}"
+            remoteImageUrl="@{showcaseModel.photo}"
             android:scaleType="centerCrop" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:text="@{showcaseModel.showcaseTitle}"
+            android:text="@{showcaseModel.title}"
             android:textStyle="bold"
             android:textColor="@color/White"
             android:layout_margin="8dp"/>

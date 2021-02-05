@@ -3,7 +3,7 @@ package com.omada.junction.viewmodels;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.external.OrganizationModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 import com.omada.junction.viewmodels.content.AnnouncementViewHandler;
 import com.omada.junction.viewmodels.content.ArticleViewHandler;

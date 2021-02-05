@@ -10,14 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.ArticleModel;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.databinding.ArticleDetailsFragmentLayoutBinding;
-import com.omada.junction.databinding.EventDetailsFragmentLayoutBinding;
-import com.omada.junction.viewmodels.FeedContentViewModel;
+import com.omada.junction.data.models.external.ArticleModel;
+
 
 public class ArticleDetailsFragment extends Fragment {
 
@@ -26,7 +22,7 @@ public class ArticleDetailsFragment extends Fragment {
     public static ArticleDetailsFragment newInstance(ArticleModel articleModel) {
 
         Bundle args = new Bundle();
-        args.putSerializable("articleModel", articleModel);
+        args.putParcelable("articleModel", articleModel);
 
         ArticleDetailsFragment fragment = new ArticleDetailsFragment();
         fragment.setArguments(args);
@@ -37,7 +33,10 @@ public class ArticleDetailsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        articleModel = (ArticleModel) getArguments().getSerializable("articleModel");
+        if(getArguments() == null) {
+            throw new RuntimeException("Attempt to initialize details fragment without providing id");
+        }
+        articleModel = getArguments().getParcelable("articleModel");
     }
 
     @Nullable
