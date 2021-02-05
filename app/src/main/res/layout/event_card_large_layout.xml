@@ -2,11 +2,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
-        <import type="com.omada.junction.utils.transform.TransformUtilities"/>
+        <import type="com.omada.junction.utils.TransformUtilities"/>
         <import type="android.view.View"/>
         <variable
             name="eventModel"
-            type="com.omada.junction.data.models.EventModel" />
+            type="com.omada.junction.data.models.external.EventModel" />
         <variable
             name="viewModel"
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
@@ -30,7 +30,7 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/organizer_profile_image"
-                remoteImageUrl="@{eventModel.creatorProfilePicture}"
+                remoteImageHttp="@{eventModel.creatorProfilePicture}"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_marginStart="4dp"
@@ -146,7 +146,7 @@
                     android:id="@+id/event_date_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@{TransformUtilities.convertTimestampToDDMM(eventModel.startTime)}"
+                    android:text="@{TransformUtilities.convertUtcLocalDateTimeToddDDMM(eventModel.startTime)}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                     app:layout_constraintBottom_toTopOf="@+id/event_venue_text"
                     app:layout_constraintStart_toStartOf="parent" />
@@ -156,7 +156,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.startTime)}"
+                    android:text="@{TransformUtilities.convertUtcLocalDateTimeToHHMM(eventModel.startTime)}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/event_time_end_text"
@@ -167,7 +167,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@{TransformUtilities.convertTimestampToHHMM(eventModel.endTime)}"
+                    android:text="@{TransformUtilities.convertUtcLocalDateTimeToHHMM(eventModel.endTime)}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

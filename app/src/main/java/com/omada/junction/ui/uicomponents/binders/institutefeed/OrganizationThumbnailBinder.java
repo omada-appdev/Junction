@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.external.OrganizationModel;
 import com.omada.junction.databinding.OrganizationThumbnailLayoutBinding;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 

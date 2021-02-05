@@ -45,12 +45,16 @@ public class UserProfileEditDetailsFragment extends Fragment {
 
         userProfileViewModel.getDataValidationAction().observe(getViewLifecycleOwner(), dataValidationInformationLiveEvent -> {
 
-            if(dataValidationInformationLiveEvent.getData() != null){
-                DataValidator.DataValidationInformation information = dataValidationInformationLiveEvent.getDataOnceAndReset();
+            if(dataValidationInformationLiveEvent != null){
 
-                boolean valid = (information.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID);
+                DataValidator.DataValidationInformation dataValidationInformation = dataValidationInformationLiveEvent.getDataOnceAndReset();
+                if(dataValidationInformation == null) {
+                    return;
+                }
 
-                switch (information.getValidationPoint()){
+                boolean valid = (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID);
+
+                switch (dataValidationInformation.getValidationPoint()){
 
                     case VALIDATION_POINT_ALL:
                         if(valid){

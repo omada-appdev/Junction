@@ -12,8 +12,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.ShowcaseModel;
+import com.omada.junction.data.models.external.ArticleModel;
+import com.omada.junction.data.models.external.EventModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.ui.articledetails.ArticleDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
@@ -120,13 +121,19 @@ public class HomeActivity extends AppCompatActivity {
 
         feedContentViewModel
                 .getOrganizationDetailsTrigger()
-                .observe(this, stringLiveEvent -> {
-                    if(stringLiveEvent != null && stringLiveEvent.getData() != null){
+                .observe(this, idLiveEvent -> {
+                    if(idLiveEvent != null){
+
+                        String id = idLiveEvent.getDataOnceAndReset();
+
+                        if(id == null) {
+                            return;
+                        }
 
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder,
-                                        OrganizationProfileFragment.newInstance(stringLiveEvent.getDataOnceAndReset()))
+                                        OrganizationProfileFragment.newInstance(id))
                                 .addToBackStack("stack")
                                 .commit();
                     }
@@ -136,13 +143,18 @@ public class HomeActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getEventFormTrigger().observe(this, eventModelLiveEvent -> {
 
-                    if(eventModelLiveEvent == null || eventModelLiveEvent.getData() == null){
+                    if(eventModelLiveEvent == null){
+                        return;
+                    }
+
+                    EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
+                    if(eventModel == null) {
                         return;
                     }
 
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
+                            .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModel))
                             .addToBackStack("stack")
                             .commit();
         });
@@ -151,9 +163,13 @@ public class HomeActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getCallOrganizerTrigger().observe(this, stringLiveEvent -> {
 
-                    if(stringLiveEvent.getData() != null){
+                    if(stringLiveEvent != null){
+                        String data = stringLiveEvent.getDataOnceAndReset();
+                        if(data == null) {
+                            return;
+                        }
                         Intent intent = new Intent(Intent.ACTION_DIAL);
-                        intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
+                        intent.setData(Uri.parse("tel:" + data));
                         if (intent.resolveActivity(getPackageManager()) != null) {
                             startActivity(intent);
                         }
@@ -165,9 +181,12 @@ public class HomeActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getMailOrganizerTrigger().observe(this, pairLiveEvent -> {
 
-                    if(pairLiveEvent.getData() != null) {
+                    if(pairLiveEvent != null) {
 
                         Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+                        if(data == null) {
+                            return;
+                        }
 
                         Intent intent = new Intent(Intent.ACTION_SENDTO);
                         intent.setData(Uri.parse("mailto:")); // only email apps should handle this
@@ -184,11 +203,14 @@ public class HomeActivity extends AppCompatActivity {
                 .getArticleViewHandler()
                 .getArticleCardDetailsTrigger()
                 .observe(this, articleModelLiveEvent -> {
-                    if(articleModelLiveEvent != null && articleModelLiveEvent.getData() != null){
-
+                    if(articleModelLiveEvent != null){
+                        ArticleModel articleModel = articleModelLiveEvent.getDataOnceAndReset();
+                        if(articleModel == null) {
+                            return;
+                        }
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.home_content_placeholder, ArticleDetailsFragment.newInstance(articleModelLiveEvent.getDataOnceAndReset()))
+                                .replace(R.id.home_content_placeholder, ArticleDetailsFragment.newInstance(articleModel))
                                 .addToBackStack("stack")
                                 .commit();
 
@@ -200,13 +222,16 @@ public class HomeActivity extends AppCompatActivity {
                 .getOrganizationShowcaseDetailsTrigger()
                 .observe(this, showcaseModelLiveEvent -> {
 
-                    if(showcaseModelLiveEvent.getData() != null){
+                    if(showcaseModelLiveEvent != null){
 
                         ShowcaseModel model = showcaseModelLiveEvent.getDataOnceAndReset();
+                        if(model == null) {
+                            return;
+                        }
 
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
+                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getId()))
                                 .addToBackStack("stack")
                                 .commit();
 

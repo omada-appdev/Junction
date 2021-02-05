@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.BaseModel;
+import com.omada.junction.data.models.external.PostModel;
 import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardSmallNoTitleBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardSmallNoTitleBinder;
 import com.omada.junction.utils.factory.ShowcaseFeedViewModelFactory;
@@ -33,7 +33,7 @@ public class OrganizationShowcaseFragment extends Fragment {
     private ShowcaseFeedViewModel showcaseFeedViewModel;
 
     private final MultiViewAdapter adapter = new MultiViewAdapter();
-    private final ListSection<BaseModel> showcaseItemsListSection = new ListSection<>();
+    private final ListSection<PostModel> showcaseItemsListSection = new ListSection<>();
     private boolean refreshContents = true;
 
 
@@ -93,7 +93,7 @@ public class OrganizationShowcaseFragment extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
-    private void onShowcaseItemsLoaded(List<BaseModel> items){
+    private void onShowcaseItemsLoaded(List<PostModel> items){
         if(refreshContents || showcaseItemsListSection.size() == 0){
             showcaseItemsListSection.addAll(items);
             refreshContents = false;

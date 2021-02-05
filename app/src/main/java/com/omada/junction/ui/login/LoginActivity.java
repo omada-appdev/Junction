@@ -83,15 +83,19 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
 
-        loginViewModel.getGoToFeedAction().observe(this, goToFeed -> {
-            if(goToFeed.getDataOnceAndReset()){
+        loginViewModel.getGoToFeedAction().observe(this, booleanLiveEvent -> {
+            if(booleanLiveEvent == null) {
+                return;
+            }
+            Boolean goToFeed = booleanLiveEvent.getDataOnceAndReset();
+            if(goToFeed != null && goToFeed){
                 Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(i);
                 finish();
             }
         });
 
-        loginViewModel.getToastMessageAction().observe(this, s -> Toast.makeText(LoginActivity.this, s.getDataOnce(), Toast.LENGTH_SHORT).show());
+        loginViewModel.getToastMessageAction().observe(this, s -> Toast.makeText(LoginActivity.this, "" + s.getDataOnceAndReset(), Toast.LENGTH_SHORT).show());
     }
 
     @Override

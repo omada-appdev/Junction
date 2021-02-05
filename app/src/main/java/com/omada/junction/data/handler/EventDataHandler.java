@@ -11,10 +11,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.omada.junction.data.BaseDataHandler;
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.EventModelRemoteDB;
+import com.omada.junction.data.models.converter.EventModelConverter;
+import com.omada.junction.data.models.external.EventModel;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.internal.remote.EventModelRemoteDB;
 import com.omada.junction.utils.taskhandler.LiveDataAggregator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
@@ -23,10 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class EventDataHandler {
 
-
-
+public class EventDataHandler extends BaseDataHandler {
 
     private enum EventType{
         EVENT_TYPE_LOCAL,
@@ -47,16 +47,15 @@ public class EventDataHandler {
     private MediatorLiveData<List<EventModel>> loadedForYouEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedLearnEventsNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<EventModel>> loadedCompeteEventsNotifier = new MediatorLiveData<>();
-    private MediatorLiveData<List<EventModel>> loadedInstituteHighlightEventsNotifier = new MediatorLiveData<>();
-
 
     /*
     ###########################
     # FIELDS FOR INTERNAL USE #
     ###########################
     */
-
     private EventsAggregator ForYouEventsAggregator = new EventsAggregator(loadedForYouEventsNotifier);
+    private EventModelConverter eventModelConverter = new EventModelConverter();
+
     public EventDataHandler(){
     }
 
@@ -76,10 +75,10 @@ public class EventDataHandler {
                 .addOnSuccessListener(documentSnapshot -> {
                     if(documentSnapshot == null) return;
                     EventModelRemoteDB modelRemote = documentSnapshot.toObject(EventModelRemoteDB.class);
-
                     if(modelRemote == null) return;
+                    modelRemote.setId(documentSnapshot.getId());
                     destinationLiveData.setValue(new LiveEvent<>(
-                            new EventModel(modelRemote)
+                            eventModelConverter.convertRemoteDBToExternalModel(modelRemote)
                     ));
                 })
                 .addOnFailureListener(e -> {
@@ -138,8 +137,11 @@ public class EventDataHandler {
                     ArrayList<EventModel> loadedEvents = new ArrayList<>();
                     for(QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
                         EventModelRemoteDB item = snapshot.toObject(EventModelRemoteDB.class);
+                        if(item == null) {
+                            return;
+                        }
                         item.setId(snapshot.getId());
-                        loadedEvents.add(new EventModel(item));
+                        loadedEvents.add(eventModelConverter.convertRemoteDBToExternalModel(item));
                     }
                     if(queryDocumentSnapshots.size() > 0) {
                         PaginationHelper.lastForYouEvent = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
@@ -152,55 +154,6 @@ public class EventDataHandler {
 
     private void getAllEventsFromLocal(final MutableLiveData<ArrayList<EventModel>> destinationLiveData){
         //TODO get all events from local db and remove all the events that are expired and set live data as above
-    }
-
-    public void getInstituteHighlightEvents(){
-
-        String instituteID = DataRepository.getInstance()
-                .getUserDataHandler()
-                .getCurrentUserModel()
-                .getInstitute();
-
-        FirebaseFirestore.getInstance()
-                .collection("posts")
-                .whereEqualTo("type", "event")
-                .whereEqualTo("creatorCache.institute", instituteID)
-                .whereEqualTo("instituteHighlight", true)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<EventModel> eventModelList = new ArrayList<>(queryDocumentSnapshots.size());
-                    for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                        EventModelRemoteDB modelRemote = documentSnapshot.toObject(EventModelRemoteDB.class);
-                        modelRemote.setId(documentSnapshot.getId());
-
-                        eventModelList.add(new EventModel(modelRemote));
-                    }
-                    loadedInstituteHighlightEventsNotifier.setValue(eventModelList);
-                });
-    }
-
-    public LiveData<List<EventModel>> getOrganizationHighlightEvents(String organizerID){
-
-        final MutableLiveData<List<EventModel>> loadedOrganizationHighlightEventsNotifier = new MutableLiveData<>();
-
-        FirebaseFirestore.getInstance()
-                .collection("posts")
-                .whereEqualTo("type", "event")
-                .whereEqualTo("creator", organizerID)
-                .whereEqualTo("organizationHighlight", true)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-
-                    Log.e("InstHigh", "Fetched " + queryDocumentSnapshots.size() + " highlights");
-
-                    List<EventModel> eventModelList = new ArrayList<>(queryDocumentSnapshots.size());
-                    for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                        eventModelList.add(new EventModel(documentSnapshot.toObject(EventModelRemoteDB.class)));
-                    }
-                    loadedOrganizationHighlightEventsNotifier.setValue(eventModelList);
-                });
-
-        return loadedOrganizationHighlightEventsNotifier;
     }
 
     public void populateEventResponses(EventModel eventModel, Map <String, Map <String, String>> responses) {
@@ -222,17 +175,13 @@ public class EventDataHandler {
                 .document(UID)
                 .set(responses)
                 .addOnSuccessListener(aVoid -> {
-                    Log.e("EventRegistration" ,"Event registration succesful");
+                    Log.e("EventRegistration" ,"Event registration successful");
                 });
 
     }
 
     public LiveData<List<EventModel>> getLoadedForYouEventsNotifier(){
         return loadedForYouEventsNotifier;
-    }
-
-    public LiveData<List<EventModel>> getLoadedInstituteHighlightEventsNotifier(){
-        return loadedInstituteHighlightEventsNotifier;
     }
 
     // This class will be used to get cursors for pagination
@@ -249,12 +198,7 @@ public class EventDataHandler {
         ForYouEventsAggregator = new EventsAggregator(loadedForYouEventsNotifier);
     }
 
-    public void resetLastInstituteHighlightEvent() {
-        loadedInstituteHighlightEventsNotifier = new MediatorLiveData<>();
-    }
-
     private static class EventsAggregator extends LiveDataAggregator<EventType, List<EventModel>, List<EventModel>>{
-
 
         public EventsAggregator(MediatorLiveData<List<EventModel>> destination) {
             super(destination);
@@ -268,7 +212,7 @@ public class EventDataHandler {
         @Override
         protected boolean checkDataForAggregability() {
             try {
-                List<? extends BaseModel> remoteEvents = dataOnHold.get(EventType.EVENT_TYPE_REMOTE);
+                List<? extends PostModel> remoteEvents = dataOnHold.get(EventType.EVENT_TYPE_REMOTE);
                 //List<? extends BaseModel> localEvents = dataOnHold.get("remoteEvents");
 
                 /*

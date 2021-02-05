@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.ui.uicomponents.FormView;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.content.EventViewHandler;
@@ -29,7 +29,7 @@ public class EventRegistrationFragment extends Fragment {
     public static EventRegistrationFragment newInstance(EventModel eventModel) {
 
         Bundle args = new Bundle();
-        args.putSerializable("eventModel", eventModel);
+        args.putParcelable("eventModel", eventModel);
 
         EventRegistrationFragment fragment = new EventRegistrationFragment();
         fragment.setArguments(args);
@@ -47,10 +47,10 @@ public class EventRegistrationFragment extends Fragment {
 
         if(savedInstanceState == null) {
             if(getArguments() == null) return;
-            eventModel = (EventModel) getArguments().getSerializable("eventModel");
+            eventModel = getArguments().getParcelable("eventModel");
         }
         else{
-            eventModel = (EventModel) savedInstanceState.getSerializable("eventModel");
+            eventModel = savedInstanceState.getParcelable("eventModel");
         }
 
     }
@@ -129,7 +129,7 @@ public class EventRegistrationFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        outState.putSerializable("eventModel", eventModel);
+        outState.putParcelable("eventModel", eventModel);
     }
 
 }

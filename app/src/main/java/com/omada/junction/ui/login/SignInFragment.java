@@ -75,11 +75,15 @@ public class SignInFragment extends Fragment {
         first param in pair is what was invalid and second param is why it is invalid
          */
         loginViewModel.getDataValidationAction().observe(getViewLifecycleOwner(), dataValidationInformationLiveEvent->{
-            if(dataValidationInformationLiveEvent.getData() == null){
+            if(dataValidationInformationLiveEvent == null){
                 return;
             }
 
             DataValidator.DataValidationInformation dataValidationInformation = dataValidationInformationLiveEvent.getDataOnceAndReset();
+            if(dataValidationInformation == null) {
+                return;
+            }
+
             switch (dataValidationInformation.getValidationPoint()){
                 case VALIDATION_POINT_EMAIL:
                     if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {

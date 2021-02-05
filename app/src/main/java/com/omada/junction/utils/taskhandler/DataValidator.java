@@ -1,8 +1,6 @@
 package com.omada.junction.utils.taskhandler;
 
-import com.google.firebase.Timestamp;
-import com.omada.junction.utils.transform.TransformUtilities;
-import com.omada.junction.viewmodels.LoginViewModel;
+import com.omada.junction.utils.TransformUtilities;
 
 import java.util.Date;
 

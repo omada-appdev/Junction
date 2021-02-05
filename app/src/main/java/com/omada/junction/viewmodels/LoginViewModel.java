@@ -12,11 +12,11 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.Timestamp;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
-import com.omada.junction.data.models.InterestModel;
+import com.omada.junction.data.models.external.InterestModel;
 import com.omada.junction.ui.login.LoginActivity;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
-import com.omada.junction.utils.transform.TransformUtilities;
+import com.omada.junction.utils.TransformUtilities;
 
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.InterestModel;
+import com.omada.junction.data.models.external.InterestModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
@@ -38,31 +38,6 @@ public class AppDataHandler {
         };
 
         return Arrays.asList(arrayList);
-    }
-
-    public static class CountedAccessLiveEvent<T> extends LiveEvent<T>{
-
-        int numAccesses = 0;
-        int maxAccesses = 1;
-
-        private CountedAccessLiveEvent(T data){
-        }
-
-        public CountedAccessLiveEvent(T data, int numAccesses){
-            super(data);
-            this.numAccesses = numAccesses;
-        }
-
-        @Override
-        public T getData() {
-
-            if(numAccesses == maxAccesses){
-                return null;
-            }
-
-            numAccesses ++;
-            return super.getData();
-        }
     }
 
 }

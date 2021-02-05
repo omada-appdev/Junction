@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.omada.junction.R;
-import com.omada.junction.data.models.AchievementModel;
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.AchievementModel;
+import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.databinding.UserProfileFragmentLayoutBinding;
 import com.omada.junction.viewmodels.UserProfileViewModel;
 

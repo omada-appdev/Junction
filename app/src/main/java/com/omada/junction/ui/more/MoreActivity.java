@@ -88,16 +88,20 @@ public class MoreActivity extends AppCompatActivity {
         userProfileViewModel.getSignOutTrigger()
                 .observe(this, authStatusLiveEvent -> {
 
-                    if(authStatusLiveEvent != null && authStatusLiveEvent.getData() != null){
+                    if(authStatusLiveEvent != null){
 
-                        if(authStatusLiveEvent.getDataOnceAndReset() == UserDataHandler.AuthStatus.USER_SIGNED_OUT) {
+                        UserDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
+                        if(authStatus == null) {
+                            return;
+                        }
+
+                        if(authStatus == UserDataHandler.AuthStatus.USER_SIGNED_OUT) {
                             Intent i = new Intent(this, LoginActivity.class);
                             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 
                             startActivity(i);
                             finish();
                         }
-
                     }
                 });
     }

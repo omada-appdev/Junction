@@ -5,13 +5,14 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.BaseModel;
+import com.omada.junction.data.models.external.PostModel;
 
 import java.util.List;
 
+
 public class ShowcaseFeedViewModel extends ViewModel {
 
-    private LiveData<List<BaseModel>> loadedShowcaseItems;
+    private LiveData<List<PostModel>> loadedShowcaseItems;
 
     private final String organizationID;
     private final String showcaseID;
@@ -27,11 +28,11 @@ public class ShowcaseFeedViewModel extends ViewModel {
     private void initializeDataLoaders(){
         loadedShowcaseItems = Transformations.map(
                 DataRepository.getInstance().getShowcaseDataHandler().getOrganizationShowcaseItems(showcaseID),
-                baseModels -> baseModels
+                postModels -> postModels
         );
     }
 
-    public LiveData<List<BaseModel>> getLoadedShowcaseItems(){
+    public LiveData<List<PostModel>> getLoadedShowcaseItems(){
         return loadedShowcaseItems;
     }
 

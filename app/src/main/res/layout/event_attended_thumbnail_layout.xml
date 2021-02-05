@@ -7,7 +7,7 @@
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
         <variable
             name="eventModel"
-            type="com.omada.junction.data.models.EventModel" />
+            type="com.omada.junction.data.models.external.EventModel" />
     </data>
     <com.google.android.material.imageview.ShapeableImageView
         xmlns:android="http://schemas.android.com/apk/res/android"

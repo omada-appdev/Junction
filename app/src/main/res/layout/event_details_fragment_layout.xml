@@ -5,10 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.omada.junction.utils.transform.TransformUtilities"/>
+        <import type="com.omada.junction.utils.TransformUtilities"/>
         <variable
             name="eventDetails"
-            type="com.omada.junction.data.models.EventModel" />
+            type="com.omada.junction.data.models.external.EventModel" />
         <variable
             name="viewModel"
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
@@ -118,7 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="50dp"
                     android:layout_marginEnd="16dp"
-                    android:text="@{TransformUtilities.convertTimestampToHHMM(eventDetails.startTime)}"
+                    android:text="@{TransformUtilities.convertUtcLocalDateTimeToHHMM(eventDetails.startTime)}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline2"
                     app:layout_constraintEnd_toStartOf="@+id/event_time_guideline"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -129,7 +129,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="50dp"
-                    android:text="@{TransformUtilities.convertTimestampToHHMM(eventDetails.endTime)}"
+                    android:text="@{TransformUtilities.convertUtcLocalDateTimeToHHMM(eventDetails.endTime)}"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline2"
                     app:layout_constraintStart_toStartOf="@+id/event_time_guideline"
                     app:layout_constraintTop_toTopOf="parent" />
