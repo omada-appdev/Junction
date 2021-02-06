@@ -124,9 +124,9 @@ public class DetailsFragment extends Fragment {
                                 binding.nameLayout.setError("Invalid name");
                             }
                             break;
-                        case VALIDATION_POINT_INSTITUTE:
+                        case VALIDATION_POINT_INSTITUTE_HANDLE:
                             if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
-                                binding.emailLayout.setError("Invalid institute");
+                                binding.instituteLayout.setError("Invalid institute");
                             }
                             break;
                         case VALIDATION_POINT_INTERESTS:

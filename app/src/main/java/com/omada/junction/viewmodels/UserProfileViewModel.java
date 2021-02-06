@@ -4,7 +4,9 @@ import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
@@ -12,6 +14,7 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.Timestamp;
 import com.omada.junction.data.DataRepository;
+import com.omada.junction.data.handler.InstituteDataHandler;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
@@ -21,7 +24,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class UserProfileViewModel extends ViewModel {
+public class UserProfileViewModel extends BaseViewModel {
 
     private LiveData<LiveEvent<UserDataHandler.AuthStatus>> authStatusTrigger;
 
@@ -29,7 +32,6 @@ public class UserProfileViewModel extends ViewModel {
     private LiveData<UserDataHandler.UserModel> userUpdateAction;
 
     private final MutableLiveData<LiveEvent<Boolean>> editProfileTrigger = new MutableLiveData<>();
-    private final MutableLiveData<LiveEvent<DataValidator.DataValidationInformation>> dataValidationAction = new MutableLiveData<>();
     private UserDataHandler.UserModel currentUserModel;
 
     public MutableLiveData<String> name = new MutableLiveData<>();
@@ -82,10 +84,18 @@ public class UserProfileViewModel extends ViewModel {
 
     public void updateUserDetails(){
 
-        DataValidator dataValidator = new DataValidator();
+        DataValidator dataValidator = getDataValidator();
 
         UserDataHandler.MutableUserModel updatedUserModel = new UserDataHandler.MutableUserModel();
-        AtomicBoolean anyDetailsEntryInvalid = new AtomicBoolean(false);
+        MediatorLiveData<DataValidator.DataValidationInformation> resultLiveData = new MediatorLiveData<>();
+
+        ValidationAggregator validationAggregator = ValidationAggregator
+                .build(resultLiveData)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_GENDER)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_DATE_OF_BIRTH)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_NAME)
+                .get();
 
         dataValidator.validateDateOfBirth(dateOfBirth.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
@@ -93,34 +103,58 @@ public class UserProfileViewModel extends ViewModel {
                         new Timestamp(TransformUtilities.convertDDMMYYYYtoDate(dateOfBirth.getValue(), "/"))
                 );
             }
-            else {
-                anyDetailsEntryInvalid.set(true);
-            }
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_DATE_OF_BIRTH, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
         dataValidator.validateGender(gender.getValue(), dataValidationInformation -> {
             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                updatedUserModel.setGender(
-                        gender.getValue()
-                );
+                updatedUserModel.setGender(gender.getValue());
             }
-            else {
-                anyDetailsEntryInvalid.set(true);
-            }
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_GENDER, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
         dataValidator.validateInstitute(institute.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                updatedUserModel.setInstitute(
-                        institute.getValue()
-                );
+
+            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                LiveData<LiveEvent<String>> instituteId = DataRepository
+                        .getInstance()
+                        .getInstituteDataHandler()
+                        .getInstituteId(institute.getValue());
+
+                instituteId.observeForever(new Observer<LiveEvent<String>>() {
+                    @Override
+                    public void onChanged(LiveEvent<String> stringLiveEvent) {
+                        if (stringLiveEvent == null) {
+                            return;
+                        }
+                        String result = stringLiveEvent.getDataOnceAndReset();
+                        DataValidator.DataValidationInformation newValidationInformation;
+
+                        if (result != null && !result.equals("notFound")) {
+                            updatedUserModel.setInstitute(result);
+                            newValidationInformation = new DataValidator.DataValidationInformation(
+                                    DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                    DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
+                            );
+                        } else {
+                            newValidationInformation = new DataValidator.DataValidationInformation(
+                                    DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                    DataValidator.DataValidationResult.VALIDATION_RESULT_INVALID
+                            );
+                        }
+
+                        validationAggregator.holdData(
+                                DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                newValidationInformation
+                        );
+                        notifyValidity(newValidationInformation);
+                        instituteId.removeObserver(this);
+                    }
+                });
             }
-            else {
-                anyDetailsEntryInvalid.set(true);
-            }
-            notifyValidity(dataValidationInformation);
+            else notifyValidity(dataValidationInformation);
         });
 
         dataValidator.validateName(name.getValue(), dataValidationInformation -> {
@@ -129,29 +163,31 @@ public class UserProfileViewModel extends ViewModel {
                         name.getValue()
                 );
             }
-            else {
-                anyDetailsEntryInvalid.set(true);
-            }
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_NAME, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
-        if(!anyDetailsEntryInvalid.get()) {
+        resultLiveData.observeForever(new Observer<DataValidator.DataValidationInformation>() {
+            @Override
+            public void onChanged(DataValidator.DataValidationInformation dataValidationInformation) {
 
-            updatedUserModel.setProfilePicturePath(profilePicture.getValue());
-            Log.e("UpdateUser", "Added details to firebase");
-            notifyValidity(new DataValidator.DataValidationInformation(
-                    DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
-                    DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
-            ));
-            DataRepository.getInstance()
-                    .getUserDataHandler()
-                    .updateCurrentUserDetails(updatedUserModel);
-        }
+                if (dataValidationInformation.getValidationPoint() != DataValidator.DataValidationPoint.VALIDATION_POINT_ALL) {
+                    return;
+                }
 
-    }
+                notifyValidity(dataValidationInformation);
 
-    private void notifyValidity(DataValidator.DataValidationInformation dataValidationInformation) {
-        dataValidationAction.setValue(new LiveEvent<>(dataValidationInformation));
+                if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                    updatedUserModel.setProfilePicturePath(profilePicture.getValue());
+                    Log.e("UpdateUser", "Added details to firebase");
+                    DataRepository.getInstance()
+                            .getUserDataHandler()
+                            .updateCurrentUserDetails(updatedUserModel);
+                }
+                resultLiveData.removeObserver(this);
+            }
+        });
+
     }
 
     public void goToEditProfile(){
@@ -237,6 +273,4 @@ public class UserProfileViewModel extends ViewModel {
 
         return constraintsBuilder;
     }
-
-
 }

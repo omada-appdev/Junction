@@ -89,6 +89,11 @@ public class InstituteDataHandler extends BaseDataHandler {
 
         if (code != null) {
 
+            if (instituteHandleToIdCache.get(code) != null) {
+                resultLiveData.setValue(new LiveEvent<>(true));
+                return resultLiveData;
+            }
+
             FirebaseDatabase
                     .getInstance()
                     .getReference()
@@ -129,7 +134,7 @@ public class InstituteDataHandler extends BaseDataHandler {
             resultLiveData.setValue(new LiveEvent<>("notFound"));
         }
         else if (instituteHandleToIdCache.get(handle) != null) {
-            resultLiveData.setValue(new LiveEvent<>(instituteIdToHandleCache.get(handle)));
+            resultLiveData.setValue(new LiveEvent<>(instituteHandleToIdCache.get(handle)));
         }
         else {
             FirebaseDatabase

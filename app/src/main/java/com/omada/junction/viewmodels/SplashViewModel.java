@@ -8,7 +8,7 @@ import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
-public class SplashViewModel extends ViewModel {
+public class SplashViewModel extends BaseViewModel {
 
     private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> authResultAction;
     private final LiveData<LiveEvent<UserDataHandler.UserModel>> signedInUserAction;

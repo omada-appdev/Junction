@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import com.omada.junction.data.handler.AppDataHandler;
 import com.omada.junction.data.handler.ArticleDataHandler;
 import com.omada.junction.data.handler.ImageUploadHandler;
+import com.omada.junction.data.handler.InstituteDataHandler;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.data.handler.EventDataHandler;
 import com.omada.junction.data.handler.OrganizationDataHandler;
@@ -33,6 +34,7 @@ public class DataRepository {
     private final ImageUploadHandler imageUploadHandler = new ImageUploadHandler();
     //this is only for events
     private final EventDataHandler eventDataHandler = new EventDataHandler();
+    private final InstituteDataHandler instituteDatahandler = new InstituteDataHandler();
 
 
     private DataRepository(){
@@ -98,6 +100,10 @@ public class DataRepository {
 
     public ImageUploadHandler getImageUploadHandler() {
         return imageUploadHandler;
+    }
+
+    public InstituteDataHandler getInstituteDataHandler() {
+        return instituteDatahandler;
     }
 
     // This class identifies the data repository accessor so that state can be tracked without
