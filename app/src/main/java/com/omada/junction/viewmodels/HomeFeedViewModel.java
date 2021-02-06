@@ -18,7 +18,7 @@ import com.omada.junction.utils.taskhandler.LiveEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFeedViewModel extends ViewModel {
+public class HomeFeedViewModel extends BaseViewModel {
 
     /*
     ################################

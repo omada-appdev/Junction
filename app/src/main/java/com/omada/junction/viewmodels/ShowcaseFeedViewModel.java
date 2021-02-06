@@ -10,7 +10,7 @@ import com.omada.junction.data.models.external.PostModel;
 import java.util.List;
 
 
-public class ShowcaseFeedViewModel extends ViewModel {
+public class ShowcaseFeedViewModel extends BaseViewModel {
 
     private LiveData<List<PostModel>> loadedShowcaseItems;
 

@@ -12,7 +12,7 @@ import com.omada.junction.viewmodels.content.LeaderboardViewHandler;
 import com.omada.junction.viewmodels.content.OrganizationViewHandler;
 
 
-public class FeedContentViewModel extends ViewModel{
+public class FeedContentViewModel extends BaseViewModel{
 
     private final MutableLiveData<LiveEvent<String>> organizationDetailsTrigger = new MutableLiveData<>();
 

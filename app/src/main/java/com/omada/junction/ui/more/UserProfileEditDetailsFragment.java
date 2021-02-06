@@ -110,7 +110,7 @@ public class UserProfileEditDetailsFragment extends Fragment {
                             binding.dateOfBirthLayout.setError("Invalid date of birth");
                         }
                         break;
-                    case VALIDATION_POINT_INSTITUTE:
+                    case VALIDATION_POINT_INSTITUTE_HANDLE:
                         if(!valid){
                             binding.instituteLayout.setError("Invalid institute");
                         }
