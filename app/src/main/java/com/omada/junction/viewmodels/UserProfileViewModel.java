@@ -76,7 +76,27 @@ public class UserProfileViewModel extends BaseViewModel {
                 .getCurrentUserModel();
 
         name.setValue(currentUserModel.getName());
-        institute.setValue(currentUserModel.getInstitute());
+
+        LiveData<LiveEvent<String>> liveData = DataRepository
+                .getInstance()
+                .getInstituteDataHandler()
+                .getInstituteHandle(currentUserModel.getInstitute());
+
+        liveData.observeForever(new Observer<LiveEvent<String>>() {
+                    @Override
+                    public void onChanged(LiveEvent<String> handleLiveEvent) {
+
+                        if (handleLiveEvent == null) {
+                            return;
+                        }
+                        String handle = handleLiveEvent.getDataOnceAndReset();
+                        if (handle == null || handle.equals("notFound")) {
+                            return;
+                        }
+                        institute.setValue(handle);
+                        liveData.removeObserver(this);
+                    }
+                });
         dateOfBirth.setValue(TransformUtilities.convertTimestampToDDMMYYYY(currentUserModel.getDateOfBirth()));
         gender.setValue(currentUserModel.getGender());
     }
@@ -178,7 +198,11 @@ public class UserProfileViewModel extends BaseViewModel {
                 notifyValidity(dataValidationInformation);
 
                 if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
-                    updatedUserModel.setProfilePicturePath(profilePicture.getValue());
+
+                    if(profilePicture.getValue() != null) {
+                        updatedUserModel.setProfilePicturePath(profilePicture.getValue());
+                    }
+
                     Log.e("UpdateUser", "Added details to firebase");
                     DataRepository.getInstance()
                             .getUserDataHandler()

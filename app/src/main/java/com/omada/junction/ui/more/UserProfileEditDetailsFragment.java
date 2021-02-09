@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -31,6 +32,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.omada.junction.R;
 import com.omada.junction.databinding.UserProfileDetailsFragmentLayoutBinding;
+import com.omada.junction.utils.FileUtilities;
 import com.omada.junction.utils.ImageUtilities;
 import com.omada.junction.utils.TransformUtilities;
 import com.omada.junction.utils.taskhandler.DataValidator;
@@ -306,7 +308,8 @@ public class UserProfileEditDetailsFragment extends Fragment {
                         if(fileLiveEvent != null){
                             File file = fileLiveEvent.getDataOnceAndReset();
                             if(file != null) {
-                                binding.getViewModel().profilePicture.setValue(Uri.fromFile(file));
+                                MutableLiveData<Uri> profilePictureLiveData = userProfileViewModel.profilePicture;
+                                profilePictureLiveData.setValue(Uri.fromFile(file));
                             }
                             else {
                                 // Handle null case
@@ -318,5 +321,10 @@ public class UserProfileEditDetailsFragment extends Fragment {
                     });
 
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

@@ -188,7 +188,7 @@ public class InstituteActivity extends AppCompatActivity {
 
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.institute_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getId()))
+                                .replace(R.id.institute_content_placeholder, OrganizationShowcaseFragment.newInstance(model))
                                 .addToBackStack("stack")
                                 .commit();
 
