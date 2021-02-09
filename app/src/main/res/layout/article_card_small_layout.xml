@@ -1,6 +1,85 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="com.omada.junction.utils.TransformUtilities"/>
+        <import type="android.view.View"/>
+        <variable
+            name="articleModel"
+            type="com.omada.junction.data.models.external.ArticleModel" />
+        <variable
+            name="viewModel"
+            type="com.omada.junction.viewmodels.FeedContentViewModel" />
+    </data>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/organizer_profile_image"
+                remoteImageHttp="@{articleModel.creatorProfilePicture}"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="12dp"
+                android:onClick="@{()->viewModel.goToOrganization(articleModel.creator)}"
+                android:padding="4dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toTopOf="@+id/event_poster_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
+                app:srcCompat="@drawable/ic_avatar_40dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/event_name_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:text="@{articleModel.title}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="#DE000000"
+                app:layout_constraintBottom_toBottomOf="@+id/organizer_profile_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                app:layout_constraintTop_toTopOf="@id/organizer_profile_image"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/event_poster_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:background="#ACA9B1"
+                android:elevation="4dp"
+                android:translationZ="2dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="H,1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/organizer_profile_image"
+                app:layout_constraintVertical_chainStyle="packed"
+                app:remoteImageUrl="@{articleModel.image}"
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance"
+                android:onClick="@{()->viewModel.articleViewHandler.goToArticleCardDetails(articleModel)}" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>

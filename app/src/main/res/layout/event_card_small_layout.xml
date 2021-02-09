@@ -12,72 +12,66 @@
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/CardView.Light"
-        app:cardCornerRadius="4dp"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp">
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <com.google.android.material.imageview.ShapeableImageView
-                app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
                 android:id="@+id/organizer_profile_image"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                remoteImageHttp="@{eventModel.creatorProfilePicture}"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginStart="12dp"
+                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"
                 android:padding="4dp"
                 android:scaleType="centerCrop"
-                app:srcCompat="@drawable/ic_avatar_40dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/event_poster_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
+                app:srcCompat="@drawable/ic_avatar_40dp" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/event_name_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
+                android:text="@{eventModel.title}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="#DE000000"
-                android:text="@{eventModel.title}"
-                app:layout_constraintTop_toTopOf="@+id/organizer_profile_image"
-                app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/organizer_name_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="#8A000000"
-                android:text="@{eventModel.creatorName}"
-                app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                app:layout_constraintBottom_toBottomOf="@+id/organizer_profile_image"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/event_name_text"
-                android:onClick="@{()->viewModel.goToOrganization(eventModel.creator)}"/>
-
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/organizer_profile_image"
+                app:layout_constraintTop_toTopOf="@id/organizer_profile_image"
+                app:layout_constraintVertical_chainStyle="packed" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/event_poster_image"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
-                android:background="@color/colorPrimaryDark"
+                android:background="#ACA9B1"
+                android:elevation="4dp"
+                android:translationZ="2dp"
                 android:scaleType="centerCrop"
-                app:layout_constraintBottom_toTopOf="@+id/more_details_button"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio="H,1:1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -85,9 +79,10 @@
                 app:layout_constraintTop_toBottomOf="@id/organizer_profile_image"
                 app:layout_constraintVertical_chainStyle="packed"
                 app:remoteImageUrl="@{eventModel.image}"
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance"
                 android:onClick="@{()->viewModel.eventViewHandler.goToEventCardDetails(eventModel)}"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
-    </com.google.android.material.card.MaterialCardView>
 </layout>

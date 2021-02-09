@@ -7,6 +7,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.omada.junction.data.BaseDataHandler;
+import com.omada.junction.utils.FileUtilities;
 
 public class ImageUploadHandler extends BaseDataHandler {
 

@@ -79,7 +79,9 @@ public class ShowcaseDataHandler {
                                     continue;
                                 }
                                 remoteEvent.setId(documentSnapshot.getId());
-                                postModels.add(eventModelConverter.convertRemoteDBToExternalModel(remoteEvent));
+                                for(int i = 0; i < 20; ++i) {
+                                    postModels.add(eventModelConverter.convertRemoteDBToExternalModel(remoteEvent));
+                                }
                                 break;
                             case "article":
                                 ArticleModelRemoteDB remoteArticle = documentSnapshot.toObject(ArticleModelRemoteDB.class);

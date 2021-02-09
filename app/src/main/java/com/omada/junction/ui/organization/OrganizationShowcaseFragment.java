@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -14,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.omada.junction.R;
 import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
+import com.omada.junction.databinding.OrganizationShowcaseFragmentLayoutBinding;
 import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardSmallNoTitleBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardSmallNoTitleBinder;
 import com.omada.junction.utils.factory.ShowcaseFeedViewModelFactory;
@@ -22,26 +26,27 @@ import com.omada.junction.viewmodels.ShowcaseFeedViewModel;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import mva3.adapter.ListSection;
 import mva3.adapter.MultiViewAdapter;
 
 public class OrganizationShowcaseFragment extends Fragment {
 
-    private String organizationID;
-    private String showcaseID;
+    private ShowcaseModel showcaseModel;
 
     private ShowcaseFeedViewModel showcaseFeedViewModel;
 
     private final MultiViewAdapter adapter = new MultiViewAdapter();
     private final ListSection<PostModel> showcaseItemsListSection = new ListSection<>();
     private boolean refreshContents = true;
+    private OrganizationShowcaseFragmentLayoutBinding binding;
 
 
-    public static OrganizationShowcaseFragment newInstance(String organizationID, String showcaseID) {
+    public static OrganizationShowcaseFragment newInstance(@Nonnull ShowcaseModel model) {
 
         Bundle args = new Bundle();
-        args.putString("organizationID", organizationID);
-        args.putString("showcaseID", showcaseID);
+        args.putParcelable("showcaseModel", model);
 
         OrganizationShowcaseFragment fragment = new OrganizationShowcaseFragment();
         fragment.setArguments(args);
@@ -52,14 +57,13 @@ public class OrganizationShowcaseFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        showcaseID = getArguments().getString("showcaseID");
-        organizationID = getArguments().getString("organizationID");
+        showcaseModel = getArguments().getParcelable("showcaseModel");
 
         adapter.addSection(showcaseItemsListSection);
 
         showcaseFeedViewModel = new ViewModelProvider(
                 requireActivity(),
-                new ShowcaseFeedViewModelFactory(organizationID, showcaseID))
+                new ShowcaseFeedViewModelFactory(showcaseModel))
                 .get(ShowcaseFeedViewModel.class);
 
         FeedContentViewModel feedContentViewModel = new ViewModelProvider(requireActivity()).get(FeedContentViewModel.class);
@@ -73,7 +77,9 @@ public class OrganizationShowcaseFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.organization_showcase_fragment_layout, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.organization_showcase_fragment_layout, container, false);
+        binding.setViewModel(showcaseFeedViewModel);
+        return binding.getRoot();
     }
 
     @Override

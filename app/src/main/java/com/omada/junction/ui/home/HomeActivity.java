@@ -231,7 +231,7 @@ public class HomeActivity extends AppCompatActivity {
 
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getId()))
+                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model))
                                 .addToBackStack("stack")
                                 .commit();
 

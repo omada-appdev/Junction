@@ -85,7 +85,6 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"/>
 
-
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.viewpager2.widget.ViewPager2

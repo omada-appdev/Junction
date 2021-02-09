@@ -103,11 +103,10 @@ public class InstituteDataHandler extends BaseDataHandler {
 
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists() && snapshot.getValue() instanceof String){
+                            if (snapshot.exists() && snapshot.getValue() instanceof String) {
                                 instituteHandleToIdCache.put(snapshot.getKey(), (String) snapshot.getValue());
                                 resultLiveData.setValue(new LiveEvent<>(true));
-                            }
-                            else {
+                            } else {
                                 resultLiveData.setValue(new LiveEvent<>(false));
                             }
                         }
@@ -118,8 +117,7 @@ public class InstituteDataHandler extends BaseDataHandler {
                             Log.e("Institute", "Error checking institute code validity");
                         }
                     });
-        }
-        else {
+        } else {
             resultLiveData.setValue(new LiveEvent<>(false));
         }
 
@@ -130,13 +128,11 @@ public class InstituteDataHandler extends BaseDataHandler {
 
         MutableLiveData<LiveEvent<String>> resultLiveData = new MutableLiveData<>();
 
-        if (handle == null){
+        if (handle == null) {
             resultLiveData.setValue(new LiveEvent<>("notFound"));
-        }
-        else if (instituteHandleToIdCache.get(handle) != null) {
+        } else if (instituteHandleToIdCache.get(handle) != null) {
             resultLiveData.setValue(new LiveEvent<>(instituteHandleToIdCache.get(handle)));
-        }
-        else {
+        } else {
             FirebaseDatabase
                     .getInstance()
                     .getReference()
@@ -146,12 +142,11 @@ public class InstituteDataHandler extends BaseDataHandler {
 
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists() && snapshot.getValue() instanceof String){
+                            if (snapshot.exists() && snapshot.getValue() instanceof String) {
                                 instituteHandleToIdCache.put(snapshot.getKey(), (String) snapshot.getValue());
-                                instituteIdToHandleCache.put((String)snapshot.getValue(), snapshot.getKey());
+                                instituteIdToHandleCache.put((String) snapshot.getValue(), snapshot.getKey());
                                 resultLiveData.setValue(new LiveEvent<>((String) snapshot.getValue()));
-                            }
-                            else {
+                            } else {
                                 resultLiveData.setValue(new LiveEvent<>("notFound"));
                             }
                         }
@@ -171,13 +166,11 @@ public class InstituteDataHandler extends BaseDataHandler {
 
         MutableLiveData<LiveEvent<String>> resultLiveData = new MutableLiveData<>();
 
-        if (id == null){
+        if (id == null) {
             resultLiveData.setValue(new LiveEvent<>("notFound"));
-        }
-        else if (instituteIdToHandleCache.get(id) != null) {
+        } else if (instituteIdToHandleCache.get(id) != null) {
             resultLiveData.setValue(new LiveEvent<>(instituteIdToHandleCache.get(id)));
-        }
-        else {
+        } else {
             FirebaseDatabase
                     .getInstance()
                     .getReference()
@@ -187,12 +180,11 @@ public class InstituteDataHandler extends BaseDataHandler {
 
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists() && snapshot.getValue() instanceof String){
+                            if (snapshot.exists() && snapshot.getValue() instanceof String) {
                                 instituteHandleToIdCache.put(snapshot.getKey(), (String) snapshot.getValue());
-                                instituteIdToHandleCache.put((String)snapshot.getValue(), snapshot.getKey());
+                                instituteIdToHandleCache.put((String) snapshot.getValue(), snapshot.getKey());
                                 resultLiveData.setValue(new LiveEvent<>((String) snapshot.getValue()));
-                            }
-                            else {
+                            } else {
                                 resultLiveData.setValue(new LiveEvent<>("notFound"));
                             }
                         }

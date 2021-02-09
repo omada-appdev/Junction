@@ -12,24 +12,30 @@
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        style="@style/CardView.Light"
-        app:cardCornerRadius="4dp"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp">
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/event_poster_image"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:background="@color/colorPrimaryDark"
+                android:layout_marginTop="12dp"
+                android:background="#ACA9B1"
+                android:elevation="4dp"
+                android:translationZ="2dp"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toTopOf="@+id/more_details_button"
                 app:layout_constraintDimensionRatio="H,2:1"
@@ -38,7 +44,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
-                app:remoteImageUrl="@{eventModel.image}"/>
+                app:remoteImageUrl="@{eventModel.image}"
+                app:shapeAppearanceOverlay="@style/Widget.AppTheme.ThumbnailShapeAppearance" />
 
             <ImageButton
                 android:id="@+id/more_details_button"
@@ -46,14 +53,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:background="#00FFFFFF"
+                android:onClick="@{()->viewModel.eventViewHandler.goToEventCardDetails(eventModel)}"
                 android:padding="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/event_poster_image"
-                app:srcCompat="@drawable/ic_right_24dp"
-                android:onClick="@{()->viewModel.eventViewHandler.goToEventCardDetails(eventModel)}"/>
+                app:srcCompat="@drawable/ic_right_24dp" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
 </layout>

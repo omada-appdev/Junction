@@ -4,9 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.omada.junction.application.JunctionApplication;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
+import com.omada.junction.utils.FileUtilities;
 import com.omada.junction.utils.taskhandler.LiveEvent;
+
+import me.shouheng.utils.UtilsApp;
 
 public class SplashViewModel extends BaseViewModel {
 
@@ -14,6 +18,11 @@ public class SplashViewModel extends BaseViewModel {
     private final LiveData<LiveEvent<UserDataHandler.UserModel>> signedInUserAction;
 
     public SplashViewModel() {
+
+        // clear all files on startup
+        UtilsApp.init(JunctionApplication.getInstance());
+        FileUtilities.Companion.clearTemporaryFiles();
+
         authResultAction = Transformations.map(
                 DataRepository.getInstance()
                     .getUserDataHandler()
