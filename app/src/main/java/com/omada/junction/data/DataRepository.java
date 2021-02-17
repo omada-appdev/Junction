@@ -76,8 +76,11 @@ public class DataRepository {
         return postDataHandler;
     }
 
-    // Only for external accessors
+    public ImageUploadHandler getImageUploadHandler() {
+        return imageUploadHandler;
+    }
 
+    // Only for external accessors
     public synchronized static DataRepositoryAccessIdentifier registerForDataRepositoryAccess() {
 
         DataRepositoryAccessIdentifier identifier = new DataRepositoryAccessIdentifier(
@@ -95,11 +98,14 @@ public class DataRepository {
         return new DataRepositoryHandlerIdentifier(
                 StringUtilities.randomAlphabetGenerator(6)
         );
-
     }
 
-    public ImageUploadHandler getImageUploadHandler() {
-        return imageUploadHandler;
+    public Object getAccessorDataForHandlerWithKey(DataRepositoryAccessIdentifier accessIdentifier, DataRepositoryHandlerIdentifier handlerIdentifier, String key) {
+        DataRepositoryAccessorData data = accessTracker.get(accessIdentifier);
+        if(data == null) {
+            throw new RuntimeException("Attempt to get accessor data of a non-existent or de-registered access identifier");
+        }
+        return data.getHandlerData(handlerIdentifier, key);
     }
 
     public InstituteDataHandler getInstituteDataHandler() {

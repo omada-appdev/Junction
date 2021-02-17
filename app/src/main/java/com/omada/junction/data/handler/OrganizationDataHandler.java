@@ -61,6 +61,7 @@ public class OrganizationDataHandler extends BaseDataHandler {
         FirebaseFirestore.getInstance()
                 .collection("organizations")
                 .whereEqualTo("institute", instituteID)
+                .whereEqualTo("instituteVerified", true)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
