@@ -141,7 +141,7 @@ public class OrganizationProfileFragment extends Fragment {
 
     private void populateViews(){
         binding.organizationNameText.setText(organizationProfileViewModel.getOrganizationModel().getName());
-        CustomBindings.loadImage(
+        CustomBindings.loadImageHttp(
                 binding.organizationProfilePictureImage,
                 organizationProfileViewModel.getOrganizationModel().getProfilePicture()
         );

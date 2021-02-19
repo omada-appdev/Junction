@@ -40,14 +40,13 @@ public class InstituteActivity extends AppCompatActivity {
 
         instituteFeedViewModel = new ViewModelProvider(this).get(InstituteFeedViewModel.class);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.institute_content_placeholder, new InstituteFeedFragment())
                     .commit();
 
-        }
-        else if(!instituteFeedViewModel.checkInstituteContentLoaded()){
+        } else if (!instituteFeedViewModel.checkInstituteContentLoaded()) {
 
             instituteFeedViewModel.loadInstituteOrganizations();
             instituteFeedViewModel.loadInstituteHighlights();
@@ -65,10 +64,10 @@ public class InstituteActivity extends AppCompatActivity {
                 .getOrganizationModelDetailsTrigger()
                 .observe(this, organizationModelLiveEvent -> {
 
-                    if(organizationModelLiveEvent != null){
+                    if (organizationModelLiveEvent != null) {
 
                         OrganizationModel organizationModel = organizationModelLiveEvent.getDataOnceAndReset();
-                        if(organizationModel == null) {
+                        if (organizationModel == null) {
                             return;
                         }
                         getSupportFragmentManager()
@@ -83,9 +82,9 @@ public class InstituteActivity extends AppCompatActivity {
         feedContentViewModel.getEventViewHandler()
                 .getEventCardDetailsTrigger()
                 .observe(this, eventModelLiveEvent -> {
-                    if(eventModelLiveEvent != null){
+                    if (eventModelLiveEvent != null) {
                         EventModel model = eventModelLiveEvent.getDataOnceAndReset();
-                        if(model == null) {
+                        if (model == null) {
                             return;
                         }
                         getSupportFragmentManager().beginTransaction()
@@ -99,71 +98,68 @@ public class InstituteActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getEventFormTrigger().observe(this, eventModelLiveEvent -> {
 
-                    if(eventModelLiveEvent == null){
-                        return;
-                    }
+            if (eventModelLiveEvent == null) {
+                return;
+            }
 
-                    EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
-                    if(eventModel == null) {
-                        return;
-                    }
+            EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
+            if (eventModel == null) {
+                return;
+            }
 
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.institute_content_placeholder,
-                                    EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
-                            .addToBackStack("stack")
-                            .commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.institute_content_placeholder,
+                            EventRegistrationFragment.newInstance(eventModel))
+                    .addToBackStack("stack")
+                    .commit();
         });
 
         feedContentViewModel
                 .getEventViewHandler()
                 .getCallOrganizerTrigger().observe(this, stringLiveEvent -> {
 
-                    if(stringLiveEvent != null){
-
-                        String phone = stringLiveEvent.getDataOnceAndReset();
-                        if(phone == null) {
-                            return;
-                        }
-
-                        Intent intent = new Intent(Intent.ACTION_DIAL);
-                        intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                        }
-                    }
-
+            if (stringLiveEvent != null) {
+                String phone = stringLiveEvent.getDataOnceAndReset();
+                if (phone == null) {
+                    return;
+                }
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + phone));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
         });
 
         feedContentViewModel
                 .getEventViewHandler()
                 .getMailOrganizerTrigger().observe(this, pairLiveEvent -> {
 
-                    if(pairLiveEvent != null) {
+            if (pairLiveEvent != null) {
 
-                        Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
-                        if(data == null) {
-                            return;
-                        }
+                Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+                if (data == null) {
+                    return;
+                }
 
-                        Intent intent = new Intent(Intent.ACTION_SENDTO);
-                        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                        }
-                    }
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
 
         });
 
         feedContentViewModel.getOrganizationDetailsTrigger()
                 .observe(this, organizationIDLiveEvent -> {
-                    if(organizationIDLiveEvent != null){
+                    if (organizationIDLiveEvent != null) {
 
                         String organizationID = organizationIDLiveEvent.getDataOnceAndReset();
-                        if(organizationID == null) {
+                        if (organizationID == null) {
                             return;
                         }
 
@@ -179,10 +175,10 @@ public class InstituteActivity extends AppCompatActivity {
                 .getOrganizationShowcaseDetailsTrigger()
                 .observe(this, showcaseModelLiveEvent -> {
 
-                    if(showcaseModelLiveEvent != null){
+                    if (showcaseModelLiveEvent != null) {
 
                         ShowcaseModel model = showcaseModelLiveEvent.getDataOnceAndReset();
-                        if(model == null) {
+                        if (model == null) {
                             return;
                         }
 
@@ -197,7 +193,7 @@ public class InstituteActivity extends AppCompatActivity {
                 });
     }
 
-    private void setupBottomNavigation(){
+    private void setupBottomNavigation() {
 
         BottomNavigationView bottomMenu = findViewById(R.id.institute_bottom_navigation);
         bottomMenu.getMenu().findItem(R.id.institute_button).setChecked(true);
@@ -206,30 +202,27 @@ public class InstituteActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             Intent i = null;
 
-            if (itemId == R.id.home_button){
+            if (itemId == R.id.home_button) {
                 i = new Intent(InstituteActivity.this, HomeActivity.class);
-            }
-            else if (itemId == R.id.more_button){
+            } else if (itemId == R.id.more_button) {
                 i = new Intent(InstituteActivity.this, MoreActivity.class);
 
-            }
-            else if (itemId == R.id.institute_button){
+            } else if (itemId == R.id.institute_button) {
 
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+                if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
 
                     instituteFeedViewModel.reinitializeFeed();
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.institute_content_placeholder, new InstituteFeedFragment())
                             .commit();
-                }
-                else {
+                } else {
                     getSupportFragmentManager().popBackStack("stack", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
             }
 
             if (i != null) {
-                i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
                 return true;
 
