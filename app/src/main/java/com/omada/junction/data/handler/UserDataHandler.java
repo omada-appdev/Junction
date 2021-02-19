@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.omada.junction.BuildConfig;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.external.InterestModel;
+import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.io.Serializable;
@@ -34,9 +35,7 @@ public class UserDataHandler {
     public enum AuthStatus{
 
         CURRENT_USER_SUCCESS,
-        CURRENT_USER_LOGIN_SUCCESS,
         CURRENT_USER_FAILURE,
-        CURRENT_USER_LOGIN_FAILURE,
 
         AUTHENTICATION_SUCCESS,
         AUTHENTICATION_FAILURE,
@@ -179,6 +178,11 @@ public class UserDataHandler {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
 
+                        if(!documentSnapshot.exists()) {
+                            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
+                            return;
+                        }
+
                         signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
                         signedInUser.setInstitute(documentSnapshot.getString("institute"));
                         signedInUser.setProfilePicture(documentSnapshot.getString("profilePicture"));
@@ -277,6 +281,11 @@ public class UserDataHandler {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
 
+                        if(!documentSnapshot.exists()) {
+                            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
+                            return;
+                        }
+
                         signedInUser.setName(documentSnapshot.getString("name"));
                         signedInUser.setEmail(documentSnapshot.getString("email"));
                         signedInUser.setPhone(documentSnapshot.getString("phone"));
@@ -320,14 +329,14 @@ public class UserDataHandler {
                                         }
                                         signedInUser.following = dataMap;
 
-                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_LOGIN_SUCCESS));
+                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
                                         signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
 
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-
+                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
                                     }
                                 });
 
@@ -336,7 +345,7 @@ public class UserDataHandler {
 
         }
         else{
-            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_LOGIN_FAILURE));
+            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
         }
 
     }
@@ -407,6 +416,30 @@ public class UserDataHandler {
                     Log.e("Update", e.getMessage());
                     authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.UPDATE_USER_DETAILS_FAILURE));
                 });
+    }
+
+    public LiveData<LiveEvent<Boolean>> sendPasswordResetLink(String email) {
+
+        MutableLiveData<LiveEvent<Boolean>> result = new MutableLiveData<>();
+
+        // Just an extra layer of protection
+        DataValidator dataValidator = new DataValidator();
+        dataValidator.validateEmail(email, dataValidationInformation -> {
+            if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                result.setValue(new LiveEvent<>(false));
+                return;
+            }
+            FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+                    .addOnSuccessListener(aVoid -> {
+                        result.setValue(new LiveEvent<>(true));
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("User", "Password reset link failure");
+                        e.getMessage();
+                        result.setValue(new LiveEvent<>(false));
+                    });
+        });
+        return result;
     }
 
     public void updateFollow(String organizationID, boolean following) {

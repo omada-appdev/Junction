@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -30,6 +31,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.omada.junction.R;
 import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.databinding.LoginDetailsFragmentLayoutBinding;
@@ -132,13 +134,12 @@ public class DetailsFragment extends Fragment {
                         case VALIDATION_POINT_INTERESTS:
                             break;
                         case VALIDATION_POINT_ALL:
+                            Log.e("Details", "VALIDATION_POINT_ALL");
                             if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                                binding.nextButton.setEnabled(false);
-
                                 InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                                 imm.hideSoftInputFromWindow(binding.nextButton.getWindowToken(), 0);
-                                binding.nextButton.setEnabled(false);
-
+                            } else {
+                                binding.nextButton.setEnabled(true);
                             }
                             break;
                     }
@@ -186,7 +187,7 @@ public class DetailsFragment extends Fragment {
         });
 
         binding.nextButton.setOnClickListener(v->{
-
+            binding.nextButton.setEnabled(false);
             binding.emailLayout.setError("");
             binding.genderLayout.setError("");
             binding.passwordLayout.setError("");
@@ -239,6 +240,8 @@ public class DetailsFragment extends Fragment {
             public void afterTextChanged(Editable s) {
             }
         });
+
+        disableEditText(binding.dateOfBirthInput);
 
         binding.dateOfBirthInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -317,6 +320,13 @@ public class DetailsFragment extends Fragment {
             }
         });
 
+    }
+
+    private void disableEditText(TextInputEditText editText) {
+        editText.setFocusable(false);
+        editText.setCursorVisible(false);
+        editText.setKeyListener(null);
+        editText.setBackgroundColor(Color.TRANSPARENT);
     }
 
     private void startFilePicker() {

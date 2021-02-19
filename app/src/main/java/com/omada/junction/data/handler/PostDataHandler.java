@@ -6,8 +6,10 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.omada.junction.data.BaseDataHandler;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.converter.ArticleModelConverter;
@@ -43,7 +45,10 @@ public class PostDataHandler extends BaseDataHandler {
                 .getInstance()
                 .collection("posts")
                 .whereEqualTo("creator", organizationID)
-                .whereEqualTo("organizationHighlight", true)
+                .whereNotEqualTo("organizationHighlight", false)
+                .orderBy("organizationHighlight")
+                .orderBy("timeCreated", Query.Direction.ASCENDING)
+                .limit(5)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
@@ -70,22 +75,22 @@ public class PostDataHandler extends BaseDataHandler {
     public void getInstituteHighlights(
             DataRepository.DataRepositoryAccessIdentifier identifier){
 
-
         String instituteId = DataRepository
                 .getInstance()
                 .getUserDataHandler()
                 .getCurrentUserModel()
                 .getInstitute();
 
-
         FirebaseFirestore
                 .getInstance()
                 .collection("posts")
+                .whereEqualTo("type", "event")
                 .whereEqualTo("creatorCache.institute", instituteId)
-                .whereEqualTo("instituteHighlight", true)
+                .whereGreaterThanOrEqualTo("startTime", Timestamp.now())
+                .orderBy("startTime", Query.Direction.ASCENDING)
+                .limit(10)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-
                     List<PostModel> postModels = new ArrayList<>();
 
                     for(DocumentSnapshot snapshot: queryDocumentSnapshots){
@@ -94,16 +99,12 @@ public class PostDataHandler extends BaseDataHandler {
                             postModels.add(postModel);
                         }
                     }
-
                     loadedInstituteHighlightsNotifier.setValue(new LiveEvent<>(postModels));
-
                 })
                 .addOnFailureListener(e -> {
                     Log.e("Posts", "Error retrieving organization highlights");
                     loadedInstituteHighlightsNotifier.setValue(null);
                 });
-
-
     }
 
     public LiveData<LiveEvent<List<PostModel>>> getShowcasePosts(

@@ -2,7 +2,6 @@ package com.omada.junction.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.application.JunctionApplication;
 import com.omada.junction.data.DataRepository;
@@ -40,8 +39,8 @@ public class SplashViewModel extends BaseViewModel {
                     switch (receivedAuthResponse){
                         case CURRENT_USER_SUCCESS:
                         case CURRENT_USER_FAILURE:
-                        case CURRENT_USER_LOGIN_SUCCESS:
-                        case CURRENT_USER_LOGIN_FAILURE:
+                        case LOGIN_SUCCESS:
+                        case LOGIN_FAILURE:
                             break;
                     }
                     return new LiveEvent<>(receivedAuthResponse);

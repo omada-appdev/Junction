@@ -25,7 +25,7 @@ public class ImageUploadHandler extends BaseDataHandler {
         StorageReference reference = FirebaseStorage
                 .getInstance()
                 .getReference()
-                .child("organizationFiles")
+                .child("userFiles")
                 .child(uid)
                 .child("profilePicture");
 

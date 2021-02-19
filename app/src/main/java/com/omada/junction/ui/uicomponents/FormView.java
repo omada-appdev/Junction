@@ -61,18 +61,14 @@ public class FormView extends FrameLayout {
     public void setForm(EventModel eventModel) {
 
         this.eventModel = eventModel;
-
         try {
-
             // Creation of form class itself handles all the View inflation, etc
             this.form = new RegistrationForm(eventModel.getForm() == null ? new HashMap<>() : eventModel.getForm());
-
             addView(
                     formSectionViews.get(
                             form.sectionsList.get(0).getID()
                     )
             );
-
         } catch (ParseException e) {
             e.printStackTrace();
         }
