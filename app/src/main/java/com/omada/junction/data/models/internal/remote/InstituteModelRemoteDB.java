@@ -8,6 +8,7 @@ public class InstituteModelRemoteDB extends BaseModelInternal {
 
     private String handle;
     private String name;
+    private String image;
 
     public InstituteModelRemoteDB(String id) {
         super(id);
@@ -26,7 +27,10 @@ public class InstituteModelRemoteDB extends BaseModelInternal {
         return name;
     }
 
-
+    @PropertyName("image")
+    public String getImage() {
+        return image;
+    }
 
     @PropertyName("handle")
     public void setHandle(String handle){
@@ -36,5 +40,10 @@ public class InstituteModelRemoteDB extends BaseModelInternal {
     @PropertyName("name")
     public void setName(String name){
         this.name = name;
+    }
+
+    @PropertyName("image")
+    public void setImage(String image) {
+        this.image = image;
     }
 }

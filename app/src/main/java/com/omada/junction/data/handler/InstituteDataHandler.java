@@ -49,38 +49,12 @@ public class InstituteDataHandler extends BaseDataHandler {
                                 instituteModelConverter.convertRemoteDBToExternalModel(modelRemoteDB)
                         ));
                     }
-
                 })
                 .addOnFailureListener(e -> {
                     Log.e("Institute", "Error retrieving institute details");
                     instituteModelLiveData.setValue(null);
                 });
         return instituteModelLiveData;
-    }
-
-    public LiveData<LiveEvent<Boolean>> updateInstituteDetails(InstituteModel changedInstituteModel) {
-
-        MutableLiveData<LiveEvent<Boolean>> resultLiveData = new MutableLiveData<>();
-        String instituteId = DataRepository
-                .getInstance()
-                .getUserDataHandler()
-                .getCurrentUserModel()
-                .getInstitute();
-
-        FirebaseFirestore
-                .getInstance()
-                .collection("institutes")
-                .document(instituteId)
-                .set(instituteModelConverter.convertExternalToRemoteDBModel(changedInstituteModel), SetOptions.merge())
-                .addOnSuccessListener(aVoid -> {
-                    resultLiveData.setValue(new LiveEvent<>(true));
-                })
-                .addOnFailureListener(e -> {
-                    resultLiveData.setValue(new LiveEvent<>(false));
-                    Log.e("Institute", "Error updating institute details");
-                });
-
-        return resultLiveData;
     }
 
     public LiveData<LiveEvent<Boolean>> checkInstituteCodeValidity(String code) {

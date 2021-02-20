@@ -22,6 +22,7 @@ public class InstituteModelConverter extends BaseConverter <InstituteModel, Inst
         model.setId(remoteModel.getId());
         model.setName(remoteModel.getName());
         model.setHandle(remoteModel.getHandle());
+        model.setImage(remoteModel.getImage());
 
         return model;
     }
@@ -34,6 +35,7 @@ public class InstituteModelConverter extends BaseConverter <InstituteModel, Inst
         model.setId(externalModel.getId());
         model.setName(externalModel.getName());
         model.setHandle(externalModel.getHandle());
+        model.setImage(externalModel.getImage());
 
         return model;
     }

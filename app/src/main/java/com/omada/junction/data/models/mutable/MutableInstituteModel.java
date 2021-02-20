@@ -11,4 +11,8 @@ public class MutableInstituteModel extends InstituteModel {
     public void setName(String name){
         this.name = name;
     }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }

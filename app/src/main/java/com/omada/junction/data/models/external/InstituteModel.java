@@ -9,6 +9,7 @@ public class InstituteModel extends BaseModel {
 
     protected String handle;
     protected String name;
+    protected String image;
 
     protected InstituteModel(){
     }
@@ -17,6 +18,7 @@ public class InstituteModel extends BaseModel {
         id = in.readString();
         handle = in.readString();
         name = in.readString();
+        image = in.readString();
     }
 
     public static final Creator<InstituteModel> CREATOR = new Creator<InstituteModel>() {
@@ -39,6 +41,10 @@ public class InstituteModel extends BaseModel {
         return name;
     }
 
+    public String getImage() {
+        return image;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -49,5 +55,6 @@ public class InstituteModel extends BaseModel {
         dest.writeString(id);
         dest.writeString(handle);
         dest.writeString(name);
+        dest.writeString(image);
     }
 }

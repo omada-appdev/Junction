@@ -2,9 +2,11 @@ package com.omada.junction.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import com.omada.junction.data.DataRepository;
+import com.omada.junction.data.models.external.InstituteModel;
 import com.omada.junction.data.models.external.OrganizationModel;
 import com.omada.junction.data.models.external.PostModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
@@ -16,6 +18,8 @@ public class InstituteFeedViewModel extends BaseViewModel {
 
     private LiveData<List<PostModel>> loadedHighlights = new MediatorLiveData<>();
     private LiveData<List<OrganizationModel>> loadedInstituteOrganizations;
+    private String instituteId;
+    private InstituteModel instituteModel;
 
     public InstituteFeedViewModel(){
         initializeDataLoaders();
@@ -41,7 +45,6 @@ public class InstituteFeedViewModel extends BaseViewModel {
     }
 
     private void distributeLoadedData() {
-
         loadedHighlights = Transformations.map(
                 DataRepository.getInstance().getPostDataHandler().getLoadedInstituteHighlightsNotifier(),
                 listLiveEvent-> {
@@ -56,6 +59,36 @@ public class InstituteFeedViewModel extends BaseViewModel {
         loadedInstituteOrganizations = Transformations.map(
                 DataRepository.getInstance().getOrganizationDataHandler().getLoadedInstituteOrganizationsNotifier(),
                 LiveEvent::getDataOnceAndReset);
+    }
+
+    public LiveData<InstituteModel> getInstituteDetails() {
+
+        if(instituteModel != null) {
+            return new MutableLiveData<>(instituteModel);
+        }
+
+        instituteId = DataRepository.getInstance()
+                .getUserDataHandler()
+                .getCurrentUserModel()
+                .getInstitute();
+
+        return Transformations.map(
+                DataRepository.getInstance()
+                .getInstituteDataHandler()
+                .getInstituteDetails(instituteId),
+
+                input -> {
+                    if(input == null) {
+                        return null;
+                    }
+                    InstituteModel model = input.getDataOnceAndReset();
+                    if(model == null) {
+                        return null;
+                    }
+                    instituteModel = model;
+                    return model;
+                }
+        );
     }
 
     public void loadInstituteOrganizations(){

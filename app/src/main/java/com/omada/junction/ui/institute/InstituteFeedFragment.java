@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textview.MaterialTextView;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.omada.junction.R;
 import com.omada.junction.data.models.external.OrganizationModel;
@@ -58,7 +61,7 @@ public class InstituteFeedFragment extends Fragment {
         instituteFeedViewModel = viewModelProvider.get(InstituteFeedViewModel.class);
         FeedContentViewModel feedContentViewModel = viewModelProvider.get(FeedContentViewModel.class);
 
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             instituteFeedViewModel.loadInstituteOrganizations();
             instituteFeedViewModel.loadInstituteHighlights();
         }
@@ -89,10 +92,17 @@ public class InstituteFeedFragment extends Fragment {
         MaterialSearchBar searchBar = view.findViewById(R.id.institute_search_bar);
         AppBarLayout appBarLayout = view.findViewById(R.id.appbar);
 
-        CustomBindings.loadImage(
-                view.findViewById(R.id.institute_banner),
-                "gs://junction-b7b44.appspot.com/instituteFiles/nitw.jpg"
-        );
+        MaterialTextView instituteNameText = view.findViewById(R.id.institute_name_text);
+        ShapeableImageView instituteBanner = view.findViewById(R.id.institute_banner);
+
+        instituteFeedViewModel.getInstituteDetails()
+                .observe(getViewLifecycleOwner(), instituteModel -> {
+                    if (instituteModel == null) {
+                        return;
+                    }
+                    CustomBindings.loadImage(instituteBanner, instituteModel.getImage());
+                    instituteNameText.setText(instituteModel.getName());
+                });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -100,8 +110,8 @@ public class InstituteFeedFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         instituteFeedViewModel.getLoadedHighlights()
-                .observe(getViewLifecycleOwner(), postModels-> {
-                    if(postModels == null) {
+                .observe(getViewLifecycleOwner(), postModels -> {
+                    if (postModels == null) {
                         return;
                     }
                     onHighlightsLoaded(postModels);
@@ -115,7 +125,7 @@ public class InstituteFeedFragment extends Fragment {
 
     private void onOrganizationsLoaded(List<OrganizationModel> organizationModels) {
 
-        if(organizationModels != null && organizationModels.size() > 0 && refreshOrganizations) {
+        if (organizationModels != null && organizationModels.size() > 0 && refreshOrganizations) {
 
             organizationSection.getItem().addAll(organizationModels);
 
@@ -133,7 +143,7 @@ public class InstituteFeedFragment extends Fragment {
     private void onHighlightsLoaded(List<PostModel> highlights) {
 
         if (highlights != null && (refreshHighlights || highlightSection.size() == 0)) {
-            
+
             highlightSection.addAll(highlights);
             refreshHighlights = false;
         }
