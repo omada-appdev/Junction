@@ -15,49 +15,50 @@ import java.time.format.TextStyle;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
 
 public class TransformUtilities {
 
-    public static float DP_TO_PX(Context context, float dp_value){
+    public static float DP_TO_PX(Context context, float dp_value) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp_value, context.getResources().getDisplayMetrics());
     }
 
-    public static String convertTimestampToHHMM(Timestamp timestamp){
+    public static String convertTimestampToHHMM(Timestamp timestamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(timestamp.toDate());
         String hh = String.valueOf(cal.get(Calendar.HOUR_OF_DAY));
         String mm = String.valueOf(cal.get(Calendar.MINUTE));
 
-        if(hh.length()==1) hh = "0" + hh;
-        if(mm.length()==1) mm = "0" + mm;
+        if (hh.length() == 1) hh = "0" + hh;
+        if (mm.length() == 1) mm = "0" + mm;
 
         return hh + ":" + mm;
     }
 
-    public static String convertTimestampToDDMM(Timestamp timestamp){
+    public static String convertTimestampToDDMM(Timestamp timestamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(timestamp.toDate());
         return cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH) + 1);
     }
 
-    public static String convertTimestampToDDMMYYYY(Timestamp timestamp){
+    public static String convertTimestampToDDMMYYYY(Timestamp timestamp) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(timestamp.toDate());
         return cal.get(Calendar.DAY_OF_MONTH) + "/" + (cal.get(Calendar.MONTH) + 1) + "/" + (cal.get(Calendar.YEAR));
     }
 
-    public static Date convertDDMMYYYYtoDate(String formattedDate, String separator){
+    public static Date convertDDMMYYYYtoDate(String formattedDate, String separator) {
 
         Date date = null;
         try {
-            date = new SimpleDateFormat("dd"+separator+"MM"+separator+"yyyy", Locale.US).parse(formattedDate);
-        }catch (ParseException e){
+            date = new SimpleDateFormat("dd" + separator + "MM" + separator + "yyyy", Locale.US).parse(formattedDate);
+        } catch (ParseException e) {
             Log.e("PARSE", "parse exception");
         }
         return date;
     }
 
-    public static String convertMillisecondsToDDMMYYYY(long millis, String separator){
+    public static String convertMillisecondsToDDMMYYYY(long millis, String separator) {
 
         Calendar calendar = Calendar.getInstance();
 
@@ -114,6 +115,26 @@ public class TransformUtilities {
 
     public static Timestamp convertUtcLocalDateTimeToTimestamp(LocalDateTime localDateTime) {
         return new Timestamp(Date.from(localDateTime.atZone(ZoneId.of("UTC")).toInstant()));
+    }
+
+    public static String getUrlFromForm(Map<String, Map<String, Map<String, String>>> form) {
+        if(form == null) {
+            return null;
+        } else if (form.equals("")) {
+            return null;
+        } else {
+            String url;
+            try {
+                url = form.get("links").get("linkId").get("url");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "http://" + url;
+            }
+            return url;
+        }
     }
 
 }

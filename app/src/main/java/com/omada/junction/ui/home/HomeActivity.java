@@ -18,11 +18,12 @@ import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.ui.articledetails.ArticleDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
-import com.omada.junction.ui.institute.InstituteActivity;
 import com.omada.junction.ui.home.feed.FeedFragment;
+import com.omada.junction.ui.institute.InstituteActivity;
 import com.omada.junction.ui.more.MoreActivity;
 import com.omada.junction.ui.organization.OrganizationProfileFragment;
 import com.omada.junction.ui.organization.OrganizationShowcaseFragment;
+import com.omada.junction.utils.TransformUtilities;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.HomeFeedViewModel;
 
@@ -143,17 +144,21 @@ public class HomeActivity extends AppCompatActivity {
             if (eventModelLiveEvent == null) {
                 return;
             }
-
             EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
             if (eventModel == null) {
                 return;
             }
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModel))
-                    .addToBackStack("stack")
-                    .commit();
+            String url = TransformUtilities.getUrlFromForm(eventModel.getForm());
+            if (url != null) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            } else {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModel))
+                        .addToBackStack("stack")
+                        .commit();
+            }
         });
 
         feedContentViewModel
