@@ -37,13 +37,11 @@ public class InstituteActivity extends AppCompatActivity {
         instituteFeedViewModel = new ViewModelProvider(this).get(InstituteFeedViewModel.class);
 
         if (savedInstanceState == null) {
-
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.institute_content_placeholder, new InstituteFeedFragment())
                     .commit();
 
         } else if (!instituteFeedViewModel.checkInstituteContentLoaded()) {
-
             instituteFeedViewModel.loadInstituteOrganizations();
             instituteFeedViewModel.loadInstituteHighlights();
         }

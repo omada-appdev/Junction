@@ -264,6 +264,8 @@ public class UserDataHandler {
                                         }
                                         signedInUser.following = dataMap;
 
+                                        Log.e("User", "Retrieved details from remote");
+
                                         resultLiveData.setValue(true);
                                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
                                         signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
@@ -352,15 +354,15 @@ public class UserDataHandler {
                                         }
                                         signedInUser.following = dataMap;
 
+                                        Log.e("User", "Retrieved details from local");
                                         resultLiveData.setValue(true);
+
                                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
                                         signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
-
                                     }
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
-                                        resultLiveData.setValue(false);
                                     }
                                 });
 
