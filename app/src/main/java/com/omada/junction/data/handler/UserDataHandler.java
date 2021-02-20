@@ -166,6 +166,7 @@ public class UserDataHandler {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null && !user.getUid().equals("")) {
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_SUCCESS));
+            signedInUser.setUID(user.getUid());
             LiveData<Boolean> localResultLiveData = getUserDetailsFromLocal(user.getUid());
             localResultLiveData.observeForever(new Observer<Boolean>() {
                 @Override
@@ -295,12 +296,11 @@ public class UserDataHandler {
         MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
 
         if(!signedInUser.getUID().equals("")){
-            //TODO get data from local and then remote if that fails
 
             FirebaseFirestore.getInstance()
                     .collection("users")
                     .document(uid)
-                    .get(Source.SERVER)
+                    .get(Source.CACHE)
                     .addOnSuccessListener(documentSnapshot -> {
 
                         if(!documentSnapshot.exists()) {

@@ -12,8 +12,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
-import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.ui.institute.InstituteActivity;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.ui.home.HomeActivity;
 import com.omada.junction.ui.login.LoginActivity;
 import com.omada.junction.viewmodels.UserProfileViewModel;

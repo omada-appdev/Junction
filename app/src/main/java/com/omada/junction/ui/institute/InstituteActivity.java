@@ -3,9 +3,7 @@ package com.omada.junction.ui.institute;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,18 +12,16 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
-import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.data.models.external.OrganizationModel;
 import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
 import com.omada.junction.ui.home.HomeActivity;
-import com.omada.junction.ui.home.feed.FeedFragment;
 import com.omada.junction.ui.more.MoreActivity;
 import com.omada.junction.ui.organization.OrganizationProfileFragment;
 import com.omada.junction.ui.organization.OrganizationShowcaseFragment;
-import com.omada.junction.viewmodels.ApplicationViewModel;
+import com.omada.junction.utils.TransformUtilities;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.InstituteFeedViewModel;
 
@@ -107,12 +103,17 @@ public class InstituteActivity extends AppCompatActivity {
                 return;
             }
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.institute_content_placeholder,
-                            EventRegistrationFragment.newInstance(eventModel))
-                    .addToBackStack("stack")
-                    .commit();
+            String url = TransformUtilities.getUrlFromForm(eventModel.getForm());
+            if (url != null) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            } else {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModel))
+                        .addToBackStack("stack")
+                        .commit();
+            }
         });
 
         feedContentViewModel

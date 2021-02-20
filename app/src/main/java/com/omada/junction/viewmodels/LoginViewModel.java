@@ -65,6 +65,7 @@ public class LoginViewModel extends BaseViewModel {
                     if (receivedAuthResponse == null) {
                         return authResponse;
                     }
+                    Log.e("Login", receivedAuthResponse.toString());
                     switch (receivedAuthResponse) {
                         case AUTHENTICATION_SUCCESS:
                             break;
@@ -84,12 +85,10 @@ public class LoginViewModel extends BaseViewModel {
                             Log.e("SIGNUP", "failure");
                             email.setValue(null);
                             password.setValue(null);
-
                             break;
                         case ADD_EXTRA_DETAILS_SUCCESS:
                             Log.e("DETAILS", "success");
                             //add code to tell user to verify mail
-
                             DataRepository.getInstance()
                                     .getUserDataHandler()
                                     .authenticateUser(email.getValue(), password.getValue());
