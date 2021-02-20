@@ -24,19 +24,19 @@ public class SplashViewModel extends BaseViewModel {
 
         authResultAction = Transformations.map(
                 DataRepository.getInstance()
-                    .getUserDataHandler()
-                    .getAuthResponseNotifier(),
+                        .getUserDataHandler()
+                        .getAuthResponseNotifier(),
 
-                authResponse->{
-                    if(authResponse == null){
+                authResponse -> {
+                    if (authResponse == null) {
                         return null;
                     }
 
                     UserDataHandler.AuthStatus receivedAuthResponse = authResponse.getDataOnceAndReset();
-                    if(receivedAuthResponse == null) {
+                    if (receivedAuthResponse == null) {
                         return null;
                     }
-                    switch (receivedAuthResponse){
+                    switch (receivedAuthResponse) {
                         case CURRENT_USER_SUCCESS:
                         case CURRENT_USER_FAILURE:
                         case LOGIN_SUCCESS:
@@ -51,18 +51,18 @@ public class SplashViewModel extends BaseViewModel {
                         .getUserDataHandler()
                         .getSignedInUserNotifier(),
 
-                userModelLiveEvent->{
-                    if(userModelLiveEvent == null){
+                userModelLiveEvent -> {
+                    if (userModelLiveEvent == null) {
                         return null;
                     }
 
                     UserDataHandler.UserModel signedInUser = userModelLiveEvent.getDataOnceAndReset();
-                    if(signedInUser == null) return null;
+                    if (signedInUser == null) return null;
                     else return new LiveEvent<>(signedInUser);
                 });
     }
 
-    public void getCurrentUser(){
+    public void getCurrentUser() {
         DataRepository.getInstance()
                 .getUserDataHandler()
                 .getCurrentUserDetails();

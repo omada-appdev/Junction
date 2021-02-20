@@ -33,20 +33,19 @@ public class SplashActivity extends AppCompatActivity {
                 UserDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
                 if(authStatus==null) return;
                 Intent i;
+                Log.e("Splash", authStatus.toString());
                 switch (authStatus){
                     case CURRENT_USER_SUCCESS:
-                        Log.e("Splash", UserDataHandler.AuthStatus.CURRENT_USER_SUCCESS.toString());
                         break;
                     case LOGIN_SUCCESS:
-                        Log.e("Splash", UserDataHandler.AuthStatus.LOGIN_SUCCESS.toString());
                         i = new Intent(this, HomeActivity.class);
                         startActivity(i);
                         finish();
                         break;
                     case CURRENT_USER_FAILURE:
-                        Log.e("Splash", UserDataHandler.AuthStatus.CURRENT_USER_FAILURE.toString());
+                    case USER_SIGNED_OUT:
+                    case USER_TOKEN_EXPIRED:
                     case LOGIN_FAILURE:
-                        Log.e("Splash", UserDataHandler.AuthStatus.LOGIN_FAILURE.toString());
                         i = new Intent(this, LoginActivity.class);
                         startActivity(i);
                         finish();

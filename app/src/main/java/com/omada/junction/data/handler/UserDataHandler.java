@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 import com.omada.junction.BuildConfig;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.models.external.InterestModel;
@@ -73,10 +75,11 @@ public class UserDataHandler {
         FirebaseAuth.getInstance()
                 .addAuthStateListener(firebaseAuth -> {
 
-                    if(firebaseAuth.getCurrentUser() == null || firebaseAuth.getCurrentUser().getUid() == null){
+                    if(firebaseAuth.getCurrentUser() == null){
                         prevUserUID = signedInUser.getUID();
                         signedInUser.resetUser();
                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.USER_SIGNED_OUT));
+
                     }
 
                 });
@@ -116,7 +119,6 @@ public class UserDataHandler {
             do not use the local cached variable named signed in user because it might not yet be updated by the
             auth state listener and do not update it from here because the auth state listener will take care of it
             */
-
             DataRepository
                     .getInstance()
                     .getImageUploadHandler()
@@ -145,99 +147,11 @@ public class UserDataHandler {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.AUTHENTICATION_SUCCESS));
-                        getAuthenticatedUserDetails();
+                        getCurrentUserDetails();
                     } else {
                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.AUTHENTICATION_FAILURE));
                     }
                 });
-    }
-
-    /*
-    This method is for getting details of newly authenticated user
-     */
-    private void getAuthenticatedUserDetails(){
-
-        prevUserUID = signedInUser.getUID();
-        signedInUser.resetUser();
-
-        FirebaseUser newUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if(newUser == null){
-            signedInUserNotifier.setValue(new LiveEvent<>(null));
-        }
-        else{
-
-            signedInUser.setUID(newUser.getUid());
-            signedInUser.setName(newUser.getDisplayName());
-            signedInUser.setEmail(newUser.getEmail());
-            signedInUser.setPhone(newUser.getPhoneNumber());
-
-            FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(signedInUser.getUID())
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-
-                        if(!documentSnapshot.exists()) {
-                            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
-                            return;
-                        }
-
-                        signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
-                        signedInUser.setInstitute(documentSnapshot.getString("institute"));
-                        signedInUser.setProfilePicture(documentSnapshot.getString("profilePicture"));
-
-                        signedInUser.setName(documentSnapshot.getString("name"));
-                        signedInUser.setGender(documentSnapshot.getString("gender"));
-
-                        try {
-                            @SuppressWarnings("unchecked")
-                            List<Map<String, Object>> interestsTempRaw = (List<Map<String, Object>>)documentSnapshot.get("interestsRating");
-                            if(interestsTempRaw != null && interestsTempRaw.size()>0) {
-
-                                List<InterestModel> interestsRating = new ArrayList<>(interestsTempRaw.size());
-
-                                for (Map<String, Object> elem : interestsTempRaw) {
-
-                                    InterestModel interestModel = new InterestModel((String) elem.get("interestsRating"));
-                                    interestsRating.add(interestModel);
-                                }
-                                signedInUser.setInterests(interestsRating);
-                            }
-
-                        }
-                        catch (Exception e){
-                            signedInUser.setInterests(null);
-                        }
-
-                        FirebaseDatabase.getInstance()
-                                .getReference()
-                                .child("follows")
-                                .child(signedInUser.getUID())
-                                .addValueEventListener(new ValueEventListener(){
-
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        HashMap<String, Object> dataMap = new HashMap<>();
-                                        for (DataSnapshot childSnapshot: snapshot.getChildren()) {
-                                            dataMap.put(childSnapshot.getKey(), childSnapshot.getValue());
-                                        }
-                                        signedInUser.following = dataMap;
-
-                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
-                                        signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
-
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
-                                    }
-                                });
-
-                    })
-                    .addOnFailureListener(e -> authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE)));
-        }
     }
 
     public UserModel getCurrentUserModel(){
@@ -250,18 +164,34 @@ public class UserDataHandler {
      */
     public void getCurrentUserDetails(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null){
-
-            prevUserUID = signedInUser.getUID();
-
-            signedInUser.setUID(user.getUid());
-            signedInUser.setName(user.getDisplayName());
-            signedInUser.setEmail(user.getEmail());
-
+        if (user != null && !user.getUid().equals("")) {
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_SUCCESS));
-            getUserDetailsFromRemote();
+            LiveData<Boolean> localResultLiveData = getUserDetailsFromLocal(user.getUid());
+            localResultLiveData.observeForever(new Observer<Boolean>() {
+                @Override
+                public void onChanged(Boolean result) {
+                    if (result != null) {
+                        if (!result) {
+                            getUserDetailsFromRemote(user.getUid());
+                        }
+                        localResultLiveData.removeObserver(this);
+                    }
+                }
+            });
+        } else {
+            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_FAILURE));
         }
-        else {
+    }
+
+    /*
+       To be called when the user data is to be reset completely, ie, the cache is stale
+    */
+    public void getCurrentUserDetailsFromRemote() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null && !user.getUid().equals("")) {
+            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_SUCCESS));
+            getUserDetailsFromRemote(user.getUid());
+        } else {
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.CURRENT_USER_FAILURE));
         }
     }
@@ -270,22 +200,26 @@ public class UserDataHandler {
     This method is called after login and getting details is done. ie, when firebase already has a current user.
     It sets details into the signed in user notifier live data
      */
-    private void getUserDetailsFromRemote(){
+    private LiveData<Boolean> getUserDetailsFromRemote(String uid){
+
+        MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
 
         if(!signedInUser.getUID().equals("")){
             //TODO get data from local and then remote if that fails
 
             FirebaseFirestore.getInstance()
                     .collection("users")
-                    .document(signedInUser.getUID())
-                    .get()
+                    .document(uid)
+                    .get(Source.SERVER)
                     .addOnSuccessListener(documentSnapshot -> {
 
                         if(!documentSnapshot.exists()) {
-                            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
+                            resultLiveData.setValue(false);
+                            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.USER_TOKEN_EXPIRED));
                             return;
                         }
 
+                        signedInUser.setUID(uid);
                         signedInUser.setName(documentSnapshot.getString("name"));
                         signedInUser.setEmail(documentSnapshot.getString("email"));
                         signedInUser.setPhone(documentSnapshot.getString("phone"));
@@ -329,6 +263,7 @@ public class UserDataHandler {
                                         }
                                         signedInUser.following = dataMap;
 
+                                        resultLiveData.setValue(true);
                                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
                                         signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
 
@@ -336,17 +271,110 @@ public class UserDataHandler {
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
+                                        resultLiveData.setValue(false);
                                         authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
                                     }
                                 });
 
                     })
-                    .addOnFailureListener(e -> authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE)));
+                    .addOnFailureListener(e -> {
+                        resultLiveData.setValue(false);
+                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
+                    });
 
         }
         else{
             authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
         }
+
+        return resultLiveData;
+    }
+
+    private LiveData<Boolean> getUserDetailsFromLocal(String uid){
+
+        MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
+
+        if(!signedInUser.getUID().equals("")){
+            //TODO get data from local and then remote if that fails
+
+            FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(uid)
+                    .get(Source.SERVER)
+                    .addOnSuccessListener(documentSnapshot -> {
+
+                        if(!documentSnapshot.exists()) {
+                            resultLiveData.setValue(false);
+                            return;
+                        }
+
+                        signedInUser.setUID(uid);
+                        signedInUser.setName(documentSnapshot.getString("name"));
+                        signedInUser.setEmail(documentSnapshot.getString("email"));
+                        signedInUser.setPhone(documentSnapshot.getString("phone"));
+
+                        signedInUser.setGender(documentSnapshot.getString("gender"));
+                        signedInUser.setDateOfBirth(documentSnapshot.getTimestamp("dateOfBirth"));
+                        signedInUser.setInstitute(documentSnapshot.getString("institute"));
+                        signedInUser.setProfilePicture(documentSnapshot.getString("profilePicture"));
+
+                        try {
+                            @SuppressWarnings("unchecked")
+                            List<Map<String, Object>> interestsTempRaw = (List<Map<String, Object>>)documentSnapshot.get("interestsRating");
+                            if(interestsTempRaw != null && interestsTempRaw.size()>0) {
+
+                                List<InterestModel> userInterests = new ArrayList<>(interestsTempRaw.size());
+
+                                for (Map<String, Object> elem : interestsTempRaw) {
+
+                                    InterestModel interestModel = new InterestModel((String) elem.get("interests"));
+                                    userInterests.add(interestModel);
+                                }
+                                signedInUser.setInterests(userInterests);
+                            }
+
+                        }
+                        catch (Exception e){
+                            signedInUser.setInterests(null);
+                        }
+
+                        FirebaseDatabase.getInstance()
+                                .getReference()
+                                .child("follows")
+                                .child(signedInUser.getUID())
+                                .addValueEventListener(new ValueEventListener(){
+
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        HashMap<String, Object> dataMap = new HashMap<>();
+                                        for (DataSnapshot childSnapshot: snapshot.getChildren()) {
+                                            dataMap.put(childSnapshot.getKey(), childSnapshot.getValue());
+                                        }
+                                        signedInUser.following = dataMap;
+
+                                        resultLiveData.setValue(true);
+                                        authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_SUCCESS));
+                                        signedInUserNotifier.setValue(new LiveEvent<>(signedInUser));
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        resultLiveData.setValue(false);
+                                    }
+                                });
+
+                    })
+                    .addOnFailureListener(e -> {
+                        resultLiveData.setValue(false);
+                    });
+
+        }
+        else{
+            authResponseNotifier.setValue(new LiveEvent<>(AuthStatus.LOGIN_FAILURE));
+        }
+
+        return resultLiveData;
 
     }
 
@@ -473,10 +501,10 @@ public class UserDataHandler {
     }
 
     /*
-    to be used when the signed in user changes
-    this is distinct to auth response as that only shares status of request
-    this shares result of request ie, current user or null
-    */
+        to be used when the signed in user changes
+        this is distinct to auth response as that only shares status of request
+        this shares result of request ie, current user or null
+        */
     public LiveData<LiveEvent<UserModel>> getSignedInUserNotifier(){
         return signedInUserNotifier;
     }
