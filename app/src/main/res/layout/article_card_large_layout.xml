@@ -1,12 +1,17 @@
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <import type="com.omada.junction.utils.TransformUtilities"/>
-        <import type="android.view.View"/>
+
+        <import type="com.omada.junction.utils.TransformUtilities" />
+
+        <import type="android.view.View" />
+
         <variable
             name="articleModel"
             type="com.omada.junction.data.models.external.ArticleModel" />
+
         <variable
             name="viewModel"
             type="com.omada.junction.viewmodels.FeedContentViewModel" />
@@ -83,9 +88,13 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="12dp"
                 android:background="#ACA9B1"
+                android:clickable="true"
                 android:elevation="4dp"
-                android:translationZ="2dp"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:onClick="@{()->viewModel.articleViewHandler.goToArticleCardDetails(articleModel)}"
                 android:scaleType="centerCrop"
+                android:translationZ="2dp"
                 app:layout_constraintBottom_toTopOf="@+id/more_details_button"
                 app:layout_constraintDimensionRatio="H,3:4"
                 app:layout_constraintEnd_toEndOf="parent"
