@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.ArticleModel;
+import com.omada.junction.data.models.external.ArticleModel;
 import com.omada.junction.databinding.ArticleCardLargeLayoutBinding;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 

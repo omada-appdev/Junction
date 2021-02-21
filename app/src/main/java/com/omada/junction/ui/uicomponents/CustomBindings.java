@@ -31,6 +31,18 @@ public class CustomBindings {
                 .into(view);
     }
 
+    @BindingAdapter({"remoteImageHttp"})
+    public static void loadImageHttp(ImageView view, String httpUrl) {
+
+        if(httpUrl == null || httpUrl.equals("")){
+            return;
+        }
+        GlideApp.with(view.getContext())
+                .load(httpUrl)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(view);
+    }
+
     @BindingAdapter({"onFollowClicked"})
     public static void onFollowAction(ToggleButton toggleButton, OrganizationProfileViewModel viewModel){
 
@@ -47,7 +59,6 @@ public class CustomBindings {
         toggleButton.setOnClickListener(v -> {
 
             ToggleButton view = (ToggleButton) v;
-
             if(view.isChecked()) {
                 viewModel.updateFollowingStatus(true);
                 view.setBackgroundResource(R.drawable.ic_favorite_red_24dp);

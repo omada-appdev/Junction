@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.rubensousa.gravitysnaphelper.GravitySnapRecyclerView;
 import com.omada.junction.R;
-import com.omada.junction.data.models.BaseModel;
+import com.omada.junction.data.models.external.PostModel;
 import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardLargeBinder;
 import com.omada.junction.ui.uicomponents.binders.misc.SmallFooterBinder;
@@ -35,7 +35,7 @@ import mva3.adapter.util.InfiniteLoadingHelper;
 public class ForYouFragment extends Fragment {
 
     private HomeFeedViewModel homeFeedViewModel;
-    private ListSection<BaseModel> contentListSection;
+    private ListSection<PostModel> contentListSection;
 
     private boolean refreshContents = true;
     private boolean allPagesLoaded = false;
@@ -160,8 +160,11 @@ public class ForYouFragment extends Fragment {
 
         homeFeedViewModel.getForYouCompleteNotifier()
                 .observe(getViewLifecycleOwner(), booleanLiveEvent -> {
-                    if(booleanLiveEvent.getData() != null && booleanLiveEvent.getDataOnceAndReset()){
-
+                    if(booleanLiveEvent == null) {
+                        return;
+                    }
+                    Boolean trigger = booleanLiveEvent.getDataOnceAndReset();
+                    if(trigger != null && trigger){
                         infiniteLoadingHelper.markAllPagesLoaded();
 
                         if(contentListSection.size() == 0 && footerSection.getItem() != null){
@@ -180,7 +183,7 @@ public class ForYouFragment extends Fragment {
         super.onResume();
     }
 
-    public void onContentLoaded(List<BaseModel> contents) {
+    public void onContentLoaded(List<PostModel> contents) {
 
         if(refreshContents || contentListSection.size() == 0) {
 

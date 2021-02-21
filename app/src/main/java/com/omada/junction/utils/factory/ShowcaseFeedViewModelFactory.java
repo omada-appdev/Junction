@@ -4,17 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.viewmodels.ShowcaseFeedViewModel;
 
 public class ShowcaseFeedViewModelFactory implements ViewModelProvider.Factory {
 
-    private final String organizationID;
-    private final String showcaseID;
+    private final ShowcaseModel showcaseModel;
 
 
-    public ShowcaseFeedViewModelFactory(String organizationID, String showcaseID) {
-        this.organizationID = organizationID;
-        this.showcaseID = showcaseID;
+    public ShowcaseFeedViewModelFactory(ShowcaseModel showcaseModel) {
+        this.showcaseModel = showcaseModel;
     }
 
 
@@ -22,6 +21,6 @@ public class ShowcaseFeedViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         //noinspection unchecked
-        return (T) new ShowcaseFeedViewModel(organizationID, showcaseID);
+        return (T) new ShowcaseFeedViewModel(showcaseModel);
     }
 }

@@ -1,10 +1,17 @@
 package com.omada.junction.utils.taskhandler;
 
-import com.google.firebase.Timestamp;
-import com.omada.junction.utils.transform.TransformUtilities;
-import com.omada.junction.viewmodels.LoginViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
+
+import com.omada.junction.data.DataRepository;
+import com.omada.junction.utils.TransformUtilities;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DataValidator {
 
@@ -116,14 +123,47 @@ public class DataValidator {
         }
     }
 
-    public void validateInstitute(String institute, OnValidationCompleteListener listener){
-        listener.onValidationComplete(validateInstitute(institute));
+    public void validateInstitute(String institute, OnValidationCompleteListener listener) {
+
+        LiveData<LiveEvent<DataValidationInformation>> dataValidationLiveData = validateInstitute(institute);
+        dataValidationLiveData.observeForever(new Observer<LiveEvent<DataValidationInformation>>() {
+            @Override
+            public void onChanged(LiveEvent<DataValidationInformation> dataValidationInformationLiveEvent) {
+                listener.onValidationComplete(dataValidationLiveData.getValue().getDataOnceAndReset());
+                dataValidationLiveData.removeObserver(this);
+            }
+        });
     }
 
-    public DataValidationInformation validateInstitute(String institute){
-        return new DataValidationInformation(
-                DataValidationPoint.VALIDATION_POINT_INSTITUTE,
-                DataValidationResult.VALIDATION_RESULT_VALID
+    private LiveData<LiveEvent<DataValidationInformation>> validateInstitute(String institute) {
+
+        if(institute == null || institute.equals("")){
+            return new MutableLiveData<>(new LiveEvent<>(new DataValidationInformation(
+                    DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                    DataValidationResult.VALIDATION_RESULT_INVALID
+            )));
+        }
+
+        return Transformations.map(
+                DataRepository
+                        .getInstance()
+                        .getInstituteDataHandler()
+                        .checkInstituteCodeValidity(institute),
+
+                input -> {
+                    Boolean result = input.getDataOnceAndReset();
+                    if (result != null && result) {
+                        return new LiveEvent<>(new DataValidationInformation(
+                                DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                DataValidationResult.VALIDATION_RESULT_VALID
+                        ));
+                    } else {
+                        return new LiveEvent<>(new DataValidationInformation(
+                                DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                DataValidationResult.VALIDATION_RESULT_INVALID
+                        ));
+                    }
+                }
         );
     }
 
@@ -193,6 +233,8 @@ public class DataValidator {
         VALIDATION_POINT_INSTITUTE,
         VALIDATION_POINT_PASSWORD,
         VALIDATION_POINT_INTERESTS,
+        VALIDATION_POINT_INSTITUTE_HANDLE,
+        VALIDATION_POINT_PROFILE_PICTURE
 
     }
 

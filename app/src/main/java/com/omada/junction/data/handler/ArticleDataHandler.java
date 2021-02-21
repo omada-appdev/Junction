@@ -10,17 +10,19 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.omada.junction.data.BaseDataHandler;
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.ArticleModel;
-import com.omada.junction.data.models.ArticleModelRemoteDB;
+import com.omada.junction.data.models.converter.ArticleModelConverter;
+import com.omada.junction.data.models.external.ArticleModel;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.internal.remote.ArticleModelRemoteDB;
 import com.omada.junction.utils.taskhandler.LiveDataAggregator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ArticleDataHandler {
+public class ArticleDataHandler extends BaseDataHandler {
 
 
     private enum ArticleType{
@@ -44,15 +46,13 @@ public class ArticleDataHandler {
     private final MediatorLiveData<List<ArticleModel>> loadedLearnArticlesNotifier = new MediatorLiveData<>();
     private final MediatorLiveData<List<ArticleModel>> loadedCompeteArticlesNotifier = new MediatorLiveData<>();
 
-    private final MediatorLiveData<List<ArticleModel>> loadedInstituteHighlightArticlesNotifier = new MediatorLiveData<>();
-
-
     /*
     ###########################
     # FIELDS FOR INTERNAL USE #
     ###########################
     */
     private ArticlesAggregator allArticlesAggregator = new ArticlesAggregator(loadedAllArticlesNotifier);
+    private ArticleModelConverter articleModelConverter = new ArticleModelConverter();
 
     public ArticleDataHandler(){
     }
@@ -105,7 +105,7 @@ public class ArticleDataHandler {
                     for(QueryDocumentSnapshot snapshot : queryDocumentSnapshots){
                         ArticleModelRemoteDB item = snapshot.toObject(ArticleModelRemoteDB.class);
                         item.setId(snapshot.getId());
-                        loadedArticles.add(new ArticleModel(item));
+                        loadedArticles.add(articleModelConverter.convertRemoteDBToExternalModel(item));
                     }
                     if(queryDocumentSnapshots.size() > 0) {
                         PaginationHelper.lastAllArticle = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
@@ -119,53 +119,8 @@ public class ArticleDataHandler {
         //TODO get all articles from local db and remove all the articles that are expired and set live data as above
     }
 
-    public void getInstituteHighlightArticles(){
-
-        String instituteID = DataRepository.getInstance()
-                .getUserDataHandler()
-                .getCurrentUserModel()
-                .getInstitute();
-
-        FirebaseFirestore.getInstance()
-                .collection("articles")
-                .whereEqualTo("articlePublisherInstitute", instituteID)
-                .whereEqualTo("instituteHighlight", true)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<ArticleModel> articleModelList = new ArrayList<>(queryDocumentSnapshots.size());
-                    for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                        articleModelList.add(new ArticleModel(documentSnapshot.toObject(ArticleModelRemoteDB.class)));
-                    }
-                    loadedInstituteHighlightArticlesNotifier.setValue(articleModelList);
-                });
-    }
-
-    public LiveData<List<ArticleModel>> getOrganizationHighlightArticles(String organizerID){
-
-        final MutableLiveData<List<ArticleModel>> loadedOrganizationHighlightArticlesNotifier = new MutableLiveData<>();
-
-        FirebaseFirestore.getInstance()
-                .collection("articles")
-                .whereEqualTo("articleOrganizer", organizerID)
-                .whereEqualTo("organizationHighlight", true)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<ArticleModel> articleModelList = new ArrayList<>(queryDocumentSnapshots.size());
-                    for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                        articleModelList.add(new ArticleModel(documentSnapshot.toObject(ArticleModelRemoteDB.class)));
-                    }
-                    loadedOrganizationHighlightArticlesNotifier.setValue(articleModelList);
-                });
-
-        return loadedOrganizationHighlightArticlesNotifier;
-    }
-
     public LiveData<List<ArticleModel>> getLoadedAllArticlesNotifier(){
         return loadedAllArticlesNotifier;
-    }
-
-    public LiveData<List<ArticleModel>> getLoadedInstituteHighlightArticlesNotifier(){
-        return loadedInstituteHighlightArticlesNotifier;
     }
 
     // This class will be used to get cursors for pagination
@@ -196,7 +151,7 @@ public class ArticleDataHandler {
         @Override
         protected boolean checkDataForAggregability() {
             try {
-                List<? extends BaseModel> remoteArticles = dataOnHold.get(ArticleType.ARTICLE_TYPE_REMOTE);
+                List<? extends PostModel> remoteArticles = dataOnHold.get(ArticleType.ARTICLE_TYPE_REMOTE);
                 //List<? extends BaseModel> localArticles = dataOnHold.get("remoteArticles");
 
                 /*

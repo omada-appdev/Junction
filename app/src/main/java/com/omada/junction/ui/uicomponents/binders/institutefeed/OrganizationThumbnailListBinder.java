@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.external.OrganizationModel;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 
 import mva3.adapter.ItemBinder;

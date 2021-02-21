@@ -7,20 +7,24 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.omada.junction.data.models.ArticleModel;
-import com.omada.junction.data.models.ArticleModelRemoteDB;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.EventModelRemoteDB;
-import com.omada.junction.data.models.ShowcaseModel;
-import com.omada.junction.data.models.ShowcaseModelRemoteDB;
+import com.omada.junction.data.models.converter.ArticleModelConverter;
+import com.omada.junction.data.models.converter.EventModelConverter;
+import com.omada.junction.data.models.converter.ShowcaseModelConverter;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
+import com.omada.junction.data.models.internal.remote.ArticleModelRemoteDB;
+import com.omada.junction.data.models.internal.remote.EventModelRemoteDB;
+import com.omada.junction.data.models.internal.remote.ShowcaseModelRemoteDB;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+
 public class ShowcaseDataHandler {
+
+    private ShowcaseModelConverter showcaseModelConverter = new ShowcaseModelConverter();
+    private EventModelConverter eventModelConverter = new EventModelConverter();
+    private ArticleModelConverter articleModelConverter = new ArticleModelConverter();
 
     public LiveData<List<ShowcaseModel>> getOrganizationShowcases(String organizationID){
 
@@ -35,11 +39,11 @@ public class ShowcaseDataHandler {
                     for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
                         //TODO refactor ShowcaseModel into remote DB and local DB
                         ShowcaseModelRemoteDB modelRemoteDB = documentSnapshot.toObject(ShowcaseModelRemoteDB.class);
-                        modelRemoteDB.setShowcaseID(documentSnapshot.getId());
-
-                        showcaseModels.add(new ShowcaseModel(
-                                modelRemoteDB
-                        ));
+                        if(modelRemoteDB == null) {
+                            return;
+                        }
+                        modelRemoteDB.setId(documentSnapshot.getId());
+                        showcaseModels.add(showcaseModelConverter.convertRemoteDBToExternalModel(modelRemoteDB));
                     }
                     showcaseModelsLiveData.setValue(showcaseModels);
                 })
@@ -48,12 +52,11 @@ public class ShowcaseDataHandler {
                 });
 
         return showcaseModelsLiveData;
-
     }
 
-    public LiveData<List<BaseModel>> getOrganizationShowcaseItems(String showcaseID){
+    public LiveData<List<PostModel>> getOrganizationShowcaseItems(String showcaseID){
 
-        MutableLiveData<List<BaseModel>> showcaseItemsLiveData = new MutableLiveData<>();
+        MutableLiveData<List<PostModel>> showcaseItemsLiveData = new MutableLiveData<>();
 
         FirebaseFirestore.getInstance()
                 .collection("posts")
@@ -63,7 +66,7 @@ public class ShowcaseDataHandler {
 
                     Log.e("showcases", "loaded " + queryDocumentSnapshots.size() + " showcases");
 
-                    List<BaseModel> baseModels = new ArrayList<>();
+                    List<PostModel> postModels = new ArrayList<>();
                     for(DocumentSnapshot documentSnapshot: queryDocumentSnapshots){
 
                         String type = documentSnapshot.getString("type");
@@ -71,18 +74,26 @@ public class ShowcaseDataHandler {
 
                         switch (type){
                             case "event":
-                                baseModels.add(new EventModel(
-                                        documentSnapshot.toObject(EventModelRemoteDB.class)
-                                ));
+                                EventModelRemoteDB remoteEvent = documentSnapshot.toObject(EventModelRemoteDB.class);
+                                if(remoteEvent == null) {
+                                    continue;
+                                }
+                                remoteEvent.setId(documentSnapshot.getId());
+                                for(int i = 0; i < 20; ++i) {
+                                    postModels.add(eventModelConverter.convertRemoteDBToExternalModel(remoteEvent));
+                                }
                                 break;
                             case "article":
-                                baseModels.add(new ArticleModel(
-                                        documentSnapshot.toObject(ArticleModelRemoteDB.class)
-                                ));
+                                ArticleModelRemoteDB remoteArticle = documentSnapshot.toObject(ArticleModelRemoteDB.class);
+                                if(remoteArticle == null) {
+                                    continue;
+                                }
+                                remoteArticle.setId(documentSnapshot.getId());
+                                postModels.add(articleModelConverter.convertRemoteDBToExternalModel(remoteArticle));
                                 break;
                         }
                     }
-                    showcaseItemsLiveData.setValue(baseModels);
+                    showcaseItemsLiveData.setValue(postModels);
                 })
                 .addOnFailureListener(e -> {
 

@@ -12,16 +12,18 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.ShowcaseModel;
+import com.omada.junction.data.models.external.ArticleModel;
+import com.omada.junction.data.models.external.EventModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.ui.articledetails.ArticleDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventDetailsFragment;
 import com.omada.junction.ui.eventdetails.EventRegistrationFragment;
-import com.omada.junction.ui.institute.InstituteActivity;
 import com.omada.junction.ui.home.feed.FeedFragment;
+import com.omada.junction.ui.institute.InstituteActivity;
 import com.omada.junction.ui.more.MoreActivity;
 import com.omada.junction.ui.organization.OrganizationProfileFragment;
 import com.omada.junction.ui.organization.OrganizationShowcaseFragment;
+import com.omada.junction.utils.TransformUtilities;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 import com.omada.junction.viewmodels.HomeFeedViewModel;
 
@@ -39,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
 
         homeFeedViewModel = new ViewModelProvider(this).get(HomeFeedViewModel.class);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
 
             getSupportFragmentManager()
                     .beginTransaction()
@@ -53,7 +55,7 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void setupBottomNavigation(){
+    private void setupBottomNavigation() {
         BottomNavigationView bottomMenu = findViewById(R.id.home_bottom_navigation);
         bottomMenu.getMenu().findItem(R.id.home_button).setChecked(true);
         bottomMenu.setOnNavigationItemSelectedListener(item -> {
@@ -61,29 +63,26 @@ public class HomeActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             Intent i = null;
 
-            if (itemId == R.id.home_button){
-                if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+            if (itemId == R.id.home_button) {
+                if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
 
                     homeFeedViewModel.reinitializeFeed();
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.home_content_placeholder, new FeedFragment())
                             .commit();
-                }
-                else {
+                } else {
                     getSupportFragmentManager().popBackStack("stack", FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
-            }
-            else if (itemId == R.id.more_button){
+            } else if (itemId == R.id.more_button) {
                 i = new Intent(HomeActivity.this, MoreActivity.class);
-            }
-            else if (itemId == R.id.institute_button){
+            } else if (itemId == R.id.institute_button) {
                 i = new Intent(HomeActivity.this, InstituteActivity.class);
             }
 
 
             if (i != null) {
-                i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                i.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
                 return true;
 
@@ -94,7 +93,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void setupTriggers(){
+    private void setupTriggers() {
 
         FeedContentViewModel feedContentViewModel = new ViewModelProvider(this).get(FeedContentViewModel.class);
 
@@ -102,31 +101,37 @@ public class HomeActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getEventCardDetailsTrigger().observe(this, eventModelLiveEvent -> {
 
-                    if(eventModelLiveEvent == null){
-                        return;
-                    }
+            if (eventModelLiveEvent == null) {
+                return;
+            }
 
-                    EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
-                    if(eventModel != null) {
+            EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
+            if (eventModel != null) {
 
-                        getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.home_content_placeholder, EventDetailsFragment.newInstance(eventModel))
-                                .addToBackStack("stack")
-                                .commit();
-                    }
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.home_content_placeholder, EventDetailsFragment.newInstance(eventModel))
+                        .addToBackStack("stack")
+                        .commit();
+            }
 
         });
 
         feedContentViewModel
                 .getOrganizationDetailsTrigger()
-                .observe(this, stringLiveEvent -> {
-                    if(stringLiveEvent != null && stringLiveEvent.getData() != null){
+                .observe(this, idLiveEvent -> {
+                    if (idLiveEvent != null) {
+
+                        String id = idLiveEvent.getDataOnceAndReset();
+
+                        if (id == null) {
+                            return;
+                        }
 
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.home_content_placeholder,
-                                        OrganizationProfileFragment.newInstance(stringLiveEvent.getDataOnceAndReset()))
+                                        OrganizationProfileFragment.newInstance(id))
                                 .addToBackStack("stack")
                                 .commit();
                     }
@@ -136,28 +141,41 @@ public class HomeActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getEventFormTrigger().observe(this, eventModelLiveEvent -> {
 
-                    if(eventModelLiveEvent == null || eventModelLiveEvent.getData() == null){
-                        return;
-                    }
-
-                    getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModelLiveEvent.getDataOnceAndReset()))
-                            .addToBackStack("stack")
-                            .commit();
+            if (eventModelLiveEvent == null) {
+                return;
+            }
+            EventModel eventModel = eventModelLiveEvent.getDataOnceAndReset();
+            if (eventModel == null) {
+                return;
+            }
+            String url = TransformUtilities.getUrlFromForm(eventModel.getForm());
+            if (url != null) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+            } else {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.home_content_placeholder, EventRegistrationFragment.newInstance(eventModel))
+                        .addToBackStack("stack")
+                        .commit();
+            }
         });
 
         feedContentViewModel
                 .getEventViewHandler()
                 .getCallOrganizerTrigger().observe(this, stringLiveEvent -> {
 
-                    if(stringLiveEvent.getData() != null){
-                        Intent intent = new Intent(Intent.ACTION_DIAL);
-                        intent.setData(Uri.parse("tel:" + stringLiveEvent.getDataOnceAndReset()));
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                        }
-                    }
+            if (stringLiveEvent != null) {
+                String data = stringLiveEvent.getDataOnceAndReset();
+                if (data == null) {
+                    return;
+                }
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + data));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
 
         });
 
@@ -165,18 +183,21 @@ public class HomeActivity extends AppCompatActivity {
                 .getEventViewHandler()
                 .getMailOrganizerTrigger().observe(this, pairLiveEvent -> {
 
-                    if(pairLiveEvent.getData() != null) {
+            if (pairLiveEvent != null) {
 
-                        Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+                Pair<String, String> data = pairLiveEvent.getDataOnceAndReset();
+                if (data == null) {
+                    return;
+                }
 
-                        Intent intent = new Intent(Intent.ACTION_SENDTO);
-                        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                        }
-                    }
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{data.second});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Regarding " + data.first);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
 
         });
 
@@ -184,11 +205,14 @@ public class HomeActivity extends AppCompatActivity {
                 .getArticleViewHandler()
                 .getArticleCardDetailsTrigger()
                 .observe(this, articleModelLiveEvent -> {
-                    if(articleModelLiveEvent != null && articleModelLiveEvent.getData() != null){
-
+                    if (articleModelLiveEvent != null) {
+                        ArticleModel articleModel = articleModelLiveEvent.getDataOnceAndReset();
+                        if (articleModel == null) {
+                            return;
+                        }
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.home_content_placeholder, ArticleDetailsFragment.newInstance(articleModelLiveEvent.getDataOnceAndReset()))
+                                .replace(R.id.home_content_placeholder, ArticleDetailsFragment.newInstance(articleModel))
                                 .addToBackStack("stack")
                                 .commit();
 
@@ -200,13 +224,16 @@ public class HomeActivity extends AppCompatActivity {
                 .getOrganizationShowcaseDetailsTrigger()
                 .observe(this, showcaseModelLiveEvent -> {
 
-                    if(showcaseModelLiveEvent.getData() != null){
+                    if (showcaseModelLiveEvent != null) {
 
                         ShowcaseModel model = showcaseModelLiveEvent.getDataOnceAndReset();
+                        if (model == null) {
+                            return;
+                        }
 
                         getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model.getCreator(), model.getShowcaseID()))
+                                .replace(R.id.home_content_placeholder, OrganizationShowcaseFragment.newInstance(model))
                                 .addToBackStack("stack")
                                 .commit();
 

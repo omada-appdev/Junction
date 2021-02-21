@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.Map;

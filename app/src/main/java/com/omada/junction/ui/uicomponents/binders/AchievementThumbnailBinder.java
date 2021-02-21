@@ -4,7 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.AchievementModel;
+import com.omada.junction.data.models.external.AchievementModel;
 
 
 import mva3.adapter.ItemBinder;

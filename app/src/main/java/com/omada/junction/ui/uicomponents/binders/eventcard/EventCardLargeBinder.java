@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.databinding.EventCardLargeLayoutBinding;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 

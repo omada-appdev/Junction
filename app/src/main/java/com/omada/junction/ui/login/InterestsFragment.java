@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.InterestModel;
+import com.omada.junction.data.models.external.InterestModel;
 import com.omada.junction.databinding.LoginInterestsFragmentLayoutBinding;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.viewmodels.LoginViewModel;
@@ -85,11 +85,14 @@ public class InterestsFragment extends Fragment {
         loginViewModel.getDataValidationAction().observe(getViewLifecycleOwner(),
                 dataValidationInformationLiveEvent -> {
 
-                    if(dataValidationInformationLiveEvent.getData() == null){
+                    if(dataValidationInformationLiveEvent == null){
                         return;
                     }
 
                     DataValidator.DataValidationInformation dataValidationInformation = dataValidationInformationLiveEvent.getDataOnceAndReset();
+                    if(dataValidationInformation == null) {
+                        return;
+                    }
 
                     if(dataValidationInformation.getValidationPoint() != DataValidator.DataValidationPoint.VALIDATION_POINT_INTERESTS){
                         return;

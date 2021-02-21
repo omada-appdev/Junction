@@ -2,14 +2,12 @@ package com.omada.junction.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.OrganizationModel;
-import com.omada.junction.data.models.ShowcaseModel;
+import com.omada.junction.data.models.external.OrganizationModel;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
@@ -18,12 +16,12 @@ import java.util.List;
 
 // NOTE this class is not supposed to be used at the activity scope because it is stateful
 
-public class OrganizationProfileViewModel extends ViewModel {
+public class OrganizationProfileViewModel extends BaseViewModel {
 
     private String organizationID;
     private OrganizationModel organizationModel;
 
-    private final MediatorLiveData<List<BaseModel>> loadedOrganizationHighlights = new MediatorLiveData<>();
+    private final MediatorLiveData<List<PostModel>> loadedOrganizationHighlights = new MediatorLiveData<>();
     private final MediatorLiveData<List<ShowcaseModel>> loadedOrganizationShowcases = new MediatorLiveData<>();
 
     public void setOrganizationID(String orgID){
@@ -44,7 +42,7 @@ public class OrganizationProfileViewModel extends ViewModel {
 
     public LiveData<LiveEvent<OrganizationModel>> getOrganizationDetails(){
 
-        organizationID = organizationID == null ? (organizationModel == null ? null : organizationModel.getOrganizationID()) : organizationID;
+        organizationID = organizationID == null ? (organizationModel == null ? null : organizationModel.getId()) : organizationID;
 
         return DataRepository
                 .getInstance()
@@ -54,14 +52,19 @@ public class OrganizationProfileViewModel extends ViewModel {
 
     public void loadOrganizationHighlights(){
 
-        LiveData<List<EventModel>> eventSource = DataRepository.getInstance()
-                .getEventDataHandler()
-                .getOrganizationHighlightEvents(organizationID);
+        LiveData<LiveEvent<List<PostModel>>> eventSource = DataRepository.getInstance()
+                .getPostDataHandler()
+                .getOrganizationHighlights(getDataRepositoryAccessIdentifier(), organizationID);
 
         loadedOrganizationHighlights.addSource(eventSource,
-                eventModels -> {
-                    List<BaseModel> modelList = new ArrayList<>(eventModels);
-                    loadedOrganizationHighlights.setValue(modelList);
+                listLiveEvent -> {
+                    if(listLiveEvent != null) {
+                        List<PostModel> highlights = listLiveEvent.getDataOnceAndReset();
+                        if(highlights != null) {
+                            List<PostModel> modelList = new ArrayList<>(highlights);
+                            loadedOrganizationHighlights.setValue(modelList);
+                        }
+                    }
                     loadedOrganizationHighlights.removeSource(eventSource);
                 }
         );
@@ -81,7 +84,7 @@ public class OrganizationProfileViewModel extends ViewModel {
         );
     }
 
-    public LiveData<List<BaseModel>> getLoadedOrganizationHighlights(){
+    public LiveData<List<PostModel>> getLoadedOrganizationHighlights(){
         return loadedOrganizationHighlights;
     }
 

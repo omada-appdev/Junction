@@ -2,37 +2,45 @@ package com.omada.junction.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
+import com.omada.junction.application.JunctionApplication;
 import com.omada.junction.data.DataRepository;
 import com.omada.junction.data.handler.UserDataHandler;
+import com.omada.junction.utils.FileUtilities;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
-public class SplashViewModel extends ViewModel {
+import me.shouheng.utils.UtilsApp;
+
+public class SplashViewModel extends BaseViewModel {
 
     private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> authResultAction;
     private final LiveData<LiveEvent<UserDataHandler.UserModel>> signedInUserAction;
 
     public SplashViewModel() {
+
+        // clear all files on startup
+        UtilsApp.init(JunctionApplication.getInstance());
+        FileUtilities.Companion.clearTemporaryFiles();
+
         authResultAction = Transformations.map(
                 DataRepository.getInstance()
-                    .getUserDataHandler()
-                    .getAuthResponseNotifier(),
+                        .getUserDataHandler()
+                        .getAuthResponseNotifier(),
 
-                authResponse->{
-                    if(authResponse == null){
+                authResponse -> {
+                    if (authResponse == null) {
                         return null;
                     }
 
                     UserDataHandler.AuthStatus receivedAuthResponse = authResponse.getDataOnceAndReset();
-                    if(receivedAuthResponse == null) {
+                    if (receivedAuthResponse == null) {
                         return null;
                     }
-                    switch (receivedAuthResponse){
+                    switch (receivedAuthResponse) {
                         case CURRENT_USER_SUCCESS:
                         case CURRENT_USER_FAILURE:
-                        case CURRENT_USER_LOGIN_SUCCESS:
-                        case CURRENT_USER_LOGIN_FAILURE:
+                        case LOGIN_SUCCESS:
+                        case LOGIN_FAILURE:
                             break;
                     }
                     return new LiveEvent<>(receivedAuthResponse);
@@ -43,18 +51,18 @@ public class SplashViewModel extends ViewModel {
                         .getUserDataHandler()
                         .getSignedInUserNotifier(),
 
-                userModelLiveEvent->{
-                    if(userModelLiveEvent == null){
+                userModelLiveEvent -> {
+                    if (userModelLiveEvent == null) {
                         return null;
                     }
 
                     UserDataHandler.UserModel signedInUser = userModelLiveEvent.getDataOnceAndReset();
-                    if(signedInUser == null) return null;
+                    if (signedInUser == null) return null;
                     else return new LiveEvent<>(signedInUser);
                 });
     }
 
-    public void getCurrentUser(){
+    public void getCurrentUser() {
         DataRepository.getInstance()
                 .getUserDataHandler()
                 .getCurrentUserDetails();
