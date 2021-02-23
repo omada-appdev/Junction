@@ -16,6 +16,9 @@ import com.omada.junction.data.models.converter.ArticleModelConverter;
 import com.omada.junction.data.models.external.ArticleModel;
 import com.omada.junction.data.models.external.PostModel;
 import com.omada.junction.data.models.internal.remote.ArticleModelRemoteDB;
+import com.omada.junction.data.sink.DataSinkProvider;
+import com.omada.junction.data.source.DataSourceProvider;
+import com.omada.junction.data.source.PostDataSource;
 import com.omada.junction.utils.taskhandler.LiveDataAggregator;
 
 import java.util.ArrayList;
@@ -29,6 +32,8 @@ public class ArticleDataHandler extends BaseDataHandler {
         ARTICLE_TYPE_LOCAL,
         ARTICLE_TYPE_REMOTE
     }
+
+    private PostDataSource postDataSource;
 
      /*
     #############################
@@ -57,10 +62,14 @@ public class ArticleDataHandler extends BaseDataHandler {
     public ArticleDataHandler(){
     }
 
+    public ArticleDataHandler(PostDataSource postDataSource) {
+        this.postDataSource = postDataSource;
+    }
+
     /*
     This function gets all articles
      */
-    public void getAllArticles(){
+    public void getForYouArticles(){
 
         MutableLiveData<List<ArticleModel>> localArticles = new MutableLiveData<>();
         MutableLiveData<List<ArticleModel>> remoteArticles = new MutableLiveData<>();
@@ -92,10 +101,11 @@ public class ArticleDataHandler extends BaseDataHandler {
                 .collection("posts")
                 .whereEqualTo("type", "article")
                 .whereIn("creator", following)
+                .orderBy("timeCreated", Query.Direction.DESCENDING)
                 .limit(1);
 
-        if(PaginationHelper.lastAllArticle != null){
-            query = query.startAfter(PaginationHelper.lastAllArticle);
+        if(PaginationHelper.lastForYouArticle != null){
+            query = query.startAfter(PaginationHelper.lastForYouArticle);
         }
 
         query.get()
@@ -108,7 +118,7 @@ public class ArticleDataHandler extends BaseDataHandler {
                         loadedArticles.add(articleModelConverter.convertRemoteDBToExternalModel(item));
                     }
                     if(queryDocumentSnapshots.size() > 0) {
-                        PaginationHelper.lastAllArticle = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
+                        PaginationHelper.lastForYouArticle = queryDocumentSnapshots.getDocuments().get(queryDocumentSnapshots.size() - 1);
                     }
                     destinationLiveData.setValue(loadedArticles);
                 })
@@ -125,14 +135,13 @@ public class ArticleDataHandler extends BaseDataHandler {
 
     // This class will be used to get cursors for pagination
     private static class PaginationHelper{
-        public static DocumentSnapshot lastAllArticle = null;
         public static DocumentSnapshot lastForYouArticle = null;
         public static DocumentSnapshot lastLearnArticle = null;
         public static DocumentSnapshot lastCompeteArticle = null;
         public static DocumentSnapshot lastInstituteArticle = null;
     }
     public void resetLastForYouArticle(){
-        PaginationHelper.lastAllArticle = null;
+        PaginationHelper.lastForYouArticle = null;
         loadedAllArticlesNotifier = new MediatorLiveData<>();
         allArticlesAggregator = new ArticlesAggregator(loadedAllArticlesNotifier);
     }

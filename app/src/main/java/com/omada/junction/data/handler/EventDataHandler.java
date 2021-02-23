@@ -126,7 +126,8 @@ public class EventDataHandler extends BaseDataHandler {
                 .collection("posts")
                 .whereEqualTo("type", "event")
                 .whereIn("creator", following)
-                .limit(1);
+                .orderBy("timeCreated", Query.Direction.DESCENDING)
+                .limit(5);
 
         if(PaginationHelper.lastForYouEvent != null){
             query = query.startAfter(PaginationHelper.lastForYouEvent);
