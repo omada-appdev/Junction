@@ -45,32 +45,39 @@
                 android:paddingEnd="12dp"
                 android:paddingBottom="80dp">
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"/>
+
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/profile_picture_image"
                     android:layout_width="160dp"
                     android:layout_height="160dp"
                     android:layout_gravity="center"
                     android:layout_margin="24dp"
-                    android:src="@drawable/ic_person_profile"
-                    app:tint="@color/colorPrimaryDark"
-                    android:background="@color/JunctionLightGray"
+                    remoteImageHttp="@{viewModel.currentUserModel.profilePicture}"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"/>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Full name"
-                    android:layout_margin="2dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_margin="8dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_height="wrap_content"
                         android:layout_width="match_parent"
                         android:id="@+id/name_input"
-                        android:inputType="textEmailAddress"
-                        android:text="@={viewModel.userDisplayName}"/>
+                        android:inputType="textPersonName"
+                        android:background="@color/transparent"
+                        android:text="@={viewModel.name}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -79,15 +86,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Date of birth (DD/MM/YYYY)"
-                    android:layout_margin="2dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_margin="8dp"
+                    app:endIconMode="custom"
+                    app:endIconDrawable="@drawable/ic_calendar_today_24px"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_height="wrap_content"
                         android:layout_width="match_parent"
                         android:id="@+id/date_of_birth_input"
-                        android:inputType="textPersonName"
-                        android:text="@={viewModel.userDateOfBirth}"/>
+                        android:inputType="date"
+                        android:background="@color/transparent"
+                        android:onClick="@{()->dateOfBirthLayout.setErrorEnabled(false)}"
+                        android:text="@={viewModel.dateOfBirth}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -96,15 +107,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Gender"
-                    android:layout_margin="2dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_margin="8dp"
+                    android:background="@color/transparent"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
 
-                    <com.google.android.material.textfield.TextInputEditText
+                    <AutoCompleteTextView
+                        android:id="@+id/gender_input"
                         android:layout_height="wrap_content"
                         android:layout_width="match_parent"
-                        android:id="@+id/gender_input"
-                        android:inputType="text"
-                        android:text="@={viewModel.userGender}" />
+                        android:background="@color/transparent"
+                        android:focusable="false"
+                        android:text="@={viewModel.gender}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -117,15 +130,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Institute code"
-                    android:layout_margin="2dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_margin="8dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_height="wrap_content"
                         android:layout_width="match_parent"
                         android:id="@+id/institute_input"
-                        android:inputType="textPostalAddress"
-                        android:text="@={viewModel.userInstitute}"/>
+                        android:inputType="textPersonName"
+                        android:background="@color/transparent"
+                        android:text="@={viewModel.institute}"/>
+
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>

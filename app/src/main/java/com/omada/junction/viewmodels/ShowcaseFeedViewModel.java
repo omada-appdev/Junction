@@ -5,34 +5,36 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.BaseModel;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 
 import java.util.List;
 
-public class ShowcaseFeedViewModel extends ViewModel {
 
-    private LiveData<List<BaseModel>> showcaseItems;
+public class ShowcaseFeedViewModel extends BaseViewModel {
 
-    private final String organizationID;
-    private final String showcaseID;
+    private LiveData<List<PostModel>> loadedShowcaseItems;
 
-    public ShowcaseFeedViewModel(String organizationID, String showcaseID){
+    private final ShowcaseModel showcaseModel;
 
-        this.organizationID = organizationID;
-        this.showcaseID = showcaseID;
-
+    public ShowcaseFeedViewModel(ShowcaseModel model){
+        this.showcaseModel = model;
         initializeDataLoaders();
     }
 
     private void initializeDataLoaders(){
-        showcaseItems = Transformations.map(
-                DataRepository.getInstance().getShowcaseDataHandler().getOrganizationShowcaseItems(showcaseID),
-                baseModels -> baseModels
+        loadedShowcaseItems = Transformations.map(
+                DataRepository.getInstance().getShowcaseDataHandler().getOrganizationShowcaseItems(showcaseModel.getId()),
+                postModels -> postModels
         );
     }
 
-    public LiveData<List<BaseModel>> getShowcaseItems(){
-        return showcaseItems;
+    public ShowcaseModel getShowcaseModel() {
+        return showcaseModel;
+    }
+
+    public LiveData<List<PostModel>> getLoadedShowcaseItems(){
+        return loadedShowcaseItems;
     }
 
 }

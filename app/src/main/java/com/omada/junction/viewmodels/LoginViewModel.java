@@ -1,22 +1,24 @@
 package com.omada.junction.viewmodels;
 
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.Timestamp;
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.handler.AuthDataHandler;
-import com.omada.junction.data.models.InterestModel;
+import com.omada.junction.data.handler.UserDataHandler;
+import com.omada.junction.data.models.external.InterestModel;
 import com.omada.junction.ui.login.LoginActivity;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.utils.taskhandler.LiveEvent;
-import com.omada.junction.utils.transform.TransformUtilities;
+import com.omada.junction.utils.TransformUtilities;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,53 +27,27 @@ import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class LoginViewModel extends ViewModel {
-
-    //constant fields
-    public enum DataValidationPoint{
-        ALL_DETAILS_VALID,
-        ALL_INTERESTS_VALID,
-        ALL_SIGN_IN_INFO_VALID,
-        NO_INFO,
-        BLANK_VALUE,
-        INVALID_EMAIL,
-        INVALID_PASSWORD,
-        INVALID_DATE_OF_BIRTH,
-        INVALID_DATE_OF_BIRTH_PARSE_ERROR,
-        INVALID_DATE_OF_BIRTH_OUT_OF_RANGE,
-        INVALID_FULL_NAME,
-        INVALID_FULL_NAME_HAS_NUMBERS,
-        INVALID_INSTITUTE,
-        INVALID_GENDER,
-        INVALID_INTERESTS,
-        INVALID_INTERESTS_NONE_SELECTED,
-        INVALID_INTERESTS_MANY_SELECTED
-    }
+public class LoginViewModel extends BaseViewModel {
 
     private final static int MAX_INTERESTS = 5;
 
     //action fields (setting values triggers events)
-    private final LiveData<LiveEvent<AuthDataHandler.AuthStatus>> authResultAction;
-    private final MutableLiveData<LiveEvent<DataValidator.DataValidationInformation>> dataValidationAction = new MutableLiveData<>();
+    private final LiveData<LiveEvent<UserDataHandler.AuthStatus>> authResultAction;
     private final MutableLiveData<LiveEvent<LoginActivity.FragmentIdentifier>> fragmentChangeAction = new MutableLiveData<>();
     private final MutableLiveData<LiveEvent<Boolean>> goToFeedAction = new MutableLiveData<>();
     private final MutableLiveData<LiveEvent<String>> toastMessageAction = new MutableLiveData<>();
 
     //data fields from UI
-    public final MutableLiveData<String> userDisplayName = new MutableLiveData<>();
+    public final MutableLiveData<String> name = new MutableLiveData<>();
     public final MutableLiveData<String> password = new MutableLiveData<>();
     public final MutableLiveData<String> email = new MutableLiveData<>();
     public final MutableLiveData<String> dateOfBirth = new MutableLiveData<>();
-    public final MutableLiveData<String> userGender = new MutableLiveData<>();
-    public final MutableLiveData<String> userInstitute = new MutableLiveData<>();
+    public final MutableLiveData<String> gender = new MutableLiveData<>();
+    public final MutableLiveData<String> institute = new MutableLiveData<>();
+    public final MutableLiveData<Uri> profilePicture = new MutableLiveData<>();
 
     private final List<InterestModel> selectedInterests = new ArrayList<>();
     private final List<InterestModel> allInterests = new ArrayList<>();
-
-    private String profilePhotoUrl;
-
-    //process fields (keep track of state)
-    private final DataValidator dataValidator = new DataValidator();
 
     public LoginViewModel() {
 
@@ -82,14 +58,15 @@ public class LoginViewModel extends ViewModel {
         initCalendar();
 
         authResultAction = Transformations.map(
-                DataRepository.getInstance().getAuthDataHandler().getAuthResponseNotifier(),
+                DataRepository.getInstance().getUserDataHandler().getAuthResponseNotifier(),
                 authResponse -> {
 
-                    AuthDataHandler.AuthStatus receivedAuthResponse = authResponse.getDataOnceAndReset();
-                    if(receivedAuthResponse==null){
+                    UserDataHandler.AuthStatus receivedAuthResponse = authResponse.getDataOnceAndReset();
+                    if (receivedAuthResponse == null) {
                         return authResponse;
                     }
-                    switch (receivedAuthResponse){
+                    Log.e("Login", receivedAuthResponse.toString());
+                    switch (receivedAuthResponse) {
                         case AUTHENTICATION_SUCCESS:
                             break;
                         case AUTHENTICATION_FAILURE:
@@ -108,14 +85,12 @@ public class LoginViewModel extends ViewModel {
                             Log.e("SIGNUP", "failure");
                             email.setValue(null);
                             password.setValue(null);
-
                             break;
                         case ADD_EXTRA_DETAILS_SUCCESS:
                             Log.e("DETAILS", "success");
                             //add code to tell user to verify mail
-
                             DataRepository.getInstance()
-                                    .getAuthDataHandler()
+                                    .getUserDataHandler()
                                     .authenticateUser(email.getValue(), password.getValue());
                             break;
                         case ADD_EXTRA_DETAILS_FAILURE:
@@ -131,209 +106,254 @@ public class LoginViewModel extends ViewModel {
         );
     }
 
-    public void startSignIn(){
-        fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_SIGNIN_FRAGMENT));
+    public void startSignIn() {
+        fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_SIGN_IN_FRAGMENT));
     }
 
-    public void startSignUp(){
+    public void startSignUp() {
         fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_INTERESTS_FRAGMENT));
     }
 
-    public void doUserLogin(){
+    public void doUserLogin() {
 
         AtomicBoolean invalidData = new AtomicBoolean(false);
 
         dataValidator.validateEmail(email.getValue(), dataValidationInformation -> {
-            if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
+            if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
                 invalidData.set(true);
             }
             notifyValidity(dataValidationInformation);
         });
         dataValidator.validatePassword(password.getValue(), dataValidationInformation -> {
-            if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
+            if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
                 invalidData.set(true);
             }
             notifyValidity(dataValidationInformation);
         });
 
-        if(!invalidData.get()) {
+        if (!invalidData.get()) {
 
             notifyValidity(new DataValidator.DataValidationInformation(
                     DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
                     DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
             ));
             DataRepository.getInstance()
-                    .getAuthDataHandler()
-                    .authenticateUser(email.getValue(), password.getValue());
+                    .getUserDataHandler()
+                    .authenticateUser(email.getValue().trim(), password.getValue().trim());
         }
 
     }
 
-    public void forgotPassword(){
+    public void goToForgotPassword() {
         password.setValue(null);
-        dateOfBirth.setValue(null);
-        email.setValue(null);
-        userGender.setValue(null);
-        fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_FORGOTPASSWORD_FRAGMENT));
+        fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_FORGOT_PASSWORD_FRAGMENT));
+    }
+
+    public LiveData<LiveEvent<Boolean>> sendPasswordResetLink() {
+        if (email.getValue() == null) {
+            return new MutableLiveData<>(new LiveEvent<>(false));
+        }
+        return DataRepository.getInstance()
+                .getUserDataHandler()
+                .sendPasswordResetLink(email.getValue());
     }
 
     /*
     Called after user clicks on button to reset password. The email ID of the user is reflected onto
     email live data. It is set to null when forgotPassword() is called
      */
-    public void resetPassword(){
+    public void resetPassword() {
 
         //TODO add code to send password reset link
     }
 
-    public void detailsEntryDone(){
+    public void detailsEntryDone() {
 
         //TODO add code to verify email and go to home only if email is verified
 
-        AuthDataHandler.MutableUserModel userModel = new AuthDataHandler.MutableUserModel();
-        AtomicBoolean anyDetailsEntryInvalid = new AtomicBoolean(false);
+        UserDataHandler.MutableUserModel userModel = new UserDataHandler.MutableUserModel();
+        MediatorLiveData<DataValidator.DataValidationInformation> resultLiveData = new MediatorLiveData<>();
+
+        ValidationAggregator validationAggregator = ValidationAggregator
+                .build(resultLiveData)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_GENDER)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_EMAIL)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_DATE_OF_BIRTH)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_NAME)
+                .add(DataValidator.DataValidationPoint.VALIDATION_POINT_PASSWORD)
+                .get();
 
         dataValidator.validateDateOfBirth(dateOfBirth.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserDateOfBirth(
+            if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                userModel.setDateOfBirth(
                         new Timestamp(TransformUtilities.convertDDMMYYYYtoDate(dateOfBirth.getValue(), "/"))
                 );
             }
-            else anyDetailsEntryInvalid.set(true);
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_DATE_OF_BIRTH, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
-        dataValidator.validateGender(userGender.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserGender(
-                        Character.toString(userGender.getValue().charAt(0))
-                );
+        dataValidator.validateGender(gender.getValue(), dataValidationInformation -> {
+            if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                userModel.setGender(gender.getValue());
             }
-            else anyDetailsEntryInvalid.set(true);
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_GENDER, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
-        dataValidator.validateInstitute(userInstitute.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserInstitute(
-                        userInstitute.getValue()
+        dataValidator.validateInstitute(institute.getValue(), dataValidationInformation -> {
+
+            if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                LiveData<LiveEvent<String>> instituteId = DataRepository
+                        .getInstance()
+                        .getInstituteDataHandler()
+                        .getInstituteId(institute.getValue());
+
+                instituteId.observeForever(new Observer<LiveEvent<String>>() {
+                    @Override
+                    public void onChanged(LiveEvent<String> stringLiveEvent) {
+                        if (stringLiveEvent == null) {
+                            return;
+                        }
+                        String result = stringLiveEvent.getDataOnceAndReset();
+                        DataValidator.DataValidationInformation newValidationInformation;
+
+                        if (result != null && !result.equals("notFound")) {
+                            userModel.setInstitute(result);
+                            newValidationInformation = new DataValidator.DataValidationInformation(
+                                    DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                    DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
+                            );
+                        } else {
+                            newValidationInformation = new DataValidator.DataValidationInformation(
+                                    DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                    DataValidator.DataValidationResult.VALIDATION_RESULT_INVALID
+                            );
+                        }
+
+                        validationAggregator.holdData(
+                                DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                                newValidationInformation
+                        );
+                        notifyValidity(newValidationInformation);
+                        instituteId.removeObserver(this);
+                    }
+                });
+            } else {
+                validationAggregator.holdData(
+                        DataValidator.DataValidationPoint.VALIDATION_POINT_INSTITUTE_HANDLE,
+                        dataValidationInformation
                 );
+                notifyValidity(dataValidationInformation);
             }
-            else anyDetailsEntryInvalid.set(true);
-            notifyValidity(dataValidationInformation);
         });
 
-        dataValidator.validateName(userDisplayName.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserDisplayName(
-                        userDisplayName.getValue()
+        dataValidator.validateName(name.getValue(), dataValidationInformation -> {
+            if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                userModel.setName(
+                        name.getValue()
                 );
             }
-            else anyDetailsEntryInvalid.set(true);
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_NAME, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
         dataValidator.validateEmail(email.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                userModel.setUserEmail(
+            if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                userModel.setEmail(
                         email.getValue()
                 );
             }
-            else anyDetailsEntryInvalid.set(true);
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_EMAIL, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
         dataValidator.validatePassword(password.getValue(), dataValidationInformation -> {
-            if(dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID){
-                anyDetailsEntryInvalid.set(true);
-            }
+            validationAggregator.holdData(DataValidator.DataValidationPoint.VALIDATION_POINT_PASSWORD, dataValidationInformation);
             notifyValidity(dataValidationInformation);
         });
 
-
-
-        if(selectedInterests.size()>0){
-            userModel.setUserInterests(selectedInterests);
+        if (selectedInterests.size() > 0) {
+            userModel.setInterests(selectedInterests);
         }
+        userModel.setProfilePicturePath(profilePicture.getValue());
 
+        resultLiveData.observeForever(new Observer<DataValidator.DataValidationInformation>() {
+            @Override
+            public void onChanged(DataValidator.DataValidationInformation dataValidationInformation) {
 
-        if(!anyDetailsEntryInvalid.get()) {
-            notifyValidity(new DataValidator.DataValidationInformation(
-                    DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
-                    DataValidator.DataValidationResult.VALIDATION_RESULT_VALID
-            ));
-            DataRepository.getInstance()
-                    .getAuthDataHandler()
-                    .createNewUserWithEmailAndPassword(email.getValue(), password.getValue(), userModel);
-        }
+                Log.e("Details", "VALIDATION_POINT_ALL");
+                if (dataValidationInformation.getValidationPoint() != DataValidator.DataValidationPoint.VALIDATION_POINT_ALL) {
+                    return;
+                }
+                LoginViewModel.this.notifyValidity(new DataValidator.DataValidationInformation(
+                        DataValidator.DataValidationPoint.VALIDATION_POINT_ALL,
+                        dataValidationInformation.getDataValidationResult()
+                ));
+
+                if (dataValidationInformation.getDataValidationResult() == DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {
+                    DataRepository.getInstance()
+                            .getUserDataHandler()
+                            .createNewUserWithEmailAndPassword(email.getValue(), password.getValue(), userModel);
+                }
+                resultLiveData.removeObserver(this);
+            }
+        });
 
     }
 
-    private void notifyValidity(DataValidator.DataValidationInformation dataValidationInformation){
-        dataValidationAction.setValue(new LiveEvent<>(dataValidationInformation));
-    }
+    public void interestsSelectionDone(List<InterestModel> interestListSection) {
 
-    public void interestsSelectionDone(List<InterestModel> interestListSection){
-
-        if(interestListSection == null){
+        if (interestListSection == null) {
             return;
-        }
-        else if(interestListSection.size() == 0){
+        } else if (interestListSection.size() == 0) {
             notifyValidity(new DataValidator.DataValidationInformation(
                     DataValidator.DataValidationPoint.VALIDATION_POINT_INTERESTS,
                     DataValidator.DataValidationResult.VALIDATION_RESULT_UNDERFLOW
             ));
-        }
-        else if(interestListSection.size() > MAX_INTERESTS){
+        } else if (interestListSection.size() > MAX_INTERESTS) {
             notifyValidity(new DataValidator.DataValidationInformation(
                     DataValidator.DataValidationPoint.VALIDATION_POINT_INTERESTS,
                     DataValidator.DataValidationResult.VALIDATION_RESULT_OVERFLOW
             ));
-        }
-        else {
+        } else {
             selectedInterests.clear();
             selectedInterests.addAll(interestListSection);
-            for (InterestModel interest : selectedInterests) {
-                Log.d("TAG", interest.interestString);
-            }
             fragmentChangeAction.setValue(new LiveEvent<>(LoginActivity.FragmentIdentifier.LOGIN_DETAILS_FRAGMENT));
         }
     }
 
-    public void exitDetailsScreen(){
+    public void exitDetailsScreen() {
     }
 
-    public void exitInterestsScreen(){
-        userDisplayName.setValue(null);
-        userInstitute.setValue(null);
-        userGender.setValue(null);
+    public void exitInterestsScreen() {
+        name.setValue(null);
+        institute.setValue(null);
+        gender.setValue(null);
         password.setValue(null);
         email.setValue(null);
         dateOfBirth.setValue(null);
     }
 
-    public void exitSignInScreen(){
+    public void exitSignInScreen() {
         email.setValue(null);
         password.setValue(null);
     }
 
-    public void goToProfilePictureChooser(){
-        //TODO add code to select avatar photo
-    }
-
-    public LiveData<LiveEvent<AuthDataHandler.AuthStatus>> getAuthResultAction(){
+    public LiveData<LiveEvent<UserDataHandler.AuthStatus>> getAuthResultAction() {
         return authResultAction;
     }
 
-    public LiveData<LiveEvent<LoginActivity.FragmentIdentifier>> getFragmentChangeAction(){
+    public LiveData<LiveEvent<LoginActivity.FragmentIdentifier>> getFragmentChangeAction() {
         return fragmentChangeAction;
     }
 
-    public LiveData<LiveEvent<Boolean>> getGoToFeedAction(){
+    public LiveData<LiveEvent<Boolean>> getGoToFeedAction() {
         return goToFeedAction;
     }
 
-    public LiveData<LiveEvent<String>> getToastMessageAction(){
+    public LiveData<LiveEvent<String>> getToastMessageAction() {
         return toastMessageAction;
     }
 
@@ -341,8 +361,8 @@ public class LoginViewModel extends ViewModel {
         return dataValidationAction;
     }
 
-    public List<InterestModel> getInterestsListSection(){
-        if(allInterests.size()>0){
+    public List<InterestModel> getInterestsListSection() {
+        if (allInterests.size() > 0) {
             return allInterests;
         }
         return DataRepository.getInstance().getAppDataHandler().getInterestsList();

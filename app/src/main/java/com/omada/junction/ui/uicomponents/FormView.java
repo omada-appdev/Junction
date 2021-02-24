@@ -14,12 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.omada.junction.R;
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.viewmodels.content.EventViewHandler;
 
 import java.text.ParseException;
@@ -63,18 +61,14 @@ public class FormView extends FrameLayout {
     public void setForm(EventModel eventModel) {
 
         this.eventModel = eventModel;
-
         try {
-
             // Creation of form class itself handles all the View inflation, etc
-            this.form = new RegistrationForm(eventModel.getEventForm());
-
+            this.form = new RegistrationForm(eventModel.getForm() == null ? new HashMap<>() : eventModel.getForm());
             addView(
                     formSectionViews.get(
                             form.sectionsList.get(0).getID()
                     )
             );
-
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -88,8 +82,11 @@ public class FormView extends FrameLayout {
         assert inflater != null;
         ConstraintLayout inflatedSectionView = (ConstraintLayout) inflater.inflate(R.layout.form_section_layout, this, false);
 
+        // TODO check section button types here
+
         inflatedSectionView.findViewById(R.id.section_action_button)
                 .setOnClickListener(v->
+                        // TODO add any validation code here
                         viewModel.registerForEvent(this.eventModel, form.getFormMap())
                 );
         return inflatedSectionView;

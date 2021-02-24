@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.omada.junction.R;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.ui.home.HomeActivity;
 import com.omada.junction.ui.login.LoginActivity;
 import com.omada.junction.viewmodels.SplashViewModel;
@@ -30,19 +30,22 @@ public class SplashActivity extends AppCompatActivity {
 
         splashViewModel.getAuthResultAction().observe(this, authStatusLiveEvent -> {
             if(authStatusLiveEvent != null){
-                AuthDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
+                UserDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
                 if(authStatus==null) return;
                 Intent i;
+                Log.e("Splash", authStatus.toString());
                 switch (authStatus){
                     case CURRENT_USER_SUCCESS:
                         break;
-                    case CURRENT_USER_LOGIN_SUCCESS:
+                    case LOGIN_SUCCESS:
                         i = new Intent(this, HomeActivity.class);
                         startActivity(i);
                         finish();
                         break;
                     case CURRENT_USER_FAILURE:
-                    case CURRENT_USER_LOGIN_FAILURE:
+                    case USER_SIGNED_OUT:
+                    case USER_TOKEN_EXPIRED:
+                    case LOGIN_FAILURE:
                         i = new Intent(this, LoginActivity.class);
                         startActivity(i);
                         finish();

@@ -1,10 +1,12 @@
 package com.omada.junction.viewmodels.content;
 
+import android.util.Pair;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.EventModel;
+import com.omada.junction.data.models.external.EventModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.Map;
@@ -17,7 +19,7 @@ public class EventViewHandler {
     private final MutableLiveData<LiveEvent<EventModel>> attendedEventDetailsTrigger = new MutableLiveData<>();
 
     private final MutableLiveData<LiveEvent<String>> callOrganizerTrigger = new MutableLiveData<>();
-    private final MutableLiveData<LiveEvent<String>> mailOrganizerTrigger = new MutableLiveData<>();
+    private final MutableLiveData<LiveEvent<Pair<String, String>>> mailOrganizerTrigger = new MutableLiveData<>();
 
 
     public LiveData<LiveEvent<EventModel>> getEventCardDetailsTrigger() {
@@ -32,7 +34,7 @@ public class EventViewHandler {
         return callOrganizerTrigger;
     }
 
-    public LiveData<LiveEvent<String>> getMailOrganizerTrigger() {
+    public MutableLiveData<LiveEvent<Pair<String, String>>> getMailOrganizerTrigger() {
         return mailOrganizerTrigger;
     }
 
@@ -58,8 +60,8 @@ public class EventViewHandler {
         callOrganizerTrigger.setValue(new LiveEvent<>(organizerNumber));
     }
 
-    public void mailOrganizer(String organizerEmail){
-        mailOrganizerTrigger.setValue(new LiveEvent<>(organizerEmail));
+    public void mailOrganizer(String eventName, String organizerEmail){
+        mailOrganizerTrigger.setValue(new LiveEvent<>(new Pair<>(eventName, organizerEmail)));
     }
 
     public void registerForEvent(EventModel eventModel, Map <String, Map <String, Map <String, String>>> responses){

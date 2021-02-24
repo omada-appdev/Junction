@@ -3,7 +3,11 @@ package com.omada.junction.application;
 import android.app.Application;
 import android.content.Context;
 
-public class JunctionApplication extends Application {
+import com.omada.junction.data.DataRepository;
+import com.omada.junction.data.handler.UserDataHandler;
+import com.omada.junction.utils.FileUtilities;
+
+public final class JunctionApplication extends Application {
 
     private static JunctionApplication instance;
 

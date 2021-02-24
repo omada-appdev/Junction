@@ -4,23 +4,22 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 
 import com.omada.junction.data.DataRepository;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.EventModel;
-import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.external.InstituteModel;
+import com.omada.junction.data.models.external.OrganizationModel;
+import com.omada.junction.data.models.external.PostModel;
 import com.omada.junction.utils.taskhandler.LiveEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InstituteFeedViewModel extends ViewModel {
+public class InstituteFeedViewModel extends BaseViewModel {
 
-    private final MediatorLiveData<List<BaseModel>> loadedHighlights = new MediatorLiveData<>();
+    private LiveData<List<PostModel>> loadedHighlights = new MediatorLiveData<>();
     private LiveData<List<OrganizationModel>> loadedInstituteOrganizations;
-
-    private LiveData<List<EventModel>> loadedHighlightEvents;
+    private String instituteId;
+    private InstituteModel instituteModel;
 
     public InstituteFeedViewModel(){
         initializeDataLoaders();
@@ -28,9 +27,16 @@ public class InstituteFeedViewModel extends ViewModel {
     }
 
     private void initializeDataLoaders() {
-        loadedHighlightEvents = Transformations.map(
-                DataRepository.getInstance().getEventDataHandler().getLoadedInstituteHighlightEventsNotifier(),
-                eventList-> eventList
+
+        loadedHighlights = Transformations.map(
+                DataRepository.getInstance().getPostDataHandler().getLoadedInstituteHighlightsNotifier(),
+                listLiveEvent-> {
+                    if(listLiveEvent == null) {
+                        return null;
+                    }
+                    // returns null if nothing is there
+                    return listLiveEvent.getDataOnceAndReset();
+                }
         );
 
         loadedInstituteOrganizations = Transformations.map(
@@ -39,10 +45,50 @@ public class InstituteFeedViewModel extends ViewModel {
     }
 
     private void distributeLoadedData() {
-        loadedHighlights.addSource(loadedHighlightEvents, eventModels -> {
-            List<BaseModel> modelList = new ArrayList<>(eventModels);
-            loadedHighlights.setValue(modelList);
-        });
+        loadedHighlights = Transformations.map(
+                DataRepository.getInstance().getPostDataHandler().getLoadedInstituteHighlightsNotifier(),
+                listLiveEvent-> {
+                    if(listLiveEvent == null) {
+                        return null;
+                    }
+                    // returns null if nothing is there
+                    return listLiveEvent.getDataOnceAndReset();
+                }
+        );
+
+        loadedInstituteOrganizations = Transformations.map(
+                DataRepository.getInstance().getOrganizationDataHandler().getLoadedInstituteOrganizationsNotifier(),
+                LiveEvent::getDataOnceAndReset);
+    }
+
+    public LiveData<InstituteModel> getInstituteDetails() {
+
+        if(instituteModel != null) {
+            return new MutableLiveData<>(instituteModel);
+        }
+
+        instituteId = DataRepository.getInstance()
+                .getUserDataHandler()
+                .getCurrentUserModel()
+                .getInstitute();
+
+        return Transformations.map(
+                DataRepository.getInstance()
+                .getInstituteDataHandler()
+                .getInstituteDetails(instituteId),
+
+                input -> {
+                    if(input == null) {
+                        return null;
+                    }
+                    InstituteModel model = input.getDataOnceAndReset();
+                    if(model == null) {
+                        return null;
+                    }
+                    instituteModel = model;
+                    return model;
+                }
+        );
     }
 
     public void loadInstituteOrganizations(){
@@ -53,15 +99,15 @@ public class InstituteFeedViewModel extends ViewModel {
 
     public void loadInstituteHighlights(){
         DataRepository.getInstance()
-                .getEventDataHandler()
-                .getInstituteHighlightEvents();
+                .getPostDataHandler()
+                .getInstituteHighlights(getDataRepositoryAccessIdentifier());
     }
 
     public void searchInstitute(String query){
 
     }
 
-    public LiveData<List<BaseModel>> getLoadedHighlights(){
+    public LiveData<List<PostModel>> getLoadedHighlights(){
         return loadedHighlights;
     }
 
@@ -82,4 +128,17 @@ public class InstituteFeedViewModel extends ViewModel {
         }
     }
 
+    // TODO define this function to nuke all the existing propagation variables
+    public void reinitializeFeed() {
+
+        DataRepository.getInstance().resetInstituteFeedContent();
+        initializeDataLoaders();
+        distributeLoadedData();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        reinitializeFeed();
+    }
 }

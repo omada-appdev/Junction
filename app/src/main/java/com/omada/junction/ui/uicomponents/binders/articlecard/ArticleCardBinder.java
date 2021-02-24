@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 import androidx.databinding.DataBindingUtil;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.ArticleModel;
-import com.omada.junction.databinding.ArticleCardLayoutBinding;
+import com.omada.junction.data.models.external.ArticleModel;
+import com.omada.junction.databinding.ArticleCardLargeLayoutBinding;
 import com.omada.junction.viewmodels.FeedContentViewModel;
 
 import mva3.adapter.ItemBinder;
@@ -17,7 +17,7 @@ import mva3.adapter.ItemViewHolder;
 public class ArticleCardBinder extends ItemBinder<ArticleModel, ArticleCardBinder.ArticleCardViewHolder> {
 
 
-    private FeedContentViewModel viewModel;
+    private final FeedContentViewModel viewModel;
 
     public ArticleCardBinder(FeedContentViewModel viewModel){
         this.viewModel = viewModel;
@@ -25,7 +25,7 @@ public class ArticleCardBinder extends ItemBinder<ArticleModel, ArticleCardBinde
 
     @Override
     public ArticleCardViewHolder createViewHolder(ViewGroup parent) {
-        ArticleCardLayoutBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.article_card_layout, parent, false);
+        ArticleCardLargeLayoutBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.article_card_large_layout, parent, false);
         return new ArticleCardViewHolder(binding);
     }
 
@@ -42,14 +42,14 @@ public class ArticleCardBinder extends ItemBinder<ArticleModel, ArticleCardBinde
 
     public static class ArticleCardViewHolder extends ItemViewHolder<ArticleModel>{
 
-        ArticleCardLayoutBinding binding;
+        ArticleCardLargeLayoutBinding binding;
 
-        public ArticleCardViewHolder (ArticleCardLayoutBinding containerBinding) {
+        public ArticleCardViewHolder (ArticleCardLargeLayoutBinding containerBinding) {
             super(containerBinding.getRoot());
             binding = containerBinding;
         }
 
-        public ArticleCardLayoutBinding getBinding() {
+        public ArticleCardLargeLayoutBinding getBinding() {
             return binding;
         }
     }

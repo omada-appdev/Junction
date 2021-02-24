@@ -1,8 +1,6 @@
 package com.omada.junction.ui.organization;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.omada.junction.R;
-import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.external.OrganizationModel;
 import com.omada.junction.databinding.OrganizationProfileFragmentLayoutBinding;
 import com.omada.junction.ui.uicomponents.CustomBindings;
 import com.omada.junction.utils.taskhandler.LiveEvent;
@@ -35,8 +33,8 @@ public class OrganizationProfileFragment extends Fragment {
     public static OrganizationProfileFragment newInstance(OrganizationModel organizationModel) {
 
         Bundle args = new Bundle();
-        args.putString("organizationID", organizationModel.getOrganizationID());
-        args.putSerializable("organizationModel", organizationModel);
+        args.putString("organizationID", organizationModel.getId());
+        args.putParcelable("organizationModel", organizationModel);
 
         OrganizationProfileFragment fragment = new OrganizationProfileFragment();
         fragment.setArguments(args);
@@ -72,10 +70,9 @@ public class OrganizationProfileFragment extends Fragment {
         else{
 
             if(organizationProfileViewModel.getOrganizationID() == null){
-                Log.e("WTF", "The view model was destroyed");
                 if(organizationProfileViewModel.getOrganizationModel() != null){
                     organizationProfileViewModel.setOrganizationID(
-                            organizationProfileViewModel.getOrganizationModel().getOrganizationID()
+                            organizationProfileViewModel.getOrganizationModel().getId()
                     );
                 }
                 else {
@@ -102,8 +99,12 @@ public class OrganizationProfileFragment extends Fragment {
             LiveData<LiveEvent<OrganizationModel>> orgLiveData = organizationProfileViewModel.getOrganizationDetails();
 
             orgLiveData.observe(getViewLifecycleOwner(), orgModelLiveEvent->{
-                if (orgModelLiveEvent != null && orgModelLiveEvent.getData() != null){
-                    organizationProfileViewModel.setOrganizationModel(orgModelLiveEvent.getDataOnceAndReset());
+                if (orgModelLiveEvent != null){
+                    OrganizationModel organizationModel = orgModelLiveEvent.getDataOnceAndReset();
+                    if(organizationModel == null) {
+                        return;
+                    }
+                    organizationProfileViewModel.setOrganizationModel(organizationModel);
                     populateViews();
                 }
             });
@@ -139,10 +140,10 @@ public class OrganizationProfileFragment extends Fragment {
     }
 
     private void populateViews(){
-        binding.organizationNameText.setText(organizationProfileViewModel.getOrganizationModel().getOrganizationName());
-        CustomBindings.loadImage(
+        binding.organizationNameText.setText(organizationProfileViewModel.getOrganizationModel().getName());
+        CustomBindings.loadImageHttp(
                 binding.organizationProfilePictureImage,
-                organizationProfileViewModel.getOrganizationModel().getOrganizationProfilePhoto()
+                organizationProfileViewModel.getOrganizationModel().getProfilePicture()
         );
     }
 

@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.omada.junction.R;
-import com.omada.junction.data.handler.AuthDataHandler;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.databinding.LoginSigninFragmentLayoutBinding;
 import com.omada.junction.utils.taskhandler.DataValidator;
 import com.omada.junction.viewmodels.LoginViewModel;
@@ -51,7 +51,7 @@ public class SignInFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
         loginViewModel.getAuthResultAction().observe(getViewLifecycleOwner(), authResult -> {
-            AuthDataHandler.AuthStatus res = authResult.getDataOnceAndReset();
+            UserDataHandler.AuthStatus res = authResult.getDataOnceAndReset();
             binding.passwordLayout.clearFocus();
             if(res==null){
                 return;
@@ -75,11 +75,15 @@ public class SignInFragment extends Fragment {
         first param in pair is what was invalid and second param is why it is invalid
          */
         loginViewModel.getDataValidationAction().observe(getViewLifecycleOwner(), dataValidationInformationLiveEvent->{
-            if(dataValidationInformationLiveEvent.getData() == null){
+            if(dataValidationInformationLiveEvent == null){
                 return;
             }
 
             DataValidator.DataValidationInformation dataValidationInformation = dataValidationInformationLiveEvent.getDataOnceAndReset();
+            if(dataValidationInformation == null) {
+                return;
+            }
+
             switch (dataValidationInformation.getValidationPoint()){
                 case VALIDATION_POINT_EMAIL:
                     if (dataValidationInformation.getDataValidationResult() != DataValidator.DataValidationResult.VALIDATION_RESULT_VALID) {

@@ -1,13 +1,11 @@
 package com.omada.junction.ui.institute;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,11 +15,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textview.MaterialTextView;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.omada.junction.R;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.OrganizationModel;
+import com.omada.junction.data.models.external.OrganizationModel;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.mutable.MutableOrganizationModel;
 import com.omada.junction.ui.uicomponents.CustomBindings;
+import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardLargeBinder;
 import com.omada.junction.ui.uicomponents.binders.institutefeed.OrganizationThumbnailListBinder;
 import com.omada.junction.viewmodels.FeedContentViewModel;
@@ -38,7 +40,7 @@ public class InstituteFeedFragment extends Fragment {
     private InstituteFeedViewModel instituteFeedViewModel;
 
     private final MultiViewAdapter adapter = new MultiViewAdapter();
-    private final ListSection<BaseModel> highlightSection = new ListSection<>();
+    private final ListSection<PostModel> highlightSection = new ListSection<>();
     private final ItemSection<ListSection<OrganizationModel>> organizationSection = new ItemSection<>();
 
     private boolean refreshOrganizations = true;
@@ -46,7 +48,7 @@ public class InstituteFeedFragment extends Fragment {
 
     public InstituteFeedFragment() {
         ListSection<OrganizationModel> organizationThumbnailSection = new ListSection<>();
-        organizationThumbnailSection.add(new OrganizationModel());
+        organizationThumbnailSection.add(new MutableOrganizationModel());
         organizationSection.setItem(organizationThumbnailSection);
     }
 
@@ -59,16 +61,20 @@ public class InstituteFeedFragment extends Fragment {
         instituteFeedViewModel = viewModelProvider.get(InstituteFeedViewModel.class);
         FeedContentViewModel feedContentViewModel = viewModelProvider.get(FeedContentViewModel.class);
 
-        if(savedInstanceState != null){
-            refreshHighlights = true;
-            refreshOrganizations = true;
+        if (savedInstanceState == null) {
+            instituteFeedViewModel.loadInstituteOrganizations();
+            instituteFeedViewModel.loadInstituteHighlights();
         }
+
+        refreshHighlights = true;
+        refreshOrganizations = true;
 
         adapter.addSection(organizationSection);
         adapter.addSection(highlightSection);
         adapter.registerItemBinders(
                 new OrganizationThumbnailListBinder(feedContentViewModel),
-                new EventCardLargeBinder(feedContentViewModel)
+                new EventCardLargeBinder(feedContentViewModel),
+                new ArticleCardBinder(feedContentViewModel)
         );
 
     }
@@ -86,10 +92,17 @@ public class InstituteFeedFragment extends Fragment {
         MaterialSearchBar searchBar = view.findViewById(R.id.institute_search_bar);
         AppBarLayout appBarLayout = view.findViewById(R.id.appbar);
 
-        CustomBindings.loadImage(
-                view.findViewById(R.id.institute_banner),
-                "gs://junction-b7b44.appspot.com/instituteFiles/nitw.jpg"
-        );
+        MaterialTextView instituteNameText = view.findViewById(R.id.institute_name_text);
+        ShapeableImageView instituteBanner = view.findViewById(R.id.institute_banner);
+
+        instituteFeedViewModel.getInstituteDetails()
+                .observe(getViewLifecycleOwner(), instituteModel -> {
+                    if (instituteModel == null) {
+                        return;
+                    }
+                    CustomBindings.loadImage(instituteBanner, instituteModel.getImage());
+                    instituteNameText.setText(instituteModel.getName());
+                });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -97,7 +110,13 @@ public class InstituteFeedFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         instituteFeedViewModel.getLoadedHighlights()
-                .observe(getViewLifecycleOwner(), this::onHighlightsLoaded);
+                .observe(getViewLifecycleOwner(), postModels -> {
+                    if (postModels == null) {
+                        return;
+                    }
+                    onHighlightsLoaded(postModels);
+                    Log.e("highlights loaded", String.valueOf(postModels.size()));
+                });
 
         instituteFeedViewModel.getLoadedInstituteOrganizations()
                 .observe(getViewLifecycleOwner(), this::onOrganizationsLoaded);
@@ -106,13 +125,13 @@ public class InstituteFeedFragment extends Fragment {
 
     private void onOrganizationsLoaded(List<OrganizationModel> organizationModels) {
 
-        if(organizationModels != null && organizationModels.size() > 0 && refreshOrganizations) {
+        if (organizationModels != null && organizationModels.size() > 0 && refreshOrganizations) {
 
             organizationSection.getItem().addAll(organizationModels);
 
             if (organizationSection.getItem() != null &&
                     organizationSection.getItem().size() > 0 &&
-                    organizationSection.getItem().get(0).getOrganizationID() == null) {
+                    organizationSection.getItem().get(0).getId() == null) {
 
                 organizationSection.getItem().remove(0);
             }
@@ -121,10 +140,10 @@ public class InstituteFeedFragment extends Fragment {
         }
     }
 
-    private void onHighlightsLoaded(List<BaseModel> highlights) {
+    private void onHighlightsLoaded(List<PostModel> highlights) {
 
         if (highlights != null && (refreshHighlights || highlightSection.size() == 0)) {
-            
+
             highlightSection.addAll(highlights);
             refreshHighlights = false;
         }

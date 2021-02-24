@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.omada.junction.R;
@@ -19,10 +18,10 @@ public class LoginActivity extends AppCompatActivity{
     //public enum identifying fragments
     public enum FragmentIdentifier {
         LOGIN_START_FRAGMENT,
-        LOGIN_SIGNIN_FRAGMENT,
+        LOGIN_SIGN_IN_FRAGMENT,
         LOGIN_DETAILS_FRAGMENT,
         LOGIN_INTERESTS_FRAGMENT,
-        LOGIN_FORGOTPASSWORD_FRAGMENT
+        LOGIN_FORGOT_PASSWORD_FRAGMENT
     }
 
     private FragmentIdentifier currentFragment;
@@ -52,14 +51,14 @@ public class LoginActivity extends AppCompatActivity{
             }
             currentFragment = id;
             switch(currentFragment){
-                case LOGIN_SIGNIN_FRAGMENT:
+                case LOGIN_SIGN_IN_FRAGMENT:
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.login_activity_placeholder, SignInFragment.getInstance())
                             .addToBackStack("signin")
                             .commit();
                     break;
-                case LOGIN_FORGOTPASSWORD_FRAGMENT:
+                case LOGIN_FORGOT_PASSWORD_FRAGMENT:
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.login_activity_placeholder, ForgotPasswordFragment.newInstance())
@@ -83,24 +82,31 @@ public class LoginActivity extends AppCompatActivity{
             }
         });
 
-        loginViewModel.getGoToFeedAction().observe(this, goToFeed -> {
-            if(goToFeed.getDataOnceAndReset()){
+        loginViewModel.getGoToFeedAction().observe(this, booleanLiveEvent -> {
+            if(booleanLiveEvent == null) {
+                return;
+            }
+            Boolean goToFeed = booleanLiveEvent.getDataOnceAndReset();
+            if(goToFeed != null && goToFeed){
                 Intent i = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(i);
                 finish();
             }
         });
 
-        loginViewModel.getToastMessageAction().observe(this, s -> Toast.makeText(LoginActivity.this, s.getDataOnce(), Toast.LENGTH_SHORT).show());
+        loginViewModel.getToastMessageAction().observe(this, s -> Toast.makeText(LoginActivity.this, "" + s.getDataOnceAndReset(), Toast.LENGTH_SHORT).show());
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         switch (currentFragment){
-            case LOGIN_SIGNIN_FRAGMENT:
+            case LOGIN_SIGN_IN_FRAGMENT:
                 currentFragment = FragmentIdentifier.LOGIN_START_FRAGMENT;
                 loginViewModel.exitSignInScreen();
+                break;
+            case LOGIN_FORGOT_PASSWORD_FRAGMENT:
+                currentFragment = FragmentIdentifier.LOGIN_SIGN_IN_FRAGMENT;
                 break;
             case LOGIN_DETAILS_FRAGMENT:
                 currentFragment = FragmentIdentifier.LOGIN_INTERESTS_FRAGMENT;

@@ -34,7 +34,7 @@
         <com.google.android.material.button.MaterialButton
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
-            android:id="@+id/get_code_button"
+            android:id="@+id/get_link_button"
             android:text="get code"
             android:layout_gravity="center|bottom" />
 

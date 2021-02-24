@@ -51,13 +51,11 @@
                     android:layout_height="160dp"
                     android:layout_gravity="center"
                     android:layout_margin="32dp"
-                    android:src="@drawable/ic_person_profile"
-                    app:tint="@color/grey"
+                    app:tint="#A0A0A0"
                     android:background="@color/white"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/Widget.AppTheme.CircleShapeAppearance"
-                    android:elevation="8dp"
-                    android:onClick="@{()->viewModel.goToProfilePictureChooser()}"/>
+                    android:elevation="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/email_layout"
@@ -91,7 +89,7 @@
                         android:id="@+id/name_input"
                         android:inputType="textPersonName"
                         android:background="@color/transparent"
-                        android:text="@={viewModel.userDisplayName}"/>
+                        android:text="@={viewModel.name}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -113,7 +111,7 @@
                         android:id="@+id/institute_input"
                         android:inputType="textPostalAddress"
                         android:background="@color/transparent"
-                        android:text="@={viewModel.userInstitute}"/>
+                        android:text="@={viewModel.institute}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -152,7 +150,7 @@
                         android:layout_width="match_parent"
                         android:background="@color/transparent"
                         android:focusable="false"
-                        android:text="@={viewModel.userGender}"/>
+                        android:text="@={viewModel.gender}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 

@@ -2,17 +2,18 @@ package com.omada.junction.ui.more;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.omada.junction.R;
-import com.omada.junction.data.handler.AuthDataHandler;
 import com.omada.junction.ui.institute.InstituteActivity;
+import com.omada.junction.data.handler.UserDataHandler;
 import com.omada.junction.ui.home.HomeActivity;
 import com.omada.junction.ui.login.LoginActivity;
 import com.omada.junction.viewmodels.UserProfileViewModel;
@@ -63,7 +64,6 @@ public class MoreActivity extends AppCompatActivity {
                 return true;
 
             } else {
-                Log.e("HomeActivity", "invalid bottom button press id" + itemId + " " + R.id.more_details_button);
                 return false;
             }
 
@@ -71,37 +71,50 @@ public class MoreActivity extends AppCompatActivity {
 
     }
 
-    private void setupTriggers(){
+    private void setupTriggers() {
+
         userProfileViewModel.getEditProfileTrigger()
                 .observe(this, booleanLiveEvent -> {
 
-                    if(booleanLiveEvent != null && booleanLiveEvent.getDataOnceAndReset()){
+                    if (booleanLiveEvent != null && booleanLiveEvent.getDataOnceAndReset()) {
 
                         getSupportFragmentManager()
                                 .beginTransaction()
                                 .replace(R.id.more_content_placeholder, new UserProfileEditDetailsFragment())
-                                .addToBackStack(null)
+                                .addToBackStack("edit")
                                 .commit();
 
                     }
 
                 });
 
-        userProfileViewModel.getSignOutTrigger()
-                .observe(this, authStatusLiveEvent -> {
+        userProfileViewModel.getAuthStatusTrigger().observe(this, authStatusLiveEvent -> {
+            if (authStatusLiveEvent == null) {
+                return;
+            }
+            UserDataHandler.AuthStatus authStatus = authStatusLiveEvent.getDataOnceAndReset();
+            if (authStatus == null) {
+                return;
+            }
+            switch (authStatus) {
+                case UPDATE_USER_DETAILS_SUCCESS:
+                    Toast.makeText(this, "Update successful", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().popBackStack("edit", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    break;
+                case UPDATE_USER_DETAILS_FAILURE:
+                    Toast.makeText(this, "Please try again", Toast.LENGTH_SHORT).show();
+                    break;
+                case USER_SIGNED_OUT:
+                    Intent i = new Intent(this, LoginActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(i);
+                    finish();
+                    break;
+                default:
+                    break;
+            }
+        });
 
-                    if(authStatusLiveEvent != null && authStatusLiveEvent.getData() != null){
-
-                        if(authStatusLiveEvent.getDataOnceAndReset() == AuthDataHandler.AuthStatus.USER_SIGNED_OUT) {
-                            Intent i = new Intent(this, LoginActivity.class);
-                            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                            startActivity(i);
-                            finish();
-                        }
-
-                    }
-                });
     }
 
     @Override

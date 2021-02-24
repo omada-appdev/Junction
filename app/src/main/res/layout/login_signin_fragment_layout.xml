@@ -72,14 +72,14 @@
         <com.google.android.material.button.MaterialButton
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/new_user"
+            android:id="@+id/forgot_password_button"
             android:text="Forgot password"
             style = "@style/Widget.MaterialComponents.Button.TextButton"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toTopOf="@id/guideline3"
             android:layout_gravity="center_horizontal"
-            android:onClick="@{()->viewModel.forgotPassword()}" />
+            android:onClick="@{()->viewModel.goToForgotPassword()}"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:layout_width="wrap_content"

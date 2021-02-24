@@ -5,10 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.omada.junction.utils.transform.TransformUtilities"/>
+        <import type="com.omada.junction.utils.TransformUtilities"/>
         <variable
             name="articleModel"
-            type="com.omada.junction.data.models.ArticleModel" />
+            type="com.omada.junction.data.models.external.ArticleModel" />
         <variable
             name="viewModel"
             type="com.omada.junction.viewmodels.content.EventViewHandler" />
@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
-                app:title="@{articleModel.articleTitle}"
+                app:title="@{articleModel.title}"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:contentScrim="@color/colorPrimaryDark"
                 app:maxLines="3">
@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     app:layout_collapseMode="pin"
-                    app:subtitle="@{articleModel.articleAuthor}"/>
+                    app:subtitle="@{articleModel.author}"/>
 
             </net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout>
         </com.google.android.material.appbar.AppBarLayout>
@@ -61,7 +61,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-                app:formattedText="@{articleModel.articleText}"/>
+                app:formattedText="@{articleModel.text}" />
 
         </androidx.core.widget.NestedScrollView>
 

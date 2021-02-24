@@ -1,7 +1,6 @@
 package com.omada.junction.ui.organization;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.omada.junction.R;
-import com.omada.junction.data.models.BaseModel;
-import com.omada.junction.data.models.ShowcaseModel;
+import com.omada.junction.data.models.external.PostModel;
+import com.omada.junction.data.models.external.ShowcaseModel;
 import com.omada.junction.ui.uicomponents.binders.articlecard.ArticleCardBinder;
 import com.omada.junction.ui.uicomponents.binders.eventcard.EventCardMediumNoTitleBinder;
-import com.omada.junction.ui.uicomponents.binders.header.LargeBoldHeaderBinder;
+import com.omada.junction.ui.uicomponents.binders.misc.LargeBoldHeaderBinder;
 import com.omada.junction.ui.uicomponents.binders.organizationfeed.OrganizationShowcaseThumbnailListBinder;
 import com.omada.junction.ui.uicomponents.models.LargeBoldHeaderModel;
 import com.omada.junction.viewmodels.FeedContentViewModel;
@@ -34,7 +33,7 @@ import mva3.adapter.MultiViewAdapter;
 public class OrganizationContentFragment extends Fragment {
 
     private final MultiViewAdapter adapter = new MultiViewAdapter();
-    private final ListSection<BaseModel> highlightListSection = new ListSection<>();
+    private final ListSection<PostModel> highlightListSection = new ListSection<>();
     private final ItemSection<ListSection<ShowcaseModel>> showcaseSection = new ItemSection<>();
 
     private HeaderSection<LargeBoldHeaderModel> showcaseHeaderSection;
@@ -115,7 +114,7 @@ public class OrganizationContentFragment extends Fragment {
             }
             if (showcaseSection.getItem() != null &&
                     showcaseSection.getItem().size() > 0 &&
-                    showcaseSection.getItem().get(0).getShowcaseID() == null) {
+                    showcaseSection.getItem().get(0).getId() == null) {
 
                 showcaseSection.getItem().remove(0);
 
@@ -128,9 +127,7 @@ public class OrganizationContentFragment extends Fragment {
         }
     }
 
-    private void onHighlightsLoaded(List<BaseModel> baseModels){
-
-        Log.e("VM", "onHighlightsLoaded : " + refreshHighlights);
+    private void onHighlightsLoaded(List<PostModel> baseModels){
 
         if(baseModels != null && baseModels.size() > 0 && refreshHighlights) {
 
