@@ -47,7 +47,7 @@ public class PostDataHandler extends BaseDataHandler {
                 .whereEqualTo("creator", organizationID)
                 .whereNotEqualTo("organizationHighlight", false)
                 .orderBy("organizationHighlight")
-                .orderBy("timeCreated", Query.Direction.ASCENDING)
+                .orderBy("timeCreated", Query.Direction.DESCENDING)
                 .limit(5)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
